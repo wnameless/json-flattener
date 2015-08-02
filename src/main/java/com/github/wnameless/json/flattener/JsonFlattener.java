@@ -55,6 +55,12 @@ public final class JsonFlattener {
   private final LinkedHashMap<String, Object> flattenJson =
       new LinkedHashMap<String, Object>();
 
+  /**
+   * Returns a JSON flattener.
+   * 
+   * @param json
+   *          the JSON string
+   */
   public JsonFlattener(String json) {
     source = Json.parse(json);
     if (!source.isObject() && !source.isArray())
@@ -63,6 +69,11 @@ public final class JsonFlattener {
     reduce(source);
   }
 
+  /**
+   * Returns a flattened JSON as a Map.
+   * 
+   * @return a flattened JSON as a Map
+   */
   public Map<String, Object> flatten() {
     while (!iters.isEmpty()) {
       if (!iters.getLast().hasNext()) {
