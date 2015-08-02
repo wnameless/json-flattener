@@ -23,9 +23,6 @@ package com.github.wnameless.json.flattener;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -33,8 +30,6 @@ import java.util.Map;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 
 /**
  * 
@@ -131,14 +126,6 @@ public final class JsonFlattener {
     }
 
     return key;
-  }
-
-  public static void main(String... args)
-      throws IOException, URISyntaxException {
-    URL url = Resources.getResource("test.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
-
-    System.out.println(new JsonFlattener(json).flatten());
   }
 
 }
