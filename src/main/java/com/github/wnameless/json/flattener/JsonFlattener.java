@@ -20,9 +20,6 @@
  */
 package com.github.wnameless.json.flattener;
 
-import static com.google.common.collect.Lists.newLinkedList;
-import static com.google.common.collect.Maps.newLinkedHashMap;
-
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -53,8 +50,10 @@ import com.eclipsesource.json.JsonValue;
 public final class JsonFlattener {
 
   private final JsonValue source;
-  private final LinkedList<IndexedPeekIterator<?>> iters = newLinkedList();
-  private final LinkedHashMap<String, Object> flattenJson = newLinkedHashMap();
+  private final LinkedList<IndexedPeekIterator<?>> iters =
+      new LinkedList<IndexedPeekIterator<?>>();
+  private final LinkedHashMap<String, Object> flattenJson =
+      new LinkedHashMap<String, Object>();
 
   public JsonFlattener(String json) {
     source = Json.parse(json);
@@ -62,9 +61,10 @@ public final class JsonFlattener {
       throw new IllegalArgumentException();
 
     if (source.isArray())
-      iters.add(new IndexedPeekIterator<>((source.asArray().iterator())));
+      iters.add(
+          new IndexedPeekIterator<JsonValue>((source.asArray().iterator())));
     if (source.isObject())
-      iters.add(new IndexedPeekIterator<>(source.asObject().iterator()));
+      iters.add(new IndexedPeekIterator<Member>(source.asObject().iterator()));
   }
 
   public Map<String, Object> flatten() {
@@ -86,9 +86,9 @@ public final class JsonFlattener {
 
   private void reduce(JsonValue val) {
     if (val.isObject()) {
-      iters.add(new IndexedPeekIterator<>(val.asObject().iterator()));
+      iters.add(new IndexedPeekIterator<Member>(val.asObject().iterator()));
     } else if (val.isArray()) {
-      iters.add(new IndexedPeekIterator<>(val.asArray().iterator()));
+      iters.add(new IndexedPeekIterator<JsonValue>(val.asArray().iterator()));
     } else {
       flattenJson.put(computeKey(), jsonVal2Obj(val));
     }
@@ -119,6 +119,7 @@ public final class JsonFlattener {
       if (iter.getCurrent() instanceof Member) {
         if (!key.isEmpty())
           key += ".";
+
         key += ((Member) iter.getCurrent()).getName();
       } else {
         key += "[" + iter.getIndex() + "]";
