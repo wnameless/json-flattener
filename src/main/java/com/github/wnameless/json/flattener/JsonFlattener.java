@@ -60,11 +60,7 @@ public final class JsonFlattener {
     if (!source.isObject() && !source.isArray())
       throw new IllegalArgumentException();
 
-    if (source.isArray())
-      iters.add(
-          new IndexedPeekIterator<JsonValue>((source.asArray().iterator())));
-    if (source.isObject())
-      iters.add(new IndexedPeekIterator<Member>(source.asObject().iterator()));
+    reduce(source);
   }
 
   public Map<String, Object> flatten() {
