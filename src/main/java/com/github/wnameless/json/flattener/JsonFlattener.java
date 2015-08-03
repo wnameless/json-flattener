@@ -95,6 +95,11 @@ public final class JsonFlattener {
     return flattenJson;
   }
 
+  /**
+   * Returns a flatten JSON string.
+   * 
+   * @return a flatten JSON string
+   */
   public String flattenAsString() {
     if (flattenJsonStr != null)
       return flattenJsonStr;
