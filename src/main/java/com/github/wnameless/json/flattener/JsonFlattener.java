@@ -78,7 +78,7 @@ public final class JsonFlattener {
    * 
    * @return a flattened JSON as a Map
    */
-  public Map<String, Object> flatten() {
+  public Map<String, Object> flattenAsMap() {
     while (!iters.isEmpty()) {
       if (!iters.getLast().hasNext()) {
         iters.removeLast();
@@ -100,11 +100,11 @@ public final class JsonFlattener {
    * 
    * @return a flatten JSON string
    */
-  public String flattenAsString() {
+  public String flatten() {
     if (flattenJsonStr != null)
       return flattenJsonStr;
 
-    flatten();
+    flattenAsMap();
 
     JsonObject jsonObj = Json.object();
     for (Entry<String, Object> mem : flattenJson.entrySet()) {

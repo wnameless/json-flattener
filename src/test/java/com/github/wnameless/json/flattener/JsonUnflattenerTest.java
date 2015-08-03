@@ -22,33 +22,18 @@ package com.github.wnameless.json.flattener;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-import java.net.URL;
-
 import org.junit.Test;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
+import com.github.wnameless.json.unflattener.JsonUnflattener;
 
-public class JsonFlattenerTest {
-
-  @Test
-  public void testFlattenAsMap() throws IOException {
-    URL url = Resources.getResource("test2.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
-
-    assertEquals("{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}",
-        new JsonFlattener(json).flattenAsMap().toString());
-  }
+public class JsonUnflattenerTest {
 
   @Test
-  public void testFlatten() throws IOException {
-    URL url = Resources.getResource("test2.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
-
+  public void testUnflatten() {
     assertEquals(
-        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
-        new JsonFlattener(json).flatten());
+        "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true]},\"e\":\"f\",\"g\":2.3}",
+        JsonUnflattener.unflatten(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"));
   }
 
 }

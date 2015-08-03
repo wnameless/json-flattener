@@ -18,12 +18,16 @@ Not publish yet
 Class with 0-argument constructor
 ```java
 String json = "{ \"a\" : { \"b\" : 1, \"c\": null, \"d\": [false, true] }, \"e\": \"f\", \"g\":2.3 }";
-Map<String, Object> flattenJson = new JsonFlattener(json).flatten();
+Map<String, Object> flattenJson = new JsonFlattener(json).flattenAsMap();
 
 System.out.println(flattenJson);
 // Output: {a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
 
-String jsonStr = new JsonFlattener(json).flattenAsString();
+String jsonStr = new JsonFlattener(json).flatten();
 System.out.println(jsonStr);
 // Output: {"a.b":1,"a.c":null,"a.d[0]":false,"a.d[1]":true,"e":"f","g":2.3}
+
+String nestedJson = JsonUnflattener.unflatten(jsonStr);
+System.out.println(nestedJson);
+// {"a":{"b":1,"c":null,"d":[false,true]},"e":"f","g":2.3}
 ```
