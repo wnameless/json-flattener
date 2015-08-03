@@ -26,10 +26,10 @@ import java.util.NoSuchElementException;
 
 /**
  * 
- * {@link IndexedPeekIterator} is an Iterator which provides a peek() method for
- * user to peek an element advanced, a {@link #getIndex()} method for the index
- * of last returned element and a {@link #getCurrent()} method for the last
- * returned element.
+ * {@link IndexedPeekIterator} is an Iterator which provides user a
+ * {@link #peek()} method to peek an element advanced, a {@link #getIndex()}
+ * method to get the index of last returned element and a {@link #getCurrent()}
+ * method to get the last returned element itself.
  * 
  * @param <E>
  *          the type of elements

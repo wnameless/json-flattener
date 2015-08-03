@@ -23,8 +23,10 @@ package com.github.wnameless.json.flattener;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
 
@@ -36,7 +38,7 @@ import com.eclipsesource.json.JsonValue;
  * the Object value are either String, Boolean, Number or null. <br>
  * <br>
  * For example: <br>
- * { "a" : { "b" : 1, "c": null, "d": [false, true] }, "e": "f"}<br>
+ * { "a" : { "b" : 1, "c": null, "d": [false, true] }, "e": "f", "g":2.3 }<br>
  * will be turned into <br>
  * {<br>
  * a.b=1,<br>
@@ -44,6 +46,7 @@ import com.eclipsesource.json.JsonValue;
  * a.d[0]=false,<br>
  * a.d[1]=true,<br>
  * e=f<br>
+ * g=2.3<br>
  * }
  *
  */
@@ -54,6 +57,7 @@ public final class JsonFlattener {
       new LinkedList<IndexedPeekIterator<?>>();
   private final LinkedHashMap<String, Object> flattenJson =
       new LinkedHashMap<String, Object>();
+  private String flattenJsonStr = null;
 
   /**
    * Returns a JSON flattener.
@@ -89,6 +93,32 @@ public final class JsonFlattener {
     }
 
     return flattenJson;
+  }
+
+  public String flattenAsString() {
+    if (flattenJsonStr != null)
+      return flattenJsonStr;
+
+    flatten();
+
+    JsonObject jsonObj = Json.object();
+    for (Entry<String, Object> mem : flattenJson.entrySet()) {
+      if (mem.getValue() instanceof Boolean) {
+        jsonObj.add(mem.getKey(), (Boolean) mem.getValue());
+      } else if (mem.getValue() instanceof String) {
+        jsonObj.add(mem.getKey(), (String) mem.getValue());
+      } else if (mem.getValue() instanceof Number) {
+        if (mem.getValue() instanceof Long) {
+          jsonObj.add(mem.getKey(), (Long) mem.getValue());
+        } else {
+          jsonObj.add(mem.getKey(), (Double) mem.getValue());
+        }
+      } else {
+        jsonObj.add(mem.getKey(), Json.NULL);
+      }
+    }
+
+    return flattenJsonStr = jsonObj.toString();
   }
 
   private void reduce(JsonValue val) {

@@ -37,8 +37,18 @@ public class JsonFlattenerTest {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
-    assertEquals("{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f}",
+    assertEquals("{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}",
         new JsonFlattener(json).flatten().toString());
+  }
+
+  @Test
+  public void testFlattenAsString() throws IOException {
+    URL url = Resources.getResource("test2.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    assertEquals(
+        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
+        new JsonFlattener(json).flattenAsString());
   }
 
 }
