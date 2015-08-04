@@ -20,13 +20,12 @@
  */
 package com.github.wnameless.json.unflattener;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 /**
@@ -48,70 +47,39 @@ public final class JsonUnflattener {
    * @return a nested JSON string
    */
   public static String unflatten(String json) {
-    JsonValue flattened = Json.parse(json);
-    if (!flattened.isObject())
-      throw new IllegalArgumentException("Input must bea a JSON object");
-
+    JsonObject flattened = Json.parse(json).asObject();
     JsonValue unflattened = null;
 
-    List<String> names = new ArrayList<String>(flattened.asObject().names());
-    while (!names.isEmpty()) {
+    for (String key : flattened.names()) {
       JsonValue currentVal = unflattened;
       String objKey = null;
       Integer aryIdx = null;
 
-      String key = names.remove(0);
       Matcher matcher = pattern.matcher(key);
       while (matcher.find()) {
         String keyPart = matcher.group();
 
         if (objKey != null) {
-          if (keyPart.startsWith("[")) {
-            if (currentVal.asObject().get(objKey) == null) {
-              JsonValue ary = Json.array();
-              currentVal.asObject().add(objKey, ary);
-              currentVal = ary;
-            } else {
-              currentVal = currentVal.asObject().get(objKey);
-            }
-            aryIdx = Integer.valueOf(keyPart.replaceAll("[\\[\\]]", ""));
+          if (matchJsonArray(keyPart)) {
+            currentVal = findOrCreateJsonArray(currentVal, objKey, aryIdx);
+            aryIdx = extractIndex(keyPart);
             objKey = null;
           } else {
-            if (currentVal.asObject().get(objKey) == null) {
-              JsonValue obj = Json.object();
-              currentVal.asObject().add(objKey, obj);
-              currentVal = obj;
-            } else {
-              currentVal = currentVal.asObject().get(objKey);
-            }
-            objKey = keyPart.replace(".", "");
+            currentVal = findOrCreateJsonObject(currentVal, objKey, aryIdx);
+            objKey = extractKey(keyPart);
           }
         } else if (aryIdx != null) {
-          if (keyPart.startsWith("[")) {
-            if (currentVal.asArray().get(aryIdx) == null) {
-              JsonValue ary = Json.array();
-              assureJsonArraySize(currentVal.asArray(), aryIdx);
-              currentVal.asArray().set(aryIdx, ary);
-              currentVal = ary;
-            } else {
-              currentVal = currentVal.asArray().get(aryIdx);
-            }
-            aryIdx = Integer.valueOf(keyPart.replaceAll("[\\[\\]]", ""));
+          if (matchJsonArray(keyPart)) {
+            currentVal = findOrCreateJsonArray(currentVal, objKey, aryIdx);
+            aryIdx = extractIndex(keyPart);
           } else {
-            if (currentVal.asArray().get(aryIdx) == null) {
-              JsonValue obj = Json.object();
-              assureJsonArraySize(currentVal.asArray(), aryIdx);
-              currentVal.asArray().set(aryIdx, obj);
-              currentVal = obj;
-            } else {
-              currentVal = currentVal.asArray().get(aryIdx);
-            }
-            objKey = keyPart.replace(".", "");
+            currentVal = findOrCreateJsonObject(currentVal, objKey, aryIdx);
+            objKey = extractKey(keyPart);
             aryIdx = null;
           }
-        } else {
-          if (keyPart.startsWith("[")) {
-            aryIdx = Integer.valueOf(keyPart.replaceAll("[\\[\\]]", ""));
+        } else { // objKey == null && aryIdx == null
+          if (matchJsonArray(keyPart)) {
+            aryIdx = extractIndex(keyPart);
             if (currentVal == null) currentVal = Json.array();
           } else {
             objKey = keyPart.replace(".", "");
@@ -122,15 +90,79 @@ public final class JsonUnflattener {
         if (unflattened == null) unflattened = currentVal;
       }
 
-      if (objKey != null) {
-        currentVal.asObject().add(objKey, flattened.asObject().get(key));
-      } else if (aryIdx != null) {
-        assureJsonArraySize(currentVal.asArray(), aryIdx);
-        currentVal.asArray().set(aryIdx, flattened.asObject().get(key));
-      }
+      setUnflattenedValue(flattened, key, currentVal, objKey, aryIdx);
     }
 
     return unflattened.toString();
+  }
+
+  private static String extractKey(String keyPart) {
+    return keyPart.replace(".", "");
+  }
+
+  private static Integer extractIndex(String keyPart) {
+    return Integer.valueOf(keyPart.replaceAll("[\\[\\]]", ""));
+  }
+
+  private static boolean matchJsonArray(String keyPart) {
+    return keyPart.startsWith("[");
+  }
+
+  private static JsonValue findOrCreateJsonArray(JsonValue currentVal,
+      String objKey, Integer aryIdx) {
+    if (objKey != null) {
+      if (currentVal.asObject().get(objKey) == null) {
+        JsonValue ary = Json.array();
+        currentVal.asObject().add(objKey, ary);
+
+        return ary;
+      }
+
+      return currentVal.asObject().get(objKey);
+    } else {
+      if (currentVal.asArray().get(aryIdx) == null) {
+        JsonValue ary = Json.array();
+        assureJsonArraySize(currentVal.asArray(), aryIdx);
+        currentVal.asArray().set(aryIdx, ary);
+
+        return ary;
+      }
+
+      return currentVal.asArray().get(aryIdx);
+    }
+  }
+
+  private static JsonValue findOrCreateJsonObject(JsonValue currentVal,
+      String objKey, Integer aryIdx) {
+    if (objKey != null) {
+      if (currentVal.asObject().get(objKey) == null) {
+        JsonValue obj = Json.object();
+        currentVal.asObject().add(objKey, obj);
+
+        return obj;
+      }
+      return currentVal.asObject().get(objKey);
+    } else {
+      if (currentVal.asArray().get(aryIdx) == null) {
+        JsonValue obj = Json.object();
+        assureJsonArraySize(currentVal.asArray(), aryIdx);
+        currentVal.asArray().set(aryIdx, obj);
+
+        return obj;
+      }
+
+      return currentVal.asArray().get(aryIdx);
+    }
+  }
+
+  private static void setUnflattenedValue(JsonObject flattened, String key,
+      JsonValue currentVal, String objKey, Integer aryIdx) {
+    if (objKey != null) {
+      currentVal.asObject().add(objKey, flattened.get(key));
+    } else if (aryIdx != null) {
+      assureJsonArraySize(currentVal.asArray(), aryIdx);
+      currentVal.asArray().set(aryIdx, flattened.get(key));
+    }
   }
 
   private static void assureJsonArraySize(JsonArray jsonArray, Integer index) {
