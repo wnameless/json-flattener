@@ -21,6 +21,10 @@
 package com.github.wnameless.json.flattener;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 
 import org.junit.Test;
 
@@ -29,11 +33,23 @@ import com.github.wnameless.json.unflattener.JsonUnflattener;
 public class JsonUnflattenerTest {
 
   @Test
+  public void testPrivateContructor() throws Exception {
+    Constructor<JsonUnflattener> c =
+        JsonUnflattener.class.getDeclaredConstructor();
+    assertTrue(Modifier.isPrivate(c.getModifiers()));
+    c.setAccessible(true);
+    c.newInstance();
+  }
+
+  @Test
   public void testUnflatten() {
     assertEquals(
-        "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true]},\"e\":\"f\",\"g\":2.3}",
+        "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}",
         JsonUnflattener.unflatten(
-            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"));
+            "{\"a.b\":1,\"a.c\":null,\"a.d[1]\":true,\"a.d[0]\":false,\"a.d[2].sss\":777,\"a.d[2].vvv\":888,\"e\":\"f\",\"g\":2.3}"));
+
+    assertEquals("[1,[2,3],4,{\"abc\":5}]", JsonUnflattener.unflatten(
+        "{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3].abc\":5}"));
   }
 
 }

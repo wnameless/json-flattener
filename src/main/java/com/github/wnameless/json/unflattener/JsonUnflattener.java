@@ -36,6 +36,8 @@ import com.eclipsesource.json.JsonValue;
  */
 public final class JsonUnflattener {
 
+  private JsonUnflattener() {}
+
   private static final Pattern keyPartPattern =
       Pattern.compile("\\[\\d+\\]|[^\\.\\[\\]]+");
 
@@ -114,7 +116,8 @@ public final class JsonUnflattener {
 
       return currentVal.asObject().get(objKey);
     } else {
-      if (currentVal.asArray().get(aryIdx) == null) {
+      if (currentVal.asArray().size() <= aryIdx
+          || currentVal.asArray().get(aryIdx) == null) {
         JsonValue ary = Json.array();
         assureJsonArraySize(currentVal.asArray(), aryIdx);
         currentVal.asArray().set(aryIdx, ary);
@@ -137,7 +140,8 @@ public final class JsonUnflattener {
       }
       return currentVal.asObject().get(objKey);
     } else {
-      if (currentVal.asArray().get(aryIdx) == null) {
+      if (currentVal.asArray().size() <= aryIdx
+          || currentVal.asArray().get(aryIdx) == null) {
         JsonValue obj = Json.object();
         assureJsonArraySize(currentVal.asArray(), aryIdx);
         currentVal.asArray().set(aryIdx, obj);
