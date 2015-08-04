@@ -53,35 +53,35 @@ import com.eclipsesource.json.JsonValue;
 public final class JsonFlattener {
 
   /**
-   * Returns a flatten JSON string.
+   * Returns a flattened JSON string.
    * 
    * @param json
    *          the JSON string
-   * @return a flatten JSON string.
+   * @return a flattened JSON string.
    */
   public static String flatten(String json) {
     return new JsonFlattener(json).flatten();
   }
 
   /**
-   * Returns a flattened JSON as a Map.
+   * Returns a flattened JSON as Map.
    * 
    * @param json
    *          the JSON string
-   * @return a flattened JSON as a Map
+   * @return a flattened JSON as Map
    */
   public static Map<String, Object> flattenAsMap(String json) {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private final LinkedList<IndexedPeekIterator<?>> iters =
+  private final LinkedList<IndexedPeekIterator<?>> elementIters =
       new LinkedList<IndexedPeekIterator<?>>();
-  private final Map<String, Object> flattenedJson =
+  private final Map<String, Object> flattenedJsonMap =
       new LinkedHashMap<String, Object>();
-  private String flattenedJsonStr = null;
+  private String flattenedJson = null;
 
   /**
-   * Returns a JSON flattener.
+   * Creates a JSON flattener.
    * 
    * @param json
    *          the JSON string
@@ -96,38 +96,38 @@ public final class JsonFlattener {
   }
 
   /**
-   * Returns a flattened JSON as a Map.
+   * Returns a flattened JSON as Map.
    * 
-   * @return a flattened JSON as a Map
+   * @return a flattened JSON as Map
    */
   public Map<String, Object> flattenAsMap() {
-    while (!iters.isEmpty()) {
-      if (!iters.getLast().hasNext()) {
-        iters.removeLast();
-      } else if (iters.getLast().peek() instanceof Member) {
-        Member mem = (Member) iters.getLast().next();
+    while (!elementIters.isEmpty()) {
+      if (!elementIters.getLast().hasNext()) {
+        elementIters.removeLast();
+      } else if (elementIters.getLast().peek() instanceof Member) {
+        Member mem = (Member) elementIters.getLast().next();
         reduce(mem.getValue());
-      } else if (iters.getLast().peek() instanceof JsonValue) {
-        JsonValue val = (JsonValue) iters.getLast().next();
+      } else if (elementIters.getLast().peek() instanceof JsonValue) {
+        JsonValue val = (JsonValue) elementIters.getLast().next();
         reduce(val);
       }
     }
 
-    return flattenedJson;
+    return flattenedJsonMap;
   }
 
   /**
-   * Returns a flatten JSON string.
+   * Returns a flattened JSON string.
    * 
-   * @return a flatten JSON string
+   * @return a flattened JSON string
    */
   public String flatten() {
-    if (flattenedJsonStr != null) return flattenedJsonStr;
+    if (flattenedJson != null) return flattenedJson;
 
     flattenAsMap();
 
     JsonObject jsonObj = Json.object();
-    for (Entry<String, Object> mem : flattenedJson.entrySet()) {
+    for (Entry<String, Object> mem : flattenedJsonMap.entrySet()) {
       if (mem.getValue() instanceof Boolean) {
         jsonObj.add(mem.getKey(), (Boolean) mem.getValue());
       } else if (mem.getValue() instanceof String) {
@@ -141,16 +141,18 @@ public final class JsonFlattener {
       }
     }
 
-    return flattenedJsonStr = jsonObj.toString();
+    return flattenedJson = jsonObj.toString();
   }
 
   private void reduce(JsonValue val) {
     if (val.isObject())
-      iters.add(new IndexedPeekIterator<Member>(val.asObject().iterator()));
+      elementIters
+          .add(new IndexedPeekIterator<Member>(val.asObject().iterator()));
     else if (val.isArray())
-      iters.add(new IndexedPeekIterator<JsonValue>(val.asArray().iterator()));
+      elementIters
+          .add(new IndexedPeekIterator<JsonValue>(val.asArray().iterator()));
     else
-      flattenedJson.put(computeKey(), jsonVal2Obj(val));
+      flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
   }
 
   private Object jsonVal2Obj(JsonValue jsonValue) {
@@ -170,7 +172,7 @@ public final class JsonFlattener {
   private String computeKey() {
     String key = "";
 
-    for (IndexedPeekIterator<?> iter : iters) {
+    for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
         if (!key.isEmpty()) key += ".";
 

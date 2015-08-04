@@ -36,15 +36,15 @@ import com.eclipsesource.json.JsonValue;
  */
 public final class JsonUnflattener {
 
-  private static final Pattern pattern =
+  private static final Pattern keyPartPattern =
       Pattern.compile("\\[\\d+\\]|[^\\.\\[\\]]+");
 
   /**
-   * Returns a a nested JSON string by the given flattened JSON string.
+   * Returns a JSON string of nested objects by the given flattened JSON string.
    * 
    * @param json
    *          a flattened JSON string
-   * @return a nested JSON string
+   * @return a JSON string of nested objects
    */
   public static String unflatten(String json) {
     JsonObject flattened = Json.parse(json).asObject();
@@ -55,7 +55,7 @@ public final class JsonUnflattener {
       String objKey = null;
       Integer aryIdx = null;
 
-      Matcher matcher = pattern.matcher(key);
+      Matcher matcher = keyPartPattern.matcher(key);
       while (matcher.find()) {
         String keyPart = matcher.group();
 
