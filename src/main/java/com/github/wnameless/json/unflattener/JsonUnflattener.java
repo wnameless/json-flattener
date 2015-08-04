@@ -74,7 +74,7 @@ public final class JsonUnflattener {
             } else {
               currentVal = currentVal.asObject().get(objKey);
             }
-            aryIdx = Integer.valueOf(keyPart.replace("[", "").replace("]", ""));
+            aryIdx = Integer.valueOf(keyPart.replaceAll("[\\[\\]]", ""));
             objKey = null;
           } else {
             if (currentVal.asObject().get(objKey) == null) {
@@ -96,7 +96,7 @@ public final class JsonUnflattener {
             } else {
               currentVal = currentVal.asArray().get(aryIdx);
             }
-            aryIdx = Integer.valueOf(keyPart.replace("[", "").replace("]", ""));
+            aryIdx = Integer.valueOf(keyPart.replaceAll("[\\[\\]]", ""));
           } else {
             if (currentVal.asArray().get(aryIdx) == null) {
               JsonValue obj = Json.object();
@@ -111,7 +111,7 @@ public final class JsonUnflattener {
           }
         } else {
           if (keyPart.startsWith("[")) {
-            aryIdx = Integer.valueOf(keyPart.replace("[", "").replace("]", ""));
+            aryIdx = Integer.valueOf(keyPart.replaceAll("[\\[\\]]", ""));
             if (currentVal == null)
               currentVal = Json.array();
           } else {

@@ -38,7 +38,7 @@ public class JsonFlattenerTest {
     String json = Resources.toString(url, Charsets.UTF_8);
 
     assertEquals("{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}",
-        new JsonFlattener(json).flattenAsMap().toString());
+        JsonFlattener.flattenAsMap(json).toString());
   }
 
   @Test
@@ -48,7 +48,7 @@ public class JsonFlattenerTest {
 
     assertEquals(
         "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
-        new JsonFlattener(json).flatten());
+        JsonFlattener.flatten(json));
   }
 
 }

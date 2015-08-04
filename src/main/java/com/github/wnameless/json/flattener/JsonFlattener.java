@@ -52,6 +52,28 @@ import com.eclipsesource.json.JsonValue;
  */
 public final class JsonFlattener {
 
+  /**
+   * Returns a flatten JSON string.
+   * 
+   * @param json
+   *          the JSON string
+   * @return a flatten JSON string.
+   */
+  public static String flatten(String json) {
+    return new JsonFlattener(json).flatten();
+  }
+
+  /**
+   * Returns a flattened JSON as a Map.
+   * 
+   * @param json
+   *          the JSON string
+   * @return a flattened JSON as a Map
+   */
+  public static Map<String, Object> flattenAsMap(String json) {
+    return new JsonFlattener(json).flattenAsMap();
+  }
+
   private final JsonValue source;
   private final LinkedList<IndexedPeekIterator<?>> iters =
       new LinkedList<IndexedPeekIterator<?>>();
