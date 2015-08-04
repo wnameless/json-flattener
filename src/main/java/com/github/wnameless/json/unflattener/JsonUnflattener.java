@@ -59,25 +59,19 @@ public final class JsonUnflattener {
       while (matcher.find()) {
         String keyPart = matcher.group();
 
-        if (objKey != null) {
+        if (objKey != null ^ aryIdx != null) {
           if (matchJsonArray(keyPart)) {
             currentVal = findOrCreateJsonArray(currentVal, objKey, aryIdx);
-            aryIdx = extractIndex(keyPart);
             objKey = null;
-          } else {
-            currentVal = findOrCreateJsonObject(currentVal, objKey, aryIdx);
-            objKey = extractKey(keyPart);
-          }
-        } else if (aryIdx != null) {
-          if (matchJsonArray(keyPart)) {
-            currentVal = findOrCreateJsonArray(currentVal, objKey, aryIdx);
             aryIdx = extractIndex(keyPart);
           } else {
             currentVal = findOrCreateJsonObject(currentVal, objKey, aryIdx);
             objKey = extractKey(keyPart);
             aryIdx = null;
           }
-        } else { // objKey == null && aryIdx == null
+        }
+
+        if (objKey == null && aryIdx == null) {
           if (matchJsonArray(keyPart)) {
             aryIdx = extractIndex(keyPart);
             if (currentVal == null) currentVal = Json.array();
