@@ -54,6 +54,9 @@ public class JsonFlattenerTest {
     assertEquals(
         "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
         JsonFlattener.flatten(json));
+
+    assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
+        JsonFlattener.flatten("[{\"a\":1},2,{\"c\":[3,4]}]"));
   }
 
 }
