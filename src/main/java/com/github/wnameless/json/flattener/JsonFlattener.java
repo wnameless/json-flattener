@@ -74,12 +74,11 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private final JsonValue source;
   private final LinkedList<IndexedPeekIterator<?>> iters =
       new LinkedList<IndexedPeekIterator<?>>();
-  private final LinkedHashMap<String, Object> flattenJson =
+  private final Map<String, Object> flattenedJson =
       new LinkedHashMap<String, Object>();
-  private String flattenJsonStr = null;
+  private String flattenedJsonStr = null;
 
   /**
    * Returns a JSON flattener.
@@ -88,9 +87,10 @@ public final class JsonFlattener {
    *          the JSON string
    */
   public JsonFlattener(String json) {
-    source = Json.parse(json);
+    JsonValue source = Json.parse(json);
     if (!source.isObject() && !source.isArray())
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException(
+          "Input must be a JSON object or array");
 
     reduce(source);
   }
@@ -106,15 +106,14 @@ public final class JsonFlattener {
         iters.removeLast();
       } else if (iters.getLast().peek() instanceof Member) {
         Member mem = (Member) iters.getLast().next();
-        JsonValue val = mem.getValue();
-        reduce(val);
+        reduce(mem.getValue());
       } else if (iters.getLast().peek() instanceof JsonValue) {
         JsonValue val = (JsonValue) iters.getLast().next();
         reduce(val);
       }
     }
 
-    return flattenJson;
+    return flattenedJson;
   }
 
   /**
@@ -123,55 +122,46 @@ public final class JsonFlattener {
    * @return a flatten JSON string
    */
   public String flatten() {
-    if (flattenJsonStr != null)
-      return flattenJsonStr;
+    if (flattenedJsonStr != null) return flattenedJsonStr;
 
     flattenAsMap();
 
     JsonObject jsonObj = Json.object();
-    for (Entry<String, Object> mem : flattenJson.entrySet()) {
+    for (Entry<String, Object> mem : flattenedJson.entrySet()) {
       if (mem.getValue() instanceof Boolean) {
         jsonObj.add(mem.getKey(), (Boolean) mem.getValue());
       } else if (mem.getValue() instanceof String) {
         jsonObj.add(mem.getKey(), (String) mem.getValue());
       } else if (mem.getValue() instanceof Number) {
-        if (mem.getValue() instanceof Long) {
-          jsonObj.add(mem.getKey(), (Long) mem.getValue());
-        } else {
-          jsonObj.add(mem.getKey(), (Double) mem.getValue());
-        }
+        boolean isInteger = mem.getValue() instanceof Long;
+        jsonObj.add(mem.getKey(),
+            isInteger ? (Long) mem.getValue() : (Double) mem.getValue());
       } else {
         jsonObj.add(mem.getKey(), Json.NULL);
       }
     }
 
-    return flattenJsonStr = jsonObj.toString();
+    return flattenedJsonStr = jsonObj.toString();
   }
 
   private void reduce(JsonValue val) {
-    if (val.isObject()) {
+    if (val.isObject())
       iters.add(new IndexedPeekIterator<Member>(val.asObject().iterator()));
-    } else if (val.isArray()) {
+    else if (val.isArray())
       iters.add(new IndexedPeekIterator<JsonValue>(val.asArray().iterator()));
-    } else {
-      flattenJson.put(computeKey(), jsonVal2Obj(val));
-    }
+    else
+      flattenedJson.put(computeKey(), jsonVal2Obj(val));
   }
 
   private Object jsonVal2Obj(JsonValue jsonValue) {
-    if (jsonValue.isBoolean())
-      return jsonValue.asBoolean();
-
-    if (jsonValue.isString())
-      return jsonValue.asString();
-
+    if (jsonValue.isBoolean()) return jsonValue.asBoolean();
+    if (jsonValue.isString()) return jsonValue.asString();
     if (jsonValue.isNumber()) {
       double v = jsonValue.asDouble();
-      if ((v == Math.floor(v)) && !Double.isInfinite(v)) {
+      if (!Double.isNaN(v) && !Double.isInfinite(v) && v == Math.rint(v))
         return jsonValue.asLong();
-      } else {
+      else
         return jsonValue.asDouble();
-      }
     }
 
     return null;
@@ -179,10 +169,10 @@ public final class JsonFlattener {
 
   private String computeKey() {
     String key = "";
+
     for (IndexedPeekIterator<?> iter : iters) {
       if (iter.getCurrent() instanceof Member) {
-        if (!key.isEmpty())
-          key += ".";
+        if (!key.isEmpty()) key += ".";
 
         key += ((Member) iter.getCurrent()).getName();
       } else {
