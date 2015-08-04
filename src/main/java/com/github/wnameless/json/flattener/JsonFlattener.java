@@ -20,8 +20,9 @@
  */
 package com.github.wnameless.json.flattener;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -74,8 +75,8 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private final LinkedList<IndexedPeekIterator<?>> elementIters =
-      new LinkedList<IndexedPeekIterator<?>>();
+  private final Deque<IndexedPeekIterator<?>> elementIters =
+      new ArrayDeque<IndexedPeekIterator<?>>();
   private final Map<String, Object> flattenedJsonMap =
       new LinkedHashMap<String, Object>();
   private String flattenedJson = null;
@@ -102,13 +103,14 @@ public final class JsonFlattener {
    */
   public Map<String, Object> flattenAsMap() {
     while (!elementIters.isEmpty()) {
-      if (!elementIters.getLast().hasNext()) {
+      IndexedPeekIterator<?> deepestIter = elementIters.getLast();
+      if (!deepestIter.hasNext()) {
         elementIters.removeLast();
-      } else if (elementIters.getLast().peek() instanceof Member) {
-        Member mem = (Member) elementIters.getLast().next();
+      } else if (deepestIter.peek() instanceof Member) {
+        Member mem = (Member) deepestIter.next();
         reduce(mem.getValue());
-      } else if (elementIters.getLast().peek() instanceof JsonValue) {
-        JsonValue val = (JsonValue) elementIters.getLast().next();
+      } else if (deepestIter.peek() instanceof JsonValue) {
+        JsonValue val = (JsonValue) deepestIter.next();
         reduce(val);
       }
     }
@@ -128,16 +130,16 @@ public final class JsonFlattener {
 
     JsonObject jsonObj = Json.object();
     for (Entry<String, Object> mem : flattenedJsonMap.entrySet()) {
-      if (mem.getValue() instanceof Boolean) {
-        jsonObj.add(mem.getKey(), (Boolean) mem.getValue());
-      } else if (mem.getValue() instanceof String) {
-        jsonObj.add(mem.getKey(), (String) mem.getValue());
-      } else if (mem.getValue() instanceof Number) {
-        boolean isInteger = mem.getValue() instanceof Long;
-        jsonObj.add(mem.getKey(),
-            isInteger ? (Long) mem.getValue() : (Double) mem.getValue());
+      String key = mem.getKey();
+      Object val = mem.getValue();
+      if (val instanceof Boolean) {
+        jsonObj.add(key, (Boolean) val);
+      } else if (val instanceof String) {
+        jsonObj.add(key, (String) val);
+      } else if (val instanceof Number) {
+        jsonObj.add(key, val instanceof Long ? (Long) val : (Double) val);
       } else {
-        jsonObj.add(mem.getKey(), Json.NULL);
+        jsonObj.add(key, Json.NULL);
       }
     }
 
@@ -170,19 +172,21 @@ public final class JsonFlattener {
   }
 
   private String computeKey() {
-    String key = "";
+    StringBuilder sb = new StringBuilder();
 
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
-        if (!key.isEmpty()) key += ".";
+        if (sb.length() != 0) sb.append('.');
 
-        key += ((Member) iter.getCurrent()).getName();
+        sb.append(((Member) iter.getCurrent()).getName());
       } else {
-        key += "[" + iter.getIndex() + "]";
+        sb.append('[');
+        sb.append(iter.getIndex());
+        sb.append(']');
       }
     }
 
-    return key;
+    return sb.toString();
   }
 
 }
