@@ -1,12 +1,12 @@
 json-flattener
 =============
-A Java utility to flatten nested JSON objects.
+A Java utility used to flatten nested JSON objects and even more to unflatten it back.
 
 ##Purpose
 Converts a nested JSON<br />
-  { "a": { "b": 1, "c": null, "d": [false, true] }, "e": "f", "g": 2.3 }<br />
+&nbsp;&nbsp;{ "a": { "b": 1, "c": null, "d": [false, true] }, "e": "f", "g": 2.3 }<br />
 into simple Java Map<br />
-  {a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
+&nbsp;&nbsp;{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
 
 #Maven Repo
 ```xml
