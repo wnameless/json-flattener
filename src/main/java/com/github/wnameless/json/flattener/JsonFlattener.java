@@ -184,9 +184,17 @@ public final class JsonFlattener {
 
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
-        if (sb.length() != 0) sb.append('.');
-
-        sb.append(((Member) iter.getCurrent()).getName());
+        String key = ((Member) iter.getCurrent()).getName();
+        if (key.contains(".")) {
+          sb.append('[');
+          sb.append('"');
+          sb.append(key);
+          sb.append('"');
+          sb.append(']');
+        } else {
+          if (sb.length() != 0) sb.append('.');
+          sb.append(key);
+        }
       } else {
         sb.append('[');
         sb.append(iter.getIndex());

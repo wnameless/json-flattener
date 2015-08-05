@@ -52,4 +52,10 @@ public class JsonUnflattenerTest {
         "{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3].abc\":5}"));
   }
 
+  @Test
+  public void testUnflattenWithKeyContainsDot() {
+    assertEquals("[1,[2,3],4,{\"ab.c.\":5}]", JsonUnflattener.unflatten(
+        "{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.\\\"]\":5}"));
+  }
+
 }
