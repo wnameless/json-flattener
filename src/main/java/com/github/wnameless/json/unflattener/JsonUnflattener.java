@@ -39,7 +39,7 @@ public final class JsonUnflattener {
   private JsonUnflattener() {}
 
   private static final Pattern keyPartPattern =
-      Pattern.compile("\\[\\d+\\]|\\[\".*\"\\]|[^\\.\\[\\]]+");
+      Pattern.compile("\\[\\s*\\d+\\s*\\]|\\[\\s*\".*\"\\s*\\]|[^\\.\\[\\]]+");
 
   /**
    * Returns a JSON string of nested objects by the given flattened JSON string.
@@ -93,18 +93,18 @@ public final class JsonUnflattener {
   }
 
   private static String extractKey(String keyPart) {
-    if (keyPart.startsWith("[\""))
-      return keyPart.substring(2, keyPart.length() - 2);
+    if (keyPart.matches("^\\[\\s*\".*$"))
+      return keyPart.replaceAll("^\\[\\s*\"", "").replaceAll("\"\\s*\\]$", "");
     else
-      return keyPart.replace(".", "");
+      return keyPart;
   }
 
   private static Integer extractIndex(String keyPart) {
-    return Integer.valueOf(keyPart.replaceAll("[\\[\\]]", ""));
+    return Integer.valueOf(keyPart.replaceAll("[\\[\\]\\s]", ""));
   }
 
   private static boolean matchJsonArray(String keyPart) {
-    return keyPart.matches("\\[\\d+\\]");
+    return keyPart.matches("\\[\\s*\\d+\\s*\\]");
   }
 
   private static JsonValue findOrCreateJsonArray(JsonValue currentVal,

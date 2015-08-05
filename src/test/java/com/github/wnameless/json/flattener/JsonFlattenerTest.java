@@ -62,10 +62,11 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testFlattenWithKeyContainsDot() throws IOException {
+  public void testFlattenWithKeyContainsDotAndSquareBracket()
+      throws IOException {
     assertEquals(
-        "{\"[0][\\\"a.a.\\\"]\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
-        JsonFlattener.flatten("[{\"a.a.\":1},2,{\"c\":[3,4]}]"));
+        "{\"[0][\\\"a.a.[\\\"]\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
+        JsonFlattener.flatten("[{\"a.a.[\":1},2,{\"c\":[3,4]}]"));
   }
 
   @Test
