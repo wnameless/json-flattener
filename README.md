@@ -6,7 +6,7 @@ A Java utility used to FLATTEN nested JSON objects and even more to UNFLATTEN it
 Converts a nested JSON<br />
 &nbsp;&nbsp;{ "a": { "b": 1, "c": null, "d": [false, true] }, "e": "f", "g": 2.3 }<br />
 into a flattened JSON<br />
-&nbsp;&nbsp;{ "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": f, "g": 2.3 }
+&nbsp;&nbsp;{ "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": f, "g": 2.3 }<br />
 or a Java Map<br />
 &nbsp;&nbsp;{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
 
@@ -36,13 +36,13 @@ String nestedJson = JsonUnflattener.unflatten(jsonStr);
 System.out.println(nestedJson);
 // {"a":{"b":1,"c":null,"d":[false,true]},"e":"f","g":2.3}
 
-// Support JSON keys which contain dots
-String flattendJsonWithDotKey = JsonFlattener.flatten("[{\"a.a.\":1},2,{\"c\":[3,4]}]");
+// Support JSON keys which contain dots or square brackets
+String flattendJsonWithDotKey = JsonFlattener.flatten("[{\"a.a.[\":1},2,{\"c\":[3,4]}]");
 System.out.println(flatteflattendJsonWithDotKeynJsonWithDotKey);
-// Output: {"[0]&#91;\"a.a.\"&#93;":12,"[1]":2,"[2].c[0]":3,"[2].c[1]":4}
+// Output: {"[0][\"a.a.[\"]":12,"[1]":2,"[2].c[0]":3,"[2].c[1]":4}
 
 String nestedJsonWithDotKey = JsonUnflattener.unflatten(
-        "{\"&#91;1&#93;&#91;0&#93;\":2,\"&#91;0&#93;\":1,\"&#91;1&#93;&#91;1&#93;\":3,\"&#91;2&#93;\":4,\"&#91;3&#93;[\\\"ab.c.\\\"]\":5}");
+        "{\"[1][0];\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.[\\\"]\":5}");
 System.out.println(nestedJsonWithDotKey);
-// Output: [1,[2,3],4,{"ab.c.":5}]
+// Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
