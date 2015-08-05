@@ -33,21 +33,28 @@ import com.eclipsesource.json.JsonValue;
 
 /**
  * 
- * {@link JsonFlattener} flatten any JSON nested objects or arrays into a simple
- * Map{@literal <Stirng, Object>}. The String key will represents the
- * corresponding position of value in the original nested objects or arrays and
- * the Object value are either String, Boolean, Number or null. <br>
+ * {@link JsonFlattener} flattens any JSON nested objects or arrays into a
+ * flattened JSON string or a Map{@literal <Stirng, Object>}. The String key
+ * will represents the corresponding position of value in the original nested
+ * objects or arrays and the Object value are either String, Boolean, Long,
+ * Double or null. <br>
  * <br>
- * For example: <br>
+ * For example:<br>
+ * A nested JSON<br>
  * { "a" : { "b" : 1, "c": null, "d": [false, true] }, "e": "f", "g":2.3 }<br>
- * will be turned into <br>
+ * <br>
+ * can be turned into a flattened JSON <br>
+ * { "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": "f", "g":2.3 }
+ * <br>
+ * <br>
+ * or into a Map<br>
  * {<br>
- * a.b=1,<br>
- * a.c=null,<br>
- * a.d[0]=false,<br>
- * a.d[1]=true,<br>
- * e=f<br>
- * g=2.3<br>
+ * &nbsp;&nbsp;a.b=1,<br>
+ * &nbsp;&nbsp;a.c=null,<br>
+ * &nbsp;&nbsp;a.d[0]=false,<br>
+ * &nbsp;&nbsp;a.d[1]=true,<br>
+ * &nbsp;&nbsp;e=f,<br>
+ * &nbsp;&nbsp;g=2.3<br>
  * }
  *
  */
@@ -75,6 +82,7 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
+  private final JsonValue source;
   private final Deque<IndexedPeekIterator<?>> elementIters =
       new ArrayDeque<IndexedPeekIterator<?>>();
   private final Map<String, Object> flattenedJsonMap =
@@ -88,7 +96,7 @@ public final class JsonFlattener {
    *          the JSON string
    */
   public JsonFlattener(String json) {
-    JsonValue source = Json.parse(json);
+    source = Json.parse(json);
     if (!source.isObject() && !source.isArray())
       throw new IllegalArgumentException(
           "Input must be a JSON object or array");
@@ -187,6 +195,27 @@ public final class JsonFlattener {
     }
 
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    int result = 27;
+    result = 31 * result + source.hashCode();
+
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof JsonFlattener)) return false;
+
+    return source.equals(((JsonFlattener) o).source);
+  }
+
+  @Override
+  public String toString() {
+    return "JsonFlattener{source=" + source + "}";
   }
 
 }

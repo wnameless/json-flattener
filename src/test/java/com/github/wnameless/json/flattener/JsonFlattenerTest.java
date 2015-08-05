@@ -21,6 +21,8 @@
 package com.github.wnameless.json.flattener;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URL;
@@ -57,6 +59,43 @@ public class JsonFlattenerTest {
 
     assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         JsonFlattener.flatten("[{\"a\":1},2,{\"c\":[3,4]}]"));
+  }
+
+  @Test
+  public void testHashCode() throws IOException {
+    URL url1 = Resources.getResource("test.json");
+    String json1 = Resources.toString(url1, Charsets.UTF_8);
+    URL url2 = Resources.getResource("test2.json");
+    String json2 = Resources.toString(url2, Charsets.UTF_8);
+
+    JsonFlattener flattener = new JsonFlattener(json1);
+    assertTrue(flattener.hashCode() == flattener.hashCode());
+    assertTrue(flattener.hashCode() == new JsonFlattener(json1).hashCode());
+    assertFalse(flattener.hashCode() == new JsonFlattener(json2).hashCode());
+  }
+
+  @Test
+  public void testEquals() throws IOException {
+    URL url1 = Resources.getResource("test.json");
+    String json1 = Resources.toString(url1, Charsets.UTF_8);
+    URL url2 = Resources.getResource("test2.json");
+    String json2 = Resources.toString(url2, Charsets.UTF_8);
+
+    JsonFlattener flattener = new JsonFlattener(json1);
+    assertTrue(flattener.equals(flattener));
+    assertTrue(flattener.equals(new JsonFlattener(json1)));
+    assertFalse(flattener.equals(new JsonFlattener(json2)));
+    assertFalse(flattener.equals(123L));
+  }
+
+  @Test
+  public void testToString() throws IOException {
+    URL url = Resources.getResource("test2.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    assertEquals(
+        "JsonFlattener{source={\"a\":{\"b\":1,\"c\":null,\"d\":[false,true]},\"e\":\"f\",\"g\":2.3}}",
+        new JsonFlattener(json).toString());
   }
 
 }
