@@ -20,6 +20,7 @@
  */
 package com.github.wnameless.json.flattener;
 
+import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashMap;
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
 
@@ -136,22 +136,31 @@ public final class JsonFlattener {
 
     flattenAsMap();
 
-    JsonObject jsonObj = Json.object();
+    StringBuilder sb = new StringBuilder("{");
     for (Entry<String, Object> mem : flattenedJsonMap.entrySet()) {
       String key = mem.getKey();
       Object val = mem.getValue();
+      sb.append("\"");
+      sb.append(key);
+      sb.append("\"");
+      sb.append(":");
       if (val instanceof Boolean) {
-        jsonObj.add(key, (Boolean) val);
+        sb.append(val);
       } else if (val instanceof String) {
-        jsonObj.add(key, (String) val);
-      } else if (val instanceof Number) {
-        jsonObj.add(key, val instanceof Long ? (Long) val : (Double) val);
+        sb.append("\"");
+        sb.append(val);
+        sb.append("\"");
+      } else if (val instanceof BigDecimal) {
+        sb.append(val);
       } else {
-        jsonObj.add(key, Json.NULL);
+        sb.append("null");
       }
+      sb.append(",");
     }
+    if (sb.length() > 1) sb.setLength(sb.length() - 1);
+    sb.append("}");
 
-    return flattenedJson = jsonObj.toString();
+    return sb.toString();
   }
 
   private void reduce(JsonValue val) {
@@ -168,13 +177,7 @@ public final class JsonFlattener {
   private Object jsonVal2Obj(JsonValue jsonValue) {
     if (jsonValue.isBoolean()) return jsonValue.asBoolean();
     if (jsonValue.isString()) return jsonValue.asString();
-    if (jsonValue.isNumber()) {
-      double v = jsonValue.asDouble();
-      if (!Double.isNaN(v) && !Double.isInfinite(v) && v == Math.rint(v))
-        return jsonValue.asLong();
-      else
-        return jsonValue.asDouble();
-    }
+    if (jsonValue.isNumber()) return new BigDecimal(jsonValue.toString());
 
     return null;
   }
@@ -187,8 +190,10 @@ public final class JsonFlattener {
         String key = ((Member) iter.getCurrent()).getName();
         if (key.contains(".")) {
           sb.append('[');
+          sb.append('\\');
           sb.append('"');
           sb.append(key);
+          sb.append('\\');
           sb.append('"');
           sb.append(']');
         } else {

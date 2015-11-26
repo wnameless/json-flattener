@@ -106,4 +106,17 @@ public class JsonFlattenerTest {
         new JsonFlattener(json).toString());
   }
 
+  @Test
+  public void testWithNoPrecisionDouble() throws IOException {
+    String json = "{\"39473331\":{\"mega\":6.0,\"goals\":1.0}}";
+    assertEquals("{\"39473331.mega\":6.0,\"39473331.goals\":1.0}",
+        new JsonFlattener(json).flatten());
+  }
+
+  @Test
+  public void testWithEmptyJson() throws IOException {
+    String json = "{}";
+    assertEquals("{}", new JsonFlattener(json).flatten());
+  }
+
 }
