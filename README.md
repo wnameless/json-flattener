@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless/json-flattener/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless/json-flattener)
+
 json-flattener
 =============
 A Java utility used to FLATTEN nested JSON objects and even more to UNFLATTEN it back.
