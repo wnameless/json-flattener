@@ -20,6 +20,7 @@
  */
 package com.github.wnameless.json.flattener;
 
+import static com.google.common.collect.Maps.newHashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +30,7 @@ import java.net.URL;
 
 import org.junit.Test;
 
+import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
@@ -114,9 +116,37 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testWithEmptyJson() throws IOException {
+  public void testWithEmptyJsonObjectå() throws IOException {
     String json = "{}";
     assertEquals("{}", new JsonFlattener(json).flatten());
+    assertEquals(newHashMap(), new JsonFlattener(json).flattenAsMap());
+    assertEquals(json,
+        JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
+  }
+
+  @Test
+  public void testWithEmptyJsonArray() throws IOException {
+    String json = "[]";
+    assertEquals("[]", new JsonFlattener(json).flatten());
+    assertEquals(newHashMap(), new JsonFlattener(json).flattenAsMap());
+  }
+
+  @Test
+  public void testWithEmptyArray() {
+    String json = "{\"no\":\"1\",\"name\":\"riya\",\"marks\":[]}";
+    assertEquals("{\"no\":\"1\",\"name\":\"riya\",\"marks\":[]}",
+        new JsonFlattener(json).flatten());
+    assertEquals(json,
+        JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
+  }
+
+  @Test
+  public void testWithEmptyObject() {
+    String json = "{\"no\":\"1\",\"name\":\"riya\",\"marks\":[{}]}";
+    assertEquals("{\"no\":\"1\",\"name\":\"riya\",\"marks[0]\":{}}",
+        new JsonFlattener(json).flatten());
+    assertEquals(json,
+        JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
   }
 
 }

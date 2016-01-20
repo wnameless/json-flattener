@@ -22,8 +22,10 @@ package com.github.wnameless.json.flattener;
 
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -97,33 +99,21 @@ public final class JsonFlattener {
    */
   public JsonFlattener(String json) {
     source = Json.parse(json);
-    if (!source.isObject() && !source.isArray())
+    if (!source.isObject() && !source.isArray()) {
       throw new IllegalArgumentException(
           "Input must be a JSON object or array");
-
-    reduce(source);
-  }
-
-  /**
-   * Returns a flattened JSON as Map.
-   * 
-   * @return a flattened JSON as Map
-   */
-  public Map<String, Object> flattenAsMap() {
-    while (!elementIters.isEmpty()) {
-      IndexedPeekIterator<?> deepestIter = elementIters.getLast();
-      if (!deepestIter.hasNext()) {
-        elementIters.removeLast();
-      } else if (deepestIter.peek() instanceof Member) {
-        Member mem = (Member) deepestIter.next();
-        reduce(mem.getValue());
-      } else if (deepestIter.peek() instanceof JsonValue) {
-        JsonValue val = (JsonValue) deepestIter.next();
-        reduce(val);
-      }
     }
 
-    return flattenedJsonMap;
+    if (source.isObject() && !source.asObject().iterator().hasNext()) {
+      flattenedJson = "{}";
+      return;
+    }
+    if (source.isArray() && !source.asArray().iterator().hasNext()) {
+      flattenedJson = "[]";
+      return;
+    }
+
+    reduce(source);
   }
 
   /**
@@ -152,6 +142,10 @@ public final class JsonFlattener {
         sb.append("\"");
       } else if (val instanceof BigDecimal) {
         sb.append(val);
+      } else if (val instanceof List) {
+        sb.append("[]");
+      } else if (val instanceof Map) {
+        sb.append("{}");
       } else {
         sb.append("null");
       }
@@ -163,14 +157,48 @@ public final class JsonFlattener {
     return sb.toString();
   }
 
+  /**
+   * Returns a flattened JSON as Map.
+   * 
+   * @return a flattened JSON as Map
+   */
+  public Map<String, Object> flattenAsMap() {
+    while (!elementIters.isEmpty()) {
+      IndexedPeekIterator<?> deepestIter = elementIters.getLast();
+      if (!deepestIter.hasNext()) {
+        elementIters.removeLast();
+      } else if (deepestIter.peek() instanceof Member) {
+        Member mem = (Member) deepestIter.next();
+        reduce(mem.getValue());
+      } else if (deepestIter.peek() instanceof JsonValue) {
+        JsonValue val = (JsonValue) deepestIter.next();
+        reduce(val);
+      }
+    }
+
+    return flattenedJsonMap;
+  }
+
   private void reduce(JsonValue val) {
-    if (val.isObject())
-      elementIters
-          .add(new IndexedPeekIterator<Member>(val.asObject().iterator()));
-    else if (val.isArray())
+    if (val.isObject()) {
+      IndexedPeekIterator<Member> ipi =
+          new IndexedPeekIterator<Member>(val.asObject().iterator());
+      if (ipi.hasNext()) {
+        elementIters.add(ipi);
+      } else {
+        flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
+      }
+    } else if (val.isArray()) {
+      IndexedPeekIterator<JsonValue> ipi =
+          new IndexedPeekIterator<JsonValue>(val.asArray().iterator());
       elementIters
           .add(new IndexedPeekIterator<JsonValue>(val.asArray().iterator()));
-    else
+      if (ipi.hasNext()) {
+        elementIters.add(ipi);
+      } else {
+        flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
+      }
+    } else
       flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
   }
 
@@ -178,6 +206,8 @@ public final class JsonFlattener {
     if (jsonValue.isBoolean()) return jsonValue.asBoolean();
     if (jsonValue.isString()) return jsonValue.asString();
     if (jsonValue.isNumber()) return new BigDecimal(jsonValue.toString());
+    if (jsonValue.isArray()) return new ArrayList<Object>();
+    if (jsonValue.isObject()) return new LinkedHashMap<String, Object>();
 
     return null;
   }
@@ -200,7 +230,7 @@ public final class JsonFlattener {
           if (sb.length() != 0) sb.append('.');
           sb.append(key);
         }
-      } else {
+      } else if (iter.getCurrent() instanceof JsonValue) {
         sb.append('[');
         sb.append(iter.getIndex());
         sb.append(']');

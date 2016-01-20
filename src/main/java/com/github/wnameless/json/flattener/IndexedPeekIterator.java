@@ -84,8 +84,7 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
 
   @Override
   public E next() {
-    if (!hasNext())
-      throw new NoSuchElementException();
+    if (!hasNext()) throw new NoSuchElementException();
 
     index++;
     if (hasPeek) {
@@ -99,8 +98,7 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
 
   @Override
   public void remove() {
-    if (hasPeek)
-      throw new IllegalStateException();
+    if (hasPeek) throw new IllegalStateException();
 
     iterator.remove();
   }
@@ -112,10 +110,8 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
    * @return element
    */
   public E peek() {
-    if (!hasPeek && hasNext())
-      peeking();
-    if (!hasPeek)
-      throw new NoSuchElementException();
+    if (!hasPeek && hasNext()) peeking();
+    if (!hasPeek) throw new NoSuchElementException();
 
     return peek;
   }

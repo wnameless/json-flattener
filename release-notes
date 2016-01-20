@@ -3,3 +3,6 @@ Version 0.1.0
 
 Version 0.1.1
 * Fix minimal-json parsing double value(ex:6.0) error
+
+Version 0.1.2
+* Fix the bug of empty array or empty object disappearing after flattening

@@ -50,7 +50,7 @@ public final class JsonUnflattener {
    */
   public static String unflatten(String json) {
     JsonObject flattened = Json.parse(json).asObject();
-    JsonValue unflattened = null;
+    JsonValue unflattened = flattened.names().isEmpty() ? Json.object() : null;
 
     for (String key : flattened.names()) {
       JsonValue currentVal = unflattened;
