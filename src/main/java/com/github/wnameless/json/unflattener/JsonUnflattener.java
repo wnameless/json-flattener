@@ -49,7 +49,10 @@ public final class JsonUnflattener {
    * @return a JSON string of nested objects
    */
   public static String unflatten(String json) {
-    JsonObject flattened = Json.parse(json).asObject();
+    JsonValue root = Json.parse(json);
+    if (root.isArray()) return root.asArray().toString();
+
+    JsonObject flattened = root.asObject();
     JsonValue unflattened = flattened.names().isEmpty() ? Json.object() : null;
 
     for (String key : flattened.names()) {
@@ -141,6 +144,7 @@ public final class JsonUnflattener {
 
         return obj;
       }
+
       return currentVal.asObject().get(objKey);
     } else {
       if (currentVal.asArray().size() <= aryIdx

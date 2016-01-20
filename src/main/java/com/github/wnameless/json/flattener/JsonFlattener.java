@@ -170,7 +170,7 @@ public final class JsonFlattener {
       } else if (deepestIter.peek() instanceof Member) {
         Member mem = (Member) deepestIter.next();
         reduce(mem.getValue());
-      } else if (deepestIter.peek() instanceof JsonValue) {
+      } else { // JsonValue
         JsonValue val = (JsonValue) deepestIter.next();
         reduce(val);
       }
@@ -180,25 +180,13 @@ public final class JsonFlattener {
   }
 
   private void reduce(JsonValue val) {
-    if (val.isObject()) {
-      IndexedPeekIterator<Member> ipi =
-          new IndexedPeekIterator<Member>(val.asObject().iterator());
-      if (ipi.hasNext()) {
-        elementIters.add(ipi);
-      } else {
-        flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
-      }
-    } else if (val.isArray()) {
-      IndexedPeekIterator<JsonValue> ipi =
-          new IndexedPeekIterator<JsonValue>(val.asArray().iterator());
+    if (val.isObject() && val.asObject().iterator().hasNext())
+      elementIters
+          .add(new IndexedPeekIterator<Member>(val.asObject().iterator()));
+    else if (val.isArray() && val.asArray().iterator().hasNext())
       elementIters
           .add(new IndexedPeekIterator<JsonValue>(val.asArray().iterator()));
-      if (ipi.hasNext()) {
-        elementIters.add(ipi);
-      } else {
-        flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
-      }
-    } else
+    else
       flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
   }
 
@@ -230,7 +218,7 @@ public final class JsonFlattener {
           if (sb.length() != 0) sb.append('.');
           sb.append(key);
         }
-      } else if (iter.getCurrent() instanceof JsonValue) {
+      } else { // JsonValue
         sb.append('[');
         sb.append(iter.getIndex());
         sb.append(']');

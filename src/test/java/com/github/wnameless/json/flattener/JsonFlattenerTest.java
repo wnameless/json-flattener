@@ -23,6 +23,7 @@ package com.github.wnameless.json.flattener;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -79,9 +80,9 @@ public class JsonFlattenerTest {
     String json2 = Resources.toString(url2, Charsets.UTF_8);
 
     JsonFlattener flattener = new JsonFlattener(json1);
-    assertTrue(flattener.hashCode() == flattener.hashCode());
-    assertTrue(flattener.hashCode() == new JsonFlattener(json1).hashCode());
-    assertFalse(flattener.hashCode() == new JsonFlattener(json2).hashCode());
+    assertEquals(flattener.hashCode(), flattener.hashCode());
+    assertEquals(flattener.hashCode(), new JsonFlattener(json1).hashCode());
+    assertNotEquals(flattener.hashCode(), new JsonFlattener(json2).hashCode());
   }
 
   @Test
@@ -116,7 +117,7 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testWithEmptyJsonObjectå() throws IOException {
+  public void testWithEmptyJsonObject() throws IOException {
     String json = "{}";
     assertEquals("{}", new JsonFlattener(json).flatten());
     assertEquals(newHashMap(), new JsonFlattener(json).flattenAsMap());
@@ -129,6 +130,8 @@ public class JsonFlattenerTest {
     String json = "[]";
     assertEquals("[]", new JsonFlattener(json).flatten());
     assertEquals(newHashMap(), new JsonFlattener(json).flattenAsMap());
+    assertEquals(json,
+        JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
   }
 
   @Test
@@ -144,6 +147,15 @@ public class JsonFlattenerTest {
   public void testWithEmptyObject() {
     String json = "{\"no\":\"1\",\"name\":\"riya\",\"marks\":[{}]}";
     assertEquals("{\"no\":\"1\",\"name\":\"riya\",\"marks[0]\":{}}",
+        new JsonFlattener(json).flatten());
+    assertEquals(json,
+        JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
+  }
+
+  @Test
+  public void testWithArray() {
+    String json = "[{\"abc\":123},456,[null]]";
+    assertEquals("{\"[0].abc\":123,\"[1]\":456,\"[2][0]\":null}",
         new JsonFlattener(json).flatten());
     assertEquals(json,
         JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
