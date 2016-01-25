@@ -1,7 +1,4 @@
-/**
- *
- * @author Wei-Ming Wu
- *
+/*
  *
  * Copyright 2015 Wei-Ming Wu
  *

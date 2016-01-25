@@ -1,7 +1,4 @@
-/**
-*
-* @author Wei-Ming Wu
-*
+/*
 *
 * Copyright 2015 Wei-Ming Wu
 *
@@ -33,6 +30,9 @@ import java.util.NoSuchElementException;
  * 
  * @param <E>
  *          the type of elements
+ * 
+ * @author Wei-Ming Wu
+ * 
  */
 public final class IndexedPeekIterator<E> implements Iterator<E> {
 

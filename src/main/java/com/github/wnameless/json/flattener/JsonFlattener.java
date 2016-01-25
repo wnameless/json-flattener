@@ -1,8 +1,5 @@
-/**
- *
- * @author Wei-Ming Wu
- *
- *
+/*
+ * 
  * Copyright 2015 Wei-Ming Wu
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -58,6 +55,8 @@ import com.eclipsesource.json.JsonValue;
  * &nbsp;&nbsp;e=f,<br>
  * &nbsp;&nbsp;g=2.3<br>
  * }
+ *
+ * @author Wei-Ming Wu
  *
  */
 public final class JsonFlattener {

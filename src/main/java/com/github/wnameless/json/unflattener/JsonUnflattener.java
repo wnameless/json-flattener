@@ -1,7 +1,4 @@
-/**
- *
- * @author Wei-Ming Wu
- *
+/*
  *
  * Copyright 2015 Wei-Ming Wu
  *
@@ -33,6 +30,8 @@ import com.eclipsesource.json.JsonValue;
  * {@link JsonUnflattener} provides a static {@link #unflatten(String)} method
  * to unflatten any flattened JSON string back to nested one.
  *
+ * @author Wei-Ming Wu
+ * 
  */
 public final class JsonUnflattener {
 
