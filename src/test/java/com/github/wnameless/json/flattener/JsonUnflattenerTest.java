@@ -20,12 +20,16 @@ package com.github.wnameless.json.flattener;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 
 import org.junit.Test;
 
 import com.github.wnameless.json.unflattener.JsonUnflattener;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 public class JsonUnflattenerTest {
 
@@ -53,6 +57,15 @@ public class JsonUnflattenerTest {
   public void testUnflattenWithKeyContainsDotAndSquareBracket() {
     assertEquals("[1,[2,3],4,{\"ab.c.[\":5}]", JsonUnflattener.unflatten(
         "{\"[1][0]\":2,\"[ 0 ]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][ \\\"ab.c.[\\\" ]\":5}"));
+  }
+
+  @Test
+  public void testUnflattenWithReversedKeys() throws IOException {
+    URL url = Resources.getResource("test3.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    assertEquals("{\"List\":[{\"type\":\"A\"},null,{\"type\":\"B\"}]}",
+        JsonUnflattener.unflatten(json));
   }
 
 }

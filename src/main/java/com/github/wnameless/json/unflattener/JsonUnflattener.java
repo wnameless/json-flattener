@@ -147,7 +147,7 @@ public final class JsonUnflattener {
       return currentVal.asObject().get(objKey);
     } else {
       if (currentVal.asArray().size() <= aryIdx
-          || currentVal.asArray().get(aryIdx) == null) {
+          || currentVal.asArray().get(aryIdx).equals(Json.NULL)) {
         JsonValue obj = Json.object();
         assureJsonArraySize(currentVal.asArray(), aryIdx);
         currentVal.asArray().set(aryIdx, obj);
