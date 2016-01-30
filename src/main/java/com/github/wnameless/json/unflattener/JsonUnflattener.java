@@ -37,8 +37,11 @@ public final class JsonUnflattener {
 
   private JsonUnflattener() {}
 
+  private static final String arrayIndex = "\\[\\s*\\d+\\s*\\]";
+  private static final String objectComplexKey = "\\[\\s*\".*\"\\s*\\]";
+  private static final String objectKey = "[^\\.\\[\\]]+";
   private static final Pattern keyPartPattern =
-      Pattern.compile("\\[\\s*\\d+\\s*\\]|\\[\\s*\".*\"\\s*\\]|[^\\.\\[\\]]+");
+      Pattern.compile(arrayIndex + "|" + objectComplexKey + "|" + objectKey);
 
   /**
    * Returns a JSON string of nested objects by the given flattened JSON string.
@@ -95,7 +98,7 @@ public final class JsonUnflattener {
   }
 
   private static String extractKey(String keyPart) {
-    if (keyPart.matches("^\\[\\s*\".*$"))
+    if (keyPart.matches(objectComplexKey))
       return keyPart.replaceAll("^\\[\\s*\"", "").replaceAll("\"\\s*\\]$", "");
     else
       return keyPart;
@@ -106,7 +109,7 @@ public final class JsonUnflattener {
   }
 
   private static boolean matchJsonArray(String keyPart) {
-    return keyPart.matches("\\[\\s*\\d+\\s*\\]");
+    return keyPart.matches(arrayIndex);
   }
 
   private static JsonValue findOrCreateJsonArray(JsonValue currentVal,
@@ -122,7 +125,7 @@ public final class JsonUnflattener {
       return currentVal.asObject().get(objKey);
     } else {
       if (currentVal.asArray().size() <= aryIdx
-          || currentVal.asArray().get(aryIdx) == null) {
+          || currentVal.asArray().get(aryIdx).equals(Json.NULL)) {
         JsonValue ary = Json.array();
         assureJsonArraySize(currentVal.asArray(), aryIdx);
         currentVal.asArray().set(aryIdx, ary);

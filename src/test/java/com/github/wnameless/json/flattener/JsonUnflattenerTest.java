@@ -60,12 +60,20 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testUnflattenWithReversedKeys() throws IOException {
+  public void testUnflattenWithReversedIndexesWithinObjects()
+      throws IOException {
     URL url = Resources.getResource("test3.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
     assertEquals("{\"List\":[{\"type\":\"A\"},null,{\"type\":\"B\"}]}",
         JsonUnflattener.unflatten(json));
+  }
+
+  @Test
+  public void testUnflattenWithReversedIndexes() {
+    String json = "{\"[1][1]\":\"B\",\"[0][0]\":\"A\"}";
+
+    assertEquals("[[\"A\"],[null,\"B\"]]", JsonUnflattener.unflatten(json));
   }
 
 }

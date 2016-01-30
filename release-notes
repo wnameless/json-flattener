@@ -9,3 +9,6 @@ Version 0.1.2
 
 Version 0.1.3
 * Fix the bug of objects unflattening in reversed indexed array(ex: {"List[1].type":"B","List[0].type":"A"})
+
+Version 0.1.4
+* Fix the bug of reversed indexed arrays unflattening(ex: {"[1][1]":"B","[0][0]":"A"})
