@@ -76,4 +76,11 @@ public class JsonUnflattenerTest {
     assertEquals("[[\"A\"],[null,\"B\"]]", JsonUnflattener.unflatten(json));
   }
 
+  @Test
+  public void testUnflattenWithInitComplexKey() {
+    String json = "{\"[\\\"b.b\\\"].aaa\":123}";
+
+    assertEquals("{\"b.b\":{\"aaa\":123}}", JsonUnflattener.unflatten(json));
+  }
+
 }
