@@ -43,7 +43,7 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
   private E current = null;
 
   /**
-   * Creates a {@link IndexedPeekIterator}.
+   * Creates an {@link IndexedPeekIterator}.
    * 
    * @param iterator
    *          an Iterator
