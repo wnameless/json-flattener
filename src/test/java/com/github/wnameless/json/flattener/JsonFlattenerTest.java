@@ -158,4 +158,11 @@ public class JsonFlattenerTest {
         JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
   }
 
+  @Test
+  public void testWithSpecialCharacters() {
+    String json = "[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]";
+    assertEquals("{\"[0].abc\\t\":\" \\\" \\r \\t \1234 \"}",
+        new JsonFlattener(json).flatten());
+  }
+
 }

@@ -17,6 +17,8 @@
  */
 package com.github.wnameless.json.flattener;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJson;
+
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -73,7 +75,7 @@ public final class JsonFlattener {
   }
 
   /**
-   * Returns a flattened JSON as Map.
+   * Returns a flattened JSON as Map.<br>
    * 
    * @param json
    *          the JSON string
@@ -137,7 +139,7 @@ public final class JsonFlattener {
         sb.append(val);
       } else if (val instanceof String) {
         sb.append("\"");
-        sb.append(val);
+        sb.append(escapeJson((String) val));
         sb.append("\"");
       } else if (val instanceof BigDecimal) {
         sb.append(val);
@@ -153,7 +155,7 @@ public final class JsonFlattener {
     if (sb.length() > 1) sb.setLength(sb.length() - 1);
     sb.append("}");
 
-    return sb.toString();
+    return flattenedJson = sb.toString();
   }
 
   /**
@@ -209,13 +211,13 @@ public final class JsonFlattener {
           sb.append('[');
           sb.append('\\');
           sb.append('"');
-          sb.append(key);
+          sb.append(escapeJson(key));
           sb.append('\\');
           sb.append('"');
           sb.append(']');
         } else {
           if (sb.length() != 0) sb.append('.');
-          sb.append(key);
+          sb.append(escapeJson(key));
         }
       } else { // JsonValue
         sb.append('[');
