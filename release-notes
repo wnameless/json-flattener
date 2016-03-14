@@ -16,3 +16,6 @@ Version 0.1.4
 
 Version 0.1.5
 * Escape JSON special characters in flattened JSON keys, values and Java Map keys but not in Java Map values
+
+Version 0.1.6
+* For ease of use, Unicode characters aren't escaped anymore

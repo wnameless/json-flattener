@@ -165,4 +165,10 @@ public class JsonFlattenerTest {
         new JsonFlattener(json).flatten());
   }
 
+  @Test
+  public void testWithUnicodeCharacters() {
+    String json = "[{\"姓名\":123}]";
+    assertEquals("{\"[0].姓名\":123}", new JsonFlattener(json).flatten());
+  }
+
 }

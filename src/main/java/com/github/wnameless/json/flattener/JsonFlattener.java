@@ -17,8 +17,6 @@
  */
 package com.github.wnameless.json.flattener;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeJson;
-
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -27,6 +25,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.commons.lang3.text.translate.AggregateTranslator;
+import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
+import org.apache.commons.lang3.text.translate.EntityArrays;
+import org.apache.commons.lang3.text.translate.LookupTranslator;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject.Member;
@@ -62,6 +65,12 @@ import com.eclipsesource.json.JsonValue;
  *
  */
 public final class JsonFlattener {
+
+  private static final CharSequenceTranslator ESCAPE_JSON_WITHOUT_UNICODE =
+      new AggregateTranslator(
+          new LookupTranslator(new String[][] { { "\"", "\\\"" },
+              { "\\", "\\\\" }, { "/", "\\/" } }),
+          new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()));
 
   /**
    * Returns a flattened JSON string.
@@ -139,7 +148,7 @@ public final class JsonFlattener {
         sb.append(val);
       } else if (val instanceof String) {
         sb.append("\"");
-        sb.append(escapeJson((String) val));
+        sb.append(ESCAPE_JSON_WITHOUT_UNICODE.translate((String) val));
         sb.append("\"");
       } else if (val instanceof BigDecimal) {
         sb.append(val);
@@ -211,13 +220,13 @@ public final class JsonFlattener {
           sb.append('[');
           sb.append('\\');
           sb.append('"');
-          sb.append(escapeJson(key));
+          sb.append(ESCAPE_JSON_WITHOUT_UNICODE.translate(key));
           sb.append('\\');
           sb.append('"');
           sb.append(']');
         } else {
           if (sb.length() != 0) sb.append('.');
-          sb.append(escapeJson(key));
+          sb.append(ESCAPE_JSON_WITHOUT_UNICODE.translate(key));
         }
       } else { // JsonValue
         sb.append('[');
