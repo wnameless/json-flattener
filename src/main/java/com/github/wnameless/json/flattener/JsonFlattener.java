@@ -18,14 +18,11 @@
 package com.github.wnameless.json.flattener;
 
 import java.math.BigDecimal;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
 import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
 import org.apache.commons.lang3.text.translate.EntityArrays;
@@ -84,6 +81,34 @@ public final class JsonFlattener {
   }
 
   /**
+   * Returns a flattened JSON string.
+   *
+   * @param json
+   *          the JSON string
+   * @param preserveArrays
+   *          Control weather arrays are flattened or preserved.
+   * @return a flattened JSON string.
+   */
+  public static String flatten(String json, boolean preserveArrays) {
+    return new JsonFlattener(json).setPreserveArrays(preserveArrays).flatten();
+  }
+
+
+
+  /**
+   * Returns a flattened JSON as Map.<br>
+   *
+   * @param json
+   *          the JSON string
+   * @param preserveArrays
+   *          Control weather arrays are flattened or preserved.
+   * @return a flattened JSON as Map
+   */
+  public static Map<String, Object> flattenAsMap(String json, boolean preserveArrays) {
+    return new JsonFlattener(json).setPreserveArrays(preserveArrays).flattenAsMap();
+  }
+
+  /**
    * Returns a flattened JSON as Map.<br>
    * 
    * @param json
@@ -100,6 +125,7 @@ public final class JsonFlattener {
   private final Map<String, Object> flattenedJsonMap =
       new LinkedHashMap<String, Object>();
   private String flattenedJson = null;
+  private boolean preserveArrays = false;
 
   /**
    * Creates a JSON flattener.
@@ -124,6 +150,17 @@ public final class JsonFlattener {
     }
 
     reduce(source);
+  }
+
+  /**
+   * Returns a flattened JSON string.
+   * @param preserveArrays
+   *          Control weather arrays are flattened or preserved.
+   * @return a flattened JSON string
+   */
+  public String flatten(boolean preserveArrays){
+    this.setPreserveArrays(preserveArrays);
+    return flatten();
   }
 
   /**
@@ -153,7 +190,9 @@ public final class JsonFlattener {
       } else if (val instanceof BigDecimal) {
         sb.append(val);
       } else if (val instanceof List) {
-        sb.append("[]");
+        sb.append("[");
+        if(preserveArrays && !((List) val).isEmpty()) sb.append(((List) val).get(0).toString());
+        sb.append("]");
       } else if (val instanceof Map) {
         sb.append("{}");
       } else {
@@ -165,6 +204,19 @@ public final class JsonFlattener {
     sb.append("}");
 
     return flattenedJson = sb.toString();
+  }
+
+
+
+  /**
+   * Returns a flattened JSON as Map.
+   * @param preserveArrays
+   *          Control weather arrays are flattened or preserved.
+   * @return a flattened JSON as Map
+   */
+  public Map<String, Object> flattenAsMap(boolean preserveArrays) {
+    this.setPreserveArrays(preserveArrays);
+    return flattenAsMap();
   }
 
   /**
@@ -194,10 +246,23 @@ public final class JsonFlattener {
       elementIters
           .add(new IndexedPeekIterator<Member>(val.asObject().iterator()));
     else if (val.isArray() && val.asArray().iterator().hasNext())
-      elementIters
+      if (preserveArrays) flattenedJsonMap.put(computeKey(), Collections.singletonList(flattenArray((JsonArray) val)));
+      else elementIters
           .add(new IndexedPeekIterator<JsonValue>(val.asArray().iterator()));
     else
       flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
+  }
+
+  private String flattenArray(JsonArray array){
+    if(array.size()<1) return "";
+    StringBuilder sb = new StringBuilder();
+    for(JsonValue val : array) {
+      if (val.isObject() || val.isArray()) sb.append(JsonFlattener.flatten(val.toString(), preserveArrays));
+      else sb.append(val.toString());
+      sb.append(',');
+    }
+
+    return sb.toString().substring(0, sb.length()-1);
   }
 
   private Object jsonVal2Obj(JsonValue jsonValue) {
@@ -259,4 +324,14 @@ public final class JsonFlattener {
     return "JsonFlattener{source=" + source + "}";
   }
 
+  /**
+   * Fluent setter for the preserveArrays property.
+   * @param preserveArrays
+   *          Control weather arrays are flattened or preserved.
+   * @return returns the object itself to create a fluent interface.
+   */
+  public JsonFlattener setPreserveArrays(boolean preserveArrays) {
+    this.preserveArrays = preserveArrays;
+    return this;
+  }
 }

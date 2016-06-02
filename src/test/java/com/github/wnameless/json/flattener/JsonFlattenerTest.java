@@ -53,8 +53,6 @@ public class JsonFlattenerTest {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
-    System.out.println(JsonFlattener.flatten(json));
-
     assertEquals(
         "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
         JsonFlattener.flatten(json));
@@ -171,6 +169,16 @@ public class JsonFlattenerTest {
   public void testWithUnicodeCharacters() {
     String json = "[{\"姓名\":123}]";
     assertEquals("{\"[0].姓名\":123}", new JsonFlattener(json).flatten());
+  }
+
+  @Test
+  public void testFlattenKeepArray() throws IOException {
+    URL url = Resources.getResource("test4.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    assertEquals(
+            "{\"a.b\":1,\"a.c\":null,\"a.d\":[false,{\"i.j\":[false,true]}],\"e\":\"f\",\"g\":2.3,\"z\":[]}",
+            JsonFlattener.flatten(json, true));
   }
 
 }
