@@ -83,4 +83,11 @@ public class JsonUnflattenerTest {
     assertEquals("{\"b.b\":{\"aaa\":123}}", JsonUnflattener.unflatten(json));
   }
 
+  @Test
+  public void testUnflattenKeepArray() {
+    String json = "{\"a.b\":1,\"a.c\":null,\"a.d\":[false,{\"i.j\":[false,true]}],\"e\":\"f\",\"g\":2.3,\"z\":[]}";
+
+    assertEquals("{ \"a\": { \"b\": 1, \"c\": null, \"d\": [false, {\"i\":{\"j\":[false, true]}}] }, \"e\": \"f\", \"g\":2.3, \"z\":[] }", JsonUnflattener.unflatten(json));
+  }
+
 }
