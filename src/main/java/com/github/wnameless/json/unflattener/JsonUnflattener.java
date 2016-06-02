@@ -24,8 +24,6 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import com.github.wnameless.json.flattener.JsonFlattener;
-import sun.org.mozilla.javascript.internal.json.JsonParser;
 
 /**
  * 
