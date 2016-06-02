@@ -86,8 +86,20 @@ public class JsonUnflattenerTest {
   @Test
   public void testUnflattenKeepArray() {
     String json = "{\"a.b\":1,\"a.c\":null,\"a.d\":[false,{\"i.j\":[false,true]}],\"e\":\"f\",\"g\":2.3,\"z\":[]}";
+    assertEquals("{\"a\":{\"b\":1,\"c\":null,\"d\":[false,{\"i\":{\"j\":[false,true]}}]},\"e\":\"f\",\"g\":2.3,\"z\":[]}", JsonUnflattener.unflatten(json));
+  }
 
-    assertEquals("{ \"a\": { \"b\": 1, \"c\": null, \"d\": [false, {\"i\":{\"j\":[false, true]}}] }, \"e\": \"f\", \"g\":2.3, \"z\":[] }", JsonUnflattener.unflatten(json));
+
+  @Test
+  public void testUnflattenKeepArrayNested() {
+    String json = "[[{\"a.b\":3}]]";
+    assertEquals("[[{\"a\":{\"b\":3}}]]", JsonUnflattener.unflatten(json));
+  }
+
+  @Test
+  public void testUnflattenKeepArrayEmpty() {
+    String json = "[{}]";
+    assertEquals("[{}]", JsonUnflattener.unflatten(json));
   }
 
 }

@@ -24,6 +24,8 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import com.github.wnameless.json.flattener.JsonFlattener;
+import sun.org.mozilla.javascript.internal.json.JsonParser;
 
 /**
  * 
@@ -52,8 +54,7 @@ public final class JsonUnflattener {
    */
   public static String unflatten(String json) {
     JsonValue root = Json.parse(json);
-    if (root.isArray()) return root.asArray().toString();
-
+    if (root.isArray()) return unflattenArray((JsonArray) root).toString();
     JsonObject flattened = root.asObject();
     JsonValue unflattened = flattened.names().isEmpty() ? Json.object() : null;
 
@@ -61,6 +62,7 @@ public final class JsonUnflattener {
       JsonValue currentVal = unflattened;
       String objKey = null;
       Integer aryIdx = null;
+      JsonValue content = flattened.get(key);
 
       Matcher matcher = keyPartPattern.matcher(key);
       while (matcher.find()) {
@@ -72,6 +74,7 @@ public final class JsonUnflattener {
             objKey = null;
             aryIdx = extractIndex(keyPart);
           } else { // JSON object
+            if(content.isArray()) flattened.set(key, unflattenArray((JsonArray) content));
             currentVal = findOrCreateJsonObject(currentVal, objKey, aryIdx);
             objKey = extractKey(keyPart);
             aryIdx = null;
@@ -94,7 +97,22 @@ public final class JsonUnflattener {
       setUnflattenedValue(flattened, key, currentVal, objKey, aryIdx);
     }
 
-    return unflattened.toString();
+    return (unflattened!=null)?unflattened.toString():"";
+  }
+
+  private static JsonArray unflattenArray(JsonArray array){
+    int size = array.size();
+    for(int i = 0; i < size; i++){
+      JsonValue value = array.get(i);
+      JsonValue result = null;
+      if(value.isArray()){
+        result = unflattenArray((JsonArray) value);
+      }else if(value.isObject()){
+        result = Json.parse(JsonUnflattener.unflatten(value.toString()));
+      }
+      if(result != null) array.set(i, result);
+    }
+    return array;
   }
 
   private static String extractKey(String keyPart) {
