@@ -53,6 +53,8 @@ public class JsonFlattenerTest {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
+    System.out.println(JsonFlattener.flatten(json));
+
     assertEquals(
         "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
         JsonFlattener.flatten(json));
