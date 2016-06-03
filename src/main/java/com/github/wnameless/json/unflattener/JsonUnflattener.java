@@ -40,8 +40,8 @@ public final class JsonUnflattener {
   private static final String arrayIndex = "\\[\\s*\\d+\\s*\\]";
   private static final String objectComplexKey = "\\[\\s*\".*\"\\s*\\]";
   private static final String objectKey = "[^\\.\\[\\]]+";
-  private static final Pattern keyPartPattern =
-      Pattern.compile(arrayIndex + "|" + objectComplexKey + "|" + objectKey);
+  private static final Pattern keyPartPattern = Pattern.compile(arrayIndex
+      + "|" + objectComplexKey + "|" + objectKey);
 
   /**
    * Returns a JSON string of nested objects by the given flattened JSON string.
@@ -52,8 +52,7 @@ public final class JsonUnflattener {
    */
   public static String unflatten(String json) {
     JsonValue root = Json.parse(json);
-    if (root.isArray()) return root.asArray().toString();
-
+    if (root.isArray()) return unflattenArray((JsonArray) root).toString();
     JsonObject flattened = root.asObject();
     JsonValue unflattened = flattened.names().isEmpty() ? Json.object() : null;
 
@@ -72,6 +71,9 @@ public final class JsonUnflattener {
             objKey = null;
             aryIdx = extractIndex(keyPart);
           } else { // JSON object
+            if (flattened.get(key).isArray())
+              flattened
+                  .set(key, unflattenArray((JsonArray) flattened.get(key)));
             currentVal = findOrCreateJsonObject(currentVal, objKey, aryIdx);
             objKey = extractKey(keyPart);
             aryIdx = null;
@@ -95,6 +97,22 @@ public final class JsonUnflattener {
     }
 
     return unflattened.toString();
+  }
+
+  private static JsonArray unflattenArray(JsonArray array) {
+    JsonArray unflattenArray = Json.array().asArray();
+    for (JsonValue value : array) {
+      if (value.isArray()) {
+        unflattenArray.add(unflattenArray(value.asArray()));
+      } else if (value.isObject()) {
+        unflattenArray.add(Json.parse(JsonUnflattener.unflatten(value
+            .toString())));
+      } else {
+        unflattenArray.add(value);
+      }
+    }
+
+    return unflattenArray;
   }
 
   private static String extractKey(String keyPart) {

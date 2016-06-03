@@ -48,8 +48,7 @@ import com.eclipsesource.json.JsonValue;
  * { "a" : { "b" : 1, "c": null, "d": [false, true] }, "e": "f", "g":2.3 }<br>
  * <br>
  * can be turned into a flattened JSON <br>
- * { "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": "f", "g":2.3 }
- * <br>
+ * { "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": "f", "g":2.3 } <br>
  * <br>
  * or into a Map<br>
  * {<br>
@@ -67,9 +66,8 @@ import com.eclipsesource.json.JsonValue;
 public final class JsonFlattener {
 
   private static final CharSequenceTranslator ESCAPE_JSON_WITHOUT_UNICODE =
-      new AggregateTranslator(
-          new LookupTranslator(new String[][] { { "\"", "\\\"" },
-              { "\\", "\\\\" }, { "/", "\\/" } }),
+      new AggregateTranslator(new LookupTranslator(new String[][] {
+          { "\"", "\\\"" }, { "\\", "\\\\" }, { "/", "\\/" } }),
           new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()));
 
   /**
@@ -98,7 +96,8 @@ public final class JsonFlattener {
   private final Deque<IndexedPeekIterator<?>> elementIters =
       new ArrayDeque<IndexedPeekIterator<?>>();
   private final Map<String, Object> flattenedJsonMap =
-      new LinkedHashMap<String, Object>();
+      new JsonifyLinkedHashMap<String, Object>(ESCAPE_JSON_WITHOUT_UNICODE);
+  private FlattenMode mode = FlattenMode.NORMAL;
   private String flattenedJson = null;
 
   /**
@@ -110,8 +109,7 @@ public final class JsonFlattener {
   public JsonFlattener(String json) {
     source = Json.parse(json);
     if (!source.isObject() && !source.isArray()) {
-      throw new IllegalArgumentException(
-          "Input must be a JSON object or array");
+      throw new IllegalArgumentException("Input must be a JSON object or array");
     }
 
     if (source.isObject() && !source.asObject().iterator().hasNext()) {
@@ -124,6 +122,11 @@ public final class JsonFlattener {
     }
 
     reduce(source);
+  }
+
+  public JsonFlattener withMode(FlattenMode mode) {
+    this.mode = mode;
+    return this;
   }
 
   /**
@@ -153,9 +156,9 @@ public final class JsonFlattener {
       } else if (val instanceof BigDecimal) {
         sb.append(val);
       } else if (val instanceof List) {
-        sb.append("[]");
+        sb.append(val);
       } else if (val instanceof Map) {
-        sb.append("{}");
+        sb.append(val);
       } else {
         sb.append("null");
       }
@@ -190,22 +193,47 @@ public final class JsonFlattener {
   }
 
   private void reduce(JsonValue val) {
-    if (val.isObject() && val.asObject().iterator().hasNext())
-      elementIters
-          .add(new IndexedPeekIterator<Member>(val.asObject().iterator()));
-    else if (val.isArray() && val.asArray().iterator().hasNext())
-      elementIters
-          .add(new IndexedPeekIterator<JsonValue>(val.asArray().iterator()));
-    else
+    if (val.isObject() && val.asObject().iterator().hasNext()) {
+      elementIters.add(new IndexedPeekIterator<Member>(val.asObject()
+          .iterator()));
+    } else if (val.isArray() && mode == FlattenMode.NORMAL) {
+      if (val.asArray().iterator().hasNext()) {
+        elementIters.add(new IndexedPeekIterator<JsonValue>(val.asArray()
+            .iterator()));
+      } else {
+        flattenedJsonMap.put(computeKey(), new ArrayList<Object>());
+      }
+    } else if (val.isArray() && mode == FlattenMode.KEEP_ARRAYS) {
+      if (val.asArray().iterator().hasNext()) {
+        List<Object> array =
+            new JsonifyArrayList<Object>(ESCAPE_JSON_WITHOUT_UNICODE);
+        for (JsonValue jv : val.asArray()) {
+          array.add(jsonVal2Obj(jv));
+        }
+        flattenedJsonMap.put(computeKey(), array);
+      } else {
+        flattenedJsonMap.put(computeKey(), new ArrayList<Object>());
+      }
+    } else {
       flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
+    }
   }
 
   private Object jsonVal2Obj(JsonValue jsonValue) {
     if (jsonValue.isBoolean()) return jsonValue.asBoolean();
     if (jsonValue.isString()) return jsonValue.asString();
     if (jsonValue.isNumber()) return new BigDecimal(jsonValue.toString());
-    if (jsonValue.isArray()) return new ArrayList<Object>();
-    if (jsonValue.isObject()) return new LinkedHashMap<String, Object>();
+    switch (mode) {
+      case KEEP_ARRAYS:
+        if (jsonValue.isArray() && !jsonValue.asArray().iterator().hasNext())
+          return new ArrayList<Object>();
+        else
+          return new JsonFlattener(jsonValue.toString()).withMode(
+              FlattenMode.KEEP_ARRAYS).flattenAsMap();
+      default:
+        if (jsonValue.isArray()) return new ArrayList<Object>();
+        if (jsonValue.isObject()) return new LinkedHashMap<String, Object>();
+    }
 
     return null;
   }
