@@ -67,4 +67,9 @@ System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePo
 json = "{\"abc\":{\"def\":123}}";
 System.out.println(new JsonFlattener(json).withSeparator('*').flatten());
 // {"abc*def":123}
+
+// Separator - Unflattener can also be set arbitrary separator
+json = "{\"abc*def\":123}";
+System.out.println(new JsonUnflattener(json).withSeparator('*').unflatten());
+// {"abc":{"def":123}}
 ```

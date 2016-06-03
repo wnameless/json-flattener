@@ -86,4 +86,11 @@ public class JsonUnflattenerTest {
             FlattenMode.KEEP_ARRAYS).flatten()));
   }
 
+  @Test
+  public void testWithSeparater() {
+    String json = "{\"abc\":{\"def\":123}}";
+    assertEquals(json, new JsonUnflattener(new JsonFlattener(json)
+        .withSeparator('*').flatten()).withSeparator('*').unflatten());
+  }
+
 }
