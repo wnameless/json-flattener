@@ -39,12 +39,6 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
   private CharSequenceTranslator translator = StringEscapePolicy.NORMAL
       .getCharSequenceTranslator();
 
-  public JsonifyLinkedHashMap(CharSequenceTranslator translator) {
-    this.translator = translator;
-  }
-
-  public JsonifyLinkedHashMap() {}
-
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
   }

@@ -48,3 +48,23 @@ String nestedJsonWithDotKey = JsonUnflattener.unflatten(
 System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
+
+###New Features(Since v0.2.0)
+```java
+String json = null;
+
+// FlattenMode - Keep arrays or not
+json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
+System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten());
+// Output: {"abc.def":[1,2,{"g.h":[3]}]}
+
+// StringEscapePolicy - Escape Unicodes or not
+json = "{\"abc\":{\"def\":\"太極\"}}";
+System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePolicy.ALL_UNICODES).flatten());
+// {"abc.def":"\u592A\u6975"}
+
+// Separator - Accept arbitrary separator
+json = "{\"abc\":{\"def\":123}}";
+System.out.println(new JsonFlattener(json).withSeparator('*').flatten());
+// {"abc*def":123}
+```

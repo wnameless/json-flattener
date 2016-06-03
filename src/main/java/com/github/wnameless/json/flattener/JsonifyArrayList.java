@@ -37,12 +37,6 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
   private CharSequenceTranslator translator = StringEscapePolicy.NORMAL
       .getCharSequenceTranslator();
 
-  public JsonifyArrayList(CharSequenceTranslator translator) {
-    this.translator = translator;
-  }
-
-  public JsonifyArrayList() {}
-
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
   }

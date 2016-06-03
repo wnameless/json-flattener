@@ -210,14 +210,14 @@ public final class JsonFlattener {
       }
     } else if (val.isArray() && mode == FlattenMode.KEEP_ARRAYS) {
       if (val.asArray().iterator().hasNext()) {
-        List<Object> array =
-            new JsonifyArrayList<Object>(policy.getCharSequenceTranslator());
+        JsonifyArrayList<Object> array = new JsonifyArrayList<Object>();
+        array.setTranslator(policy.getCharSequenceTranslator());
         for (JsonValue jv : val.asArray()) {
           array.add(jsonVal2Obj(jv));
         }
         flattenedJsonMap.put(computeKey(), array);
       } else {
-        flattenedJsonMap.put(computeKey(), new ArrayList<Object>());
+        flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
       }
     } else {
       flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
@@ -230,11 +230,21 @@ public final class JsonFlattener {
     if (jsonValue.isNumber()) return new BigDecimal(jsonValue.toString());
     switch (mode) {
       case KEEP_ARRAYS:
-        if (jsonValue.isArray() && !jsonValue.asArray().iterator().hasNext())
-          return new ArrayList<Object>();
-        else
+        if (jsonValue.isArray()) {
+          if (!jsonValue.asArray().iterator().hasNext()) {
+            return new ArrayList<Object>();
+          } else {
+            JsonifyArrayList<Object> array = new JsonifyArrayList<Object>();
+            array.setTranslator(policy.getCharSequenceTranslator());
+            for (JsonValue jv : jsonValue.asArray()) {
+              array.add(jsonVal2Obj(jv));
+            }
+            return array;
+          }
+        } else {
           return new JsonFlattener(jsonValue.toString()).withFlattenMode(
               FlattenMode.KEEP_ARRAYS).flattenAsMap();
+        }
       default:
         if (jsonValue.isArray()) return new ArrayList<Object>();
         if (jsonValue.isObject()) return new LinkedHashMap<String, Object>();

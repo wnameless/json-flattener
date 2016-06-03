@@ -173,12 +173,27 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testWithKeepArrays() throws IOException {
+  public void testWithFlattenMode() throws IOException {
     URL url = Resources.getResource("test4.json");
     String json = Resources.toString(url, Charsets.UTF_8);
     assertEquals(
-        "{\"ab\":[1,2,3],\"cd.ef\":[4,5,{\"g.hi\":[6,\"j\"],\"g.k\":[]}]}",
-        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten());
+        "{\"ab\":[1,2,3],\"cd.ef\":[4,5,{\"g.hi\":[6,\"j\"],\"g.k\":[[7]],\"g.l\":[[]]}]}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .flatten());
+  }
+
+  @Test
+  public void testWithStringEscapePolicy() {
+    String json = "{\"abc\":{\"def\":\"太極\"}}";
+    assertEquals("{\"abc.def\":\"\\u592A\\u6975\"}", new JsonFlattener(json)
+        .withStringEscapePolicy(StringEscapePolicy.ALL_UNICODES).flatten());
+  }
+
+  @Test
+  public void testWithSeparator() {
+    String json = "{\"abc\":{\"def\":123}}";
+    assertEquals("{\"abc*def\":123}", new JsonFlattener(json)
+        .withSeparator('*').flatten());
   }
 
 }
