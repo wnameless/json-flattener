@@ -26,11 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.text.translate.AggregateTranslator;
-import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
-import org.apache.commons.lang3.text.translate.EntityArrays;
-import org.apache.commons.lang3.text.translate.LookupTranslator;
-
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
@@ -65,11 +60,6 @@ import com.eclipsesource.json.JsonValue;
  */
 public final class JsonFlattener {
 
-  private static final CharSequenceTranslator ESCAPE_JSON_WITHOUT_UNICODE =
-      new AggregateTranslator(new LookupTranslator(new String[][] {
-          { "\"", "\\\"" }, { "\\", "\\\\" }, { "/", "\\/" } }),
-          new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()));
-
   /**
    * Returns a flattened JSON string.
    * 
@@ -95,9 +85,13 @@ public final class JsonFlattener {
   private final JsonValue source;
   private final Deque<IndexedPeekIterator<?>> elementIters =
       new ArrayDeque<IndexedPeekIterator<?>>();
-  private final Map<String, Object> flattenedJsonMap =
-      new JsonifyLinkedHashMap<String, Object>(ESCAPE_JSON_WITHOUT_UNICODE);
+  private final JsonifyLinkedHashMap<String, Object> flattenedJsonMap =
+      new JsonifyLinkedHashMap<String, Object>();
+
   private FlattenMode mode = FlattenMode.NORMAL;
+  private Character separator = '.';
+  private StringEscapePolicy policy = StringEscapePolicy.NORMAL;
+
   private String flattenedJson = null;
 
   /**
@@ -124,8 +118,19 @@ public final class JsonFlattener {
     reduce(source);
   }
 
-  public JsonFlattener withMode(FlattenMode mode) {
+  public JsonFlattener withFlattenMode(FlattenMode mode) {
     this.mode = mode;
+    return this;
+  }
+
+  public JsonFlattener withSeparator(Character separator) {
+    this.separator = separator;
+    return this;
+  }
+
+  public JsonFlattener withStringEscapePolicy(StringEscapePolicy policy) {
+    this.policy = policy;
+    flattenedJsonMap.setTranslator(policy.getCharSequenceTranslator());
     return this;
   }
 
@@ -151,7 +156,7 @@ public final class JsonFlattener {
         sb.append(val);
       } else if (val instanceof String) {
         sb.append("\"");
-        sb.append(ESCAPE_JSON_WITHOUT_UNICODE.translate((String) val));
+        sb.append(policy.getCharSequenceTranslator().translate((String) val));
         sb.append("\"");
       } else if (val instanceof BigDecimal) {
         sb.append(val);
@@ -206,7 +211,7 @@ public final class JsonFlattener {
     } else if (val.isArray() && mode == FlattenMode.KEEP_ARRAYS) {
       if (val.asArray().iterator().hasNext()) {
         List<Object> array =
-            new JsonifyArrayList<Object>(ESCAPE_JSON_WITHOUT_UNICODE);
+            new JsonifyArrayList<Object>(policy.getCharSequenceTranslator());
         for (JsonValue jv : val.asArray()) {
           array.add(jsonVal2Obj(jv));
         }
@@ -228,7 +233,7 @@ public final class JsonFlattener {
         if (jsonValue.isArray() && !jsonValue.asArray().iterator().hasNext())
           return new ArrayList<Object>();
         else
-          return new JsonFlattener(jsonValue.toString()).withMode(
+          return new JsonFlattener(jsonValue.toString()).withFlattenMode(
               FlattenMode.KEEP_ARRAYS).flattenAsMap();
       default:
         if (jsonValue.isArray()) return new ArrayList<Object>();
@@ -244,22 +249,22 @@ public final class JsonFlattener {
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
         String key = ((Member) iter.getCurrent()).getName();
-        if (key.contains(".")) {
-          sb.append('[');
+        if (key.contains(separator.toString())) {
+          sb.append("[");
           sb.append('\\');
           sb.append('"');
-          sb.append(ESCAPE_JSON_WITHOUT_UNICODE.translate(key));
+          sb.append(policy.getCharSequenceTranslator().translate(key));
           sb.append('\\');
           sb.append('"');
-          sb.append(']');
+          sb.append("]");
         } else {
-          if (sb.length() != 0) sb.append('.');
-          sb.append(ESCAPE_JSON_WITHOUT_UNICODE.translate(key));
+          if (sb.length() != 0) sb.append(separator);
+          sb.append(policy.getCharSequenceTranslator().translate(key));
         }
       } else { // JsonValue
-        sb.append('[');
+        sb.append("[");
         sb.append(iter.getIndex());
-        sb.append(']');
+        sb.append("]");
       }
     }
 

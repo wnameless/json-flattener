@@ -18,11 +18,8 @@
 package com.github.wnameless.json.flattener;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 
 import org.junit.Test;
@@ -32,15 +29,6 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
 public class JsonUnflattenerTest {
-
-  @Test
-  public void testPrivateContructor() throws Exception {
-    Constructor<JsonUnflattener> c =
-        JsonUnflattener.class.getDeclaredConstructor();
-    assertTrue(Modifier.isPrivate(c.getModifiers()));
-    c.setAccessible(true);
-    c.newInstance();
-  }
 
   @Test
   public void testUnflatten() {
@@ -94,7 +82,7 @@ public class JsonUnflattenerTest {
 
     assertEquals(
         json,
-        JsonUnflattener.unflatten(new JsonFlattener(json).withMode(
+        JsonUnflattener.unflatten(new JsonFlattener(json).withFlattenMode(
             FlattenMode.KEEP_ARRAYS).flatten()));
   }
 

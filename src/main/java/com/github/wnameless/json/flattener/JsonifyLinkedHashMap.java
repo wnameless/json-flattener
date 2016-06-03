@@ -21,13 +21,31 @@ import java.util.LinkedHashMap;
 
 import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
 
+/**
+ * {@link JsonifyLinkedHashMap} is simple a LinkedHashMap but with an override
+ * jsonify toString method.
+ * 
+ * @author Wei-Ming Wu
+ *
+ * @param <K>
+ *          the type of keys
+ * @param <V>
+ *          the type of values
+ */
 public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 
   private static final long serialVersionUID = -8253975758958193883L;
 
-  private final CharSequenceTranslator translator;
+  private CharSequenceTranslator translator = StringEscapePolicy.NORMAL
+      .getCharSequenceTranslator();
 
   public JsonifyLinkedHashMap(CharSequenceTranslator translator) {
+    this.translator = translator;
+  }
+
+  public JsonifyLinkedHashMap() {}
+
+  public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
   }
 
@@ -35,15 +53,15 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
   public String toString() {
     StringBuilder sb = new StringBuilder("{");
     for (K key : keySet()) {
-      sb.append("\"");
+      sb.append('"');
       sb.append(key);
-      sb.append("\"");
+      sb.append('"');
       sb.append(":");
       V value = get(key);
       if (value instanceof String) {
-        sb.append("\"");
+        sb.append('"');
         sb.append(translator.translate((String) value));
-        sb.append("\"");
+        sb.append('"');
       } else {
         sb.append(value);
       }

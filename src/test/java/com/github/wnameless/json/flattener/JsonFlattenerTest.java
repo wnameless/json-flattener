@@ -176,8 +176,9 @@ public class JsonFlattenerTest {
   public void testWithKeepArrays() throws IOException {
     URL url = Resources.getResource("test4.json");
     String json = Resources.toString(url, Charsets.UTF_8);
-    assertEquals("{\"ab\":[1,2,3],\"cd.ef\":[4,5,{\"g.hi\":[6,7]}]}",
-        new JsonFlattener(json).withMode(FlattenMode.KEEP_ARRAYS).flatten());
+    assertEquals(
+        "{\"ab\":[1,2,3],\"cd.ef\":[4,5,{\"g.hi\":[6,\"j\"],\"g.k\":[]}]}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten());
   }
 
 }

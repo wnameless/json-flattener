@@ -19,3 +19,8 @@ Version 0.1.5
 
 Version 0.1.6
 * For ease of use, Unicode characters aren't escaped anymore
+
+Version 0.2.0
++ Add FlattenMode
++ Add StringEscapePolicy
++ Add separator config 

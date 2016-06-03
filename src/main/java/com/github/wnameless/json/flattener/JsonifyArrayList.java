@@ -21,13 +21,29 @@ import java.util.ArrayList;
 
 import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
 
+/**
+ * {@link JsonifyArrayList} is simply a ArrayList but with an override jsonify
+ * toString method.
+ * 
+ * @author Wei-Ming Wu
+ *
+ * @param <E>
+ *          the type of elements
+ */
 public class JsonifyArrayList<E> extends ArrayList<E> {
 
   private static final long serialVersionUID = -2635637825741772032L;
 
-  private final CharSequenceTranslator translator;
+  private CharSequenceTranslator translator = StringEscapePolicy.NORMAL
+      .getCharSequenceTranslator();
 
   public JsonifyArrayList(CharSequenceTranslator translator) {
+    this.translator = translator;
+  }
+
+  public JsonifyArrayList() {}
+
+  public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
   }
 
@@ -36,9 +52,9 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
     StringBuilder sb = new StringBuilder("[");
     for (E e : this) {
       if (e instanceof String) {
-        sb.append("\"");
+        sb.append('"');
         sb.append(translator.translate((String) e));
-        sb.append("\"");
+        sb.append('"');
       } else {
         sb.append(e);
       }

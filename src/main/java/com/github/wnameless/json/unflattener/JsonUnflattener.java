@@ -35,13 +35,29 @@ import com.eclipsesource.json.JsonValue;
  */
 public final class JsonUnflattener {
 
-  private JsonUnflattener() {}
-
   private static final String arrayIndex = "\\[\\s*\\d+\\s*\\]";
   private static final String objectComplexKey = "\\[\\s*\".*\"\\s*\\]";
-  private static final String objectKey = "[^\\.\\[\\]]+";
-  private static final Pattern keyPartPattern = Pattern.compile(arrayIndex
-      + "|" + objectComplexKey + "|" + objectKey);
+
+  private final String json;
+  private Character separator = '.';
+
+  public JsonUnflattener(String json) {
+    this.json = json;
+  }
+
+  private String objectKey() {
+    return "[^" + Pattern.quote(separator.toString()) + "\\[\\]]+";
+  }
+
+  private Pattern keyPartPattern() {
+    return Pattern.compile(arrayIndex + "|" + objectComplexKey + "|"
+        + objectKey());
+  }
+
+  public JsonUnflattener withSeparator(Character separator) {
+    this.separator = separator;
+    return this;
+  }
 
   /**
    * Returns a JSON string of nested objects by the given flattened JSON string.
@@ -51,6 +67,15 @@ public final class JsonUnflattener {
    * @return a JSON string of nested objects
    */
   public static String unflatten(String json) {
+    return new JsonUnflattener(json).unflatten();
+  }
+
+  /**
+   * Returns a JSON string of nested objects by the given flattened JSON string.
+   * 
+   * @return a JSON string of nested objects
+   */
+  public String unflatten() {
     JsonValue root = Json.parse(json);
     if (root.isArray()) return unflattenArray((JsonArray) root).toString();
     JsonObject flattened = root.asObject();
@@ -61,7 +86,7 @@ public final class JsonUnflattener {
       String objKey = null;
       Integer aryIdx = null;
 
-      Matcher matcher = keyPartPattern.matcher(key);
+      Matcher matcher = keyPartPattern().matcher(key);
       while (matcher.find()) {
         String keyPart = matcher.group();
 
@@ -99,14 +124,14 @@ public final class JsonUnflattener {
     return unflattened.toString();
   }
 
-  private static JsonArray unflattenArray(JsonArray array) {
+  private JsonArray unflattenArray(JsonArray array) {
     JsonArray unflattenArray = Json.array().asArray();
     for (JsonValue value : array) {
       if (value.isArray()) {
         unflattenArray.add(unflattenArray(value.asArray()));
       } else if (value.isObject()) {
-        unflattenArray.add(Json.parse(JsonUnflattener.unflatten(value
-            .toString())));
+        unflattenArray.add(Json.parse(new JsonUnflattener(value.toString())
+            .withSeparator(separator).unflatten()));
       } else {
         unflattenArray.add(value);
       }
