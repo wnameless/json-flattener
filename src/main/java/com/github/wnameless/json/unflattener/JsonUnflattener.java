@@ -89,6 +89,8 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withPrintMode(PrintMode printMode) {
+    if (printMode == null) throw new NullPointerException();
+
     this.printMode = printMode;
     return this;
   }

@@ -117,7 +117,10 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
+    if (flattenMode == null) throw new NullPointerException();
+
     this.flattenMode = flattenMode;
+    flattenedMap = null;
     return this;
   }
 
@@ -129,7 +132,10 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withStringEscapePolicy(StringEscapePolicy policy) {
+    if (policy == null) throw new NullPointerException();
+
     this.policy = policy;
+    flattenedMap = null;
     return this;
   }
 
@@ -143,6 +149,7 @@ public final class JsonFlattener {
    */
   public JsonFlattener withSeparator(char separator) {
     this.separator = separator;
+    flattenedMap = null;
     return this;
   }
 
@@ -155,6 +162,8 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withPrintMode(PrintMode printMode) {
+    if (printMode == null) throw new NullPointerException();
+
     this.printMode = printMode;
     return this;
   }
@@ -197,6 +206,8 @@ public final class JsonFlattener {
    * @return a flattened JSON as Map
    */
   public Map<String, Object> flattenAsMap() {
+    if (flattenedMap != null) return flattenedMap;
+
     flattenedMap = new JsonifyLinkedHashMap<String, Object>();
     flattenedMap.setTranslator(policy.getCharSequenceTranslator());
     reduce(source);

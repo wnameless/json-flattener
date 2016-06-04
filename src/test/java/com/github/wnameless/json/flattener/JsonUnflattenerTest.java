@@ -141,4 +141,9 @@ public class JsonUnflattenerTest {
         ju.withPrintMode(PrintMode.REGULAR).unflatten());
   }
 
+  @Test(expected = NullPointerException.class)
+  public void testNullPointerException() {
+    new JsonUnflattener("{\"abc.def\":123}").withPrintMode(null);
+  }
+
 }

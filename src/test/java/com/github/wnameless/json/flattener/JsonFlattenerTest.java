@@ -23,7 +23,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -302,9 +304,26 @@ public class JsonFlattenerTest {
   @Test
   public void testNoCache() {
     JsonFlattener jf = new JsonFlattener("{\"abc\":{\"def\":123}}");
-    assertNotSame(jf.flattenAsMap(), jf.flattenAsMap());
+    assertSame(jf.flattenAsMap(), jf.flattenAsMap());
     assertNotSame(jf.flatten(), jf.flatten());
     assertEquals("{\"abc*def\":123}", jf.withSeparator('*').flatten());
+    assertNotEquals(jf.flatten(), jf.withPrintMode(PrintMode.REGULAR).flatten());
+  }
+
+  @Test
+  public void testNullPointerException() {
+    try {
+      new JsonFlattener("{\"abc\":{\"def\":123}}").withFlattenMode(null);
+      fail();
+    } catch (NullPointerException e) {}
+    try {
+      new JsonFlattener("{\"abc\":{\"def\":123}}").withStringEscapePolicy(null);
+      fail();
+    } catch (NullPointerException e) {}
+    try {
+      new JsonFlattener("{\"abc\":{\"def\":123}}").withPrintMode(null);
+      fail();
+    } catch (NullPointerException e) {}
   }
 
 }
