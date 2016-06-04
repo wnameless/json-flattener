@@ -33,9 +33,16 @@ import org.apache.commons.lang3.text.translate.LookupTranslator;
  */
 public enum StringEscapePolicy {
 
+  /**
+   * Escapes JSON special characters.
+   */
   NORMAL(new AggregateTranslator(new LookupTranslator(new String[][] {
       { "\"", "\\\"" }, { "\\", "\\\\" }, { "/", "\\/" } }),
       new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()))),
+
+  /**
+   * Escapes JSON special characters and Unicode characters.
+   */
   ALL_UNICODES(StringEscapeUtils.ESCAPE_JSON);
 
   private final CharSequenceTranslator translator;

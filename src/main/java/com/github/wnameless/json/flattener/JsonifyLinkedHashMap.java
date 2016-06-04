@@ -17,10 +17,16 @@
  */
 package com.github.wnameless.json.flattener;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
+
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.PrettyPrint;
+import com.eclipsesource.json.WriterConfig;
 
 /**
  * {@link JsonifyLinkedHashMap} is simple a LinkedHashMap but with an override
@@ -35,13 +41,31 @@ import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
  */
 public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 
-  private static final long serialVersionUID = -8253975758958193883L;
+  private static final long serialVersionUID = 1L;
 
   private CharSequenceTranslator translator = StringEscapePolicy.NORMAL
       .getCharSequenceTranslator();
 
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
+  }
+
+  public String toString(PrintMode printMode) {
+    StringWriter sw = new StringWriter();
+    try {
+      switch (printMode) {
+        case REGULAR:
+          Json.parse(toString()).writeTo(sw, PrettyPrint.singleLine());
+          break;
+        case PRETTY:
+          Json.parse(toString()).writeTo(sw, WriterConfig.PRETTY_PRINT);
+          break;
+        default:
+          return toString();
+      }
+    } catch (IOException e) {}
+
+    return sw.toString();
   }
 
   @Override

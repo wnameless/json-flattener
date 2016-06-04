@@ -95,9 +95,10 @@ public final class JsonFlattener {
   private final JsonifyLinkedHashMap<String, Object> flattenedMap =
       new JsonifyLinkedHashMap<String, Object>();
 
-  private FlattenMode mode = FlattenMode.NORMAL;
+  private FlattenMode flattenMode = FlattenMode.NORMAL;
   private StringEscapePolicy policy = StringEscapePolicy.NORMAL;
   private Character separator = '.';
+  private PrintMode printMode = PrintMode.MINIMAL;
   private String flattenedJson = null;
 
   /**
@@ -113,12 +114,12 @@ public final class JsonFlattener {
   /**
    * A fluent setter to setup a mode of the {@link JsonFlattener}.
    * 
-   * @param mode
+   * @param flattenMode
    *          a {@link FlattenMode}
    * @return this {@link JsonFlattener}
    */
-  public JsonFlattener withFlattenMode(FlattenMode mode) {
-    this.mode = mode;
+  public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
+    this.flattenMode = flattenMode;
     return this;
   }
 
@@ -132,6 +133,23 @@ public final class JsonFlattener {
    */
   public JsonFlattener withSeparator(char separator) {
     this.separator = separator;
+    return this;
+  }
+
+  /**
+   * A fluent setter to setup a print mode of the {@link JsonFlattener}. The
+   * default print mode is minimal.
+   * 
+   * @param printMode
+   *          a {@link PrintMode}
+   * @return this {@link JsonFlattener}
+   */
+  public JsonFlattener withPrintMode(PrintMode printMode) {
+    if (flattenedJson != null) {
+      throw new IllegalStateException(
+          "Print mode can NOT be changed after flattening JSON");
+    }
+    this.printMode = printMode;
     return this;
   }
 
@@ -161,7 +179,7 @@ public final class JsonFlattener {
     if (flattenedMap.containsKey(ROOT))
       return javaObj2Json(flattenedMap.get(ROOT));
     else
-      return flattenedJson = flattenedMap.toString();
+      return flattenedJson = flattenedMap.toString(printMode);
   }
 
   private String javaObj2Json(Object obj) {
@@ -174,6 +192,9 @@ public final class JsonFlattener {
           .translate((CharSequence) obj));
       sb.append('"');
       return sb.toString();
+    } else if (obj instanceof JsonifyArrayList) {
+      JsonifyArrayList<?> list = (JsonifyArrayList<?>) obj;
+      return list.toString(printMode);
     } else {
       return obj.toString();
     }
@@ -208,12 +229,12 @@ public final class JsonFlattener {
       elementIters.add(new IndexedPeekIterator<Member>(val.asObject()
           .iterator()));
     } else if (val.isArray() && val.asArray().iterator().hasNext()) {
-      switch (mode) {
+      switch (flattenMode) {
         case KEEP_ARRAYS:
           JsonifyArrayList<Object> array = new JsonifyArrayList<Object>();
           array.setTranslator(policy.getCharSequenceTranslator());
-          for (JsonValue jv : val.asArray()) {
-            array.add(jsonVal2Obj(jv));
+          for (JsonValue value : val.asArray()) {
+            array.add(jsonVal2Obj(value));
           }
           flattenedMap.put(computeKey(), array);
           break;
@@ -234,7 +255,7 @@ public final class JsonFlattener {
     if (jsonValue.isBoolean()) return jsonValue.asBoolean();
     if (jsonValue.isString()) return jsonValue.asString();
     if (jsonValue.isNumber()) return new BigDecimal(jsonValue.toString());
-    switch (mode) {
+    switch (flattenMode) {
       case KEEP_ARRAYS:
         if (jsonValue.isArray()) {
           if (!jsonValue.asArray().iterator().hasNext()) {

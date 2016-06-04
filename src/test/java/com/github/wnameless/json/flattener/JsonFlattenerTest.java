@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Collections;
@@ -33,6 +34,9 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.PrettyPrint;
+import com.eclipsesource.json.WriterConfig;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
@@ -239,6 +243,50 @@ public class JsonFlattenerTest {
     JsonFlattener jsonFlattener = new JsonFlattener("{\"abc\":{\"def\":123}}");
     assertEquals(jsonFlattener.flatten(), jsonFlattener.flatten());
     assertEquals(jsonFlattener.flattenAsMap(), jsonFlattener.flattenAsMap());
+  }
+
+  @Test
+  public void testPrintMode() throws IOException {
+    URL url = Resources.getResource("test.json");
+    String src = Resources.toString(url, Charsets.UTF_8);
+
+    String json =
+        new JsonFlattener(src).withPrintMode(PrintMode.MINIMAL).flatten();
+    StringWriter sw = new StringWriter();
+    Json.parse(json).writeTo(sw, WriterConfig.MINIMAL);
+    assertEquals(sw.toString(), json);
+
+    json = new JsonFlattener(src).withPrintMode(PrintMode.REGULAR).flatten();
+    sw = new StringWriter();
+    Json.parse(json).writeTo(sw, PrettyPrint.singleLine());
+    assertEquals(sw.toString(), json);
+
+    json = new JsonFlattener(src).withPrintMode(PrintMode.PRETTY).flatten();
+    sw = new StringWriter();
+    Json.parse(json).writeTo(sw, WriterConfig.PRETTY_PRINT);
+    assertEquals(sw.toString(), json);
+
+    src = "[[123]]";
+    json =
+        new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withPrintMode(PrintMode.MINIMAL).flatten();
+    sw = new StringWriter();
+    Json.parse(json).writeTo(sw, WriterConfig.MINIMAL);
+    assertEquals(sw.toString(), json);
+
+    json =
+        new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withPrintMode(PrintMode.REGULAR).flatten();
+    sw = new StringWriter();
+    Json.parse(json).writeTo(sw, PrettyPrint.singleLine());
+    assertEquals(sw.toString(), json);
+
+    json =
+        new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withPrintMode(PrintMode.PRETTY).flatten();
+    sw = new StringWriter();
+    Json.parse(json).writeTo(sw, WriterConfig.PRETTY_PRINT);
+    assertEquals(sw.toString(), json);
   }
 
 }

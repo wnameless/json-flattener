@@ -17,9 +17,15 @@
  */
 package com.github.wnameless.json.flattener;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
+
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.PrettyPrint;
+import com.eclipsesource.json.WriterConfig;
 
 /**
  * {@link JsonifyArrayList} is simply a ArrayList but with an override jsonify
@@ -32,13 +38,31 @@ import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
  */
 public class JsonifyArrayList<E> extends ArrayList<E> {
 
-  private static final long serialVersionUID = -2635637825741772032L;
+  private static final long serialVersionUID = 1L;
 
   private CharSequenceTranslator translator = StringEscapePolicy.NORMAL
       .getCharSequenceTranslator();
 
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
+  }
+
+  public String toString(PrintMode printMode) {
+    StringWriter sw = new StringWriter();
+    try {
+      switch (printMode) {
+        case REGULAR:
+          Json.parse(toString()).writeTo(sw, PrettyPrint.singleLine());
+          break;
+        case PRETTY:
+          Json.parse(toString()).writeTo(sw, WriterConfig.PRETTY_PRINT);
+          break;
+        default:
+          return toString();
+      }
+    } catch (IOException e) {}
+
+    return sw.toString();
   }
 
   @Override
