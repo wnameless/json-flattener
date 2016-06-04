@@ -132,6 +132,15 @@ public class JsonFlattenerTest {
         json).flattenAsMap());
     assertEquals(json,
         JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
+    assertEquals("[]",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .flatten());
+    assertEquals(ImmutableMap.of("root", newArrayList()), new JsonFlattener(
+        json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flattenAsMap());
+    assertEquals(
+        json,
+        JsonUnflattener.unflatten(new JsonFlattener(json).withFlattenMode(
+            FlattenMode.KEEP_ARRAYS).flatten()));
   }
 
   @Test
@@ -201,6 +210,8 @@ public class JsonFlattenerTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testRootInMap() {
+    assertEquals("null", JsonFlattener.flatten("null"));
+    assertEquals(null, JsonFlattener.flattenAsMap("null").get("root"));
     assertEquals("123", JsonFlattener.flatten("123"));
     assertEquals(new BigDecimal("123"),
         JsonFlattener.flattenAsMap("123").get("root"));
@@ -219,7 +230,15 @@ public class JsonFlattenerTest {
             "[[{\"abc\":{\"def\":123}}]]")
             .withFlattenMode(FlattenMode.KEEP_ARRAYS).flattenAsMap()
             .get("root");
-    assertEquals(new BigDecimal(123), root.get(0).get(0).get("abc.def"));
+    assertEquals(ImmutableMap.of("abc.def", new BigDecimal(123)), root.get(0)
+        .get(0));
+  }
+
+  @Test
+  public void testCache() {
+    JsonFlattener jsonFlattener = new JsonFlattener("{\"abc\":{\"def\":123}}");
+    assertEquals(jsonFlattener.flatten(), jsonFlattener.flatten());
+    assertEquals(jsonFlattener.flattenAsMap(), jsonFlattener.flattenAsMap());
   }
 
 }

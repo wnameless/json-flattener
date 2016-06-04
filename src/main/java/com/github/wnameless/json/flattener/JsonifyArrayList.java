@@ -43,7 +43,8 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("[");
+    StringBuilder sb = new StringBuilder();
+    sb.append('[');
     for (E e : this) {
       if (e instanceof String) {
         sb.append('"');
@@ -52,10 +53,10 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
       } else {
         sb.append(e);
       }
-      sb.append(",");
+      sb.append(',');
     }
-    sb.setLength(sb.length() - 1);
-    sb.append("]");
+    if (sb.length() > 1) sb.setLength(sb.length() - 1);
+    sb.append(']');
 
     return sb.toString();
   }

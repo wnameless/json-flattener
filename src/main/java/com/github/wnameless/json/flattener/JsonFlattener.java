@@ -21,12 +21,8 @@ import static java.util.Collections.emptyMap;
 
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject.Member;
@@ -83,7 +79,7 @@ public final class JsonFlattener {
   }
 
   /**
-   * Returns a flattened JSON as Map.<br>
+   * Returns a flattened JSON as Map.
    * 
    * @param json
    *          the JSON string
@@ -164,36 +160,22 @@ public final class JsonFlattener {
 
     if (flattenedMap.containsKey(ROOT))
       return javaObj2Json(flattenedMap.get(ROOT));
-
-    StringBuilder sb = new StringBuilder("{");
-    for (Entry<String, Object> mem : flattenedMap.entrySet()) {
-      String key = mem.getKey();
-      Object val = mem.getValue();
-      sb.append("\"");
-      sb.append(key);
-      sb.append("\"");
-      sb.append(":");
-      sb.append(javaObj2Json(val));
-      sb.append(",");
-    }
-    if (sb.length() > 1) sb.setLength(sb.length() - 1);
-    sb.append("}");
-
-    return flattenedJson = sb.toString();
+    else
+      return flattenedJson = flattenedMap.toString();
   }
 
   private String javaObj2Json(Object obj) {
-    if (obj instanceof Boolean || obj instanceof BigDecimal
-        || obj instanceof List || obj instanceof Map) {
-      return obj.toString();
-    } else if (obj instanceof String) {
+    if (obj == null) {
+      return "null";
+    } else if (obj instanceof CharSequence) {
       StringBuilder sb = new StringBuilder();
       sb.append('"');
-      sb.append(policy.getCharSequenceTranslator().translate((String) obj));
+      sb.append(policy.getCharSequenceTranslator()
+          .translate((CharSequence) obj));
       sb.append('"');
       return sb.toString();
     } else {
-      return "null";
+      return obj.toString();
     }
   }
 
@@ -225,23 +207,19 @@ public final class JsonFlattener {
     if (val.isObject() && val.asObject().iterator().hasNext()) {
       elementIters.add(new IndexedPeekIterator<Member>(val.asObject()
           .iterator()));
-    } else if (val.isArray() && mode == FlattenMode.NORMAL) {
-      if (val.asArray().iterator().hasNext()) {
-        elementIters.add(new IndexedPeekIterator<JsonValue>(val.asArray()
-            .iterator()));
-      } else {
-        flattenedMap.put(computeKey(), new ArrayList<Object>());
-      }
-    } else if (val.isArray() && mode == FlattenMode.KEEP_ARRAYS) {
-      if (val.asArray().iterator().hasNext()) {
-        JsonifyArrayList<Object> array = new JsonifyArrayList<Object>();
-        array.setTranslator(policy.getCharSequenceTranslator());
-        for (JsonValue jv : val.asArray()) {
-          array.add(jsonVal2Obj(jv));
-        }
-        flattenedMap.put(computeKey(), array);
-      } else {
-        flattenedMap.put(computeKey(), jsonVal2Obj(val));
+    } else if (val.isArray() && val.asArray().iterator().hasNext()) {
+      switch (mode) {
+        case KEEP_ARRAYS:
+          JsonifyArrayList<Object> array = new JsonifyArrayList<Object>();
+          array.setTranslator(policy.getCharSequenceTranslator());
+          for (JsonValue jv : val.asArray()) {
+            array.add(jsonVal2Obj(jv));
+          }
+          flattenedMap.put(computeKey(), array);
+          break;
+        default:
+          elementIters.add(new IndexedPeekIterator<JsonValue>(val.asArray()
+              .iterator()));
       }
     } else {
       String key = computeKey();
@@ -260,7 +238,7 @@ public final class JsonFlattener {
       case KEEP_ARRAYS:
         if (jsonValue.isArray()) {
           if (!jsonValue.asArray().iterator().hasNext()) {
-            return new ArrayList<Object>();
+            return new JsonifyArrayList<Object>();
           } else {
             JsonifyArrayList<Object> array = new JsonifyArrayList<Object>();
             array.setTranslator(policy.getCharSequenceTranslator());
@@ -274,8 +252,9 @@ public final class JsonFlattener {
               FlattenMode.KEEP_ARRAYS).flattenAsMap();
         }
       default:
-        if (jsonValue.isArray()) return new ArrayList<Object>();
-        if (jsonValue.isObject()) return new LinkedHashMap<String, Object>();
+        if (jsonValue.isArray()) return new JsonifyArrayList<Object>();
+        if (jsonValue.isObject())
+          return new JsonifyLinkedHashMap<String, Object>();
     }
 
     return null;
