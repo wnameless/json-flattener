@@ -196,4 +196,20 @@ public class JsonFlattenerTest {
         .withSeparator('*').flatten());
   }
 
+  @Test
+  public void testRootInMap() {
+    assertEquals("123", JsonFlattener.flatten("123"));
+    assertEquals("123", JsonFlattener.flattenAsMap("123").get("root"));
+    assertEquals("\"abc\"", JsonFlattener.flatten("\"abc\""));
+    assertEquals("\"abc\"", JsonFlattener.flattenAsMap("\"abc\"").get("root"));
+    assertEquals("true", JsonFlattener.flatten("true"));
+    assertEquals("true", JsonFlattener.flattenAsMap("true").get("root"));
+    assertEquals("[]", JsonFlattener.flatten("[]"));
+    assertEquals("[]", JsonFlattener.flattenAsMap("[]").get("root"));
+    assertEquals("[[{\"abc.def\":123}]]",
+        JsonFlattener.flatten("[[{\"abc\":{\"def\":123}}]]"));
+    assertEquals("[[{\"abc.def\":123}]]",
+        JsonFlattener.flattenAsMap("[[{\"abc\":{\"def\":123}}]]").get("root"));
+  }
+
 }

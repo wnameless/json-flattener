@@ -93,4 +93,20 @@ public class JsonUnflattenerTest {
         .withSeparator('*').flatten()).withSeparator('*').unflatten());
   }
 
+  @Test
+  public void testCacheAndWhiteSpaces() {
+    String json = "{\"abc\":{\"def\":123}}";
+    JsonUnflattener ju = new JsonUnflattener("{ \"abc.def\": 123  }");
+    assertEquals(json, ju.unflatten());
+    assertEquals(json, ju.unflatten());
+  }
+
+  @Test
+  public void testWithNonObject() {
+    assertEquals("123", JsonUnflattener.unflatten("123"));
+    assertEquals("\"abc\"", JsonUnflattener.unflatten("\"abc\""));
+    assertEquals("true", JsonUnflattener.unflatten("true"));
+    assertEquals("[1,2,3]", JsonUnflattener.unflatten("[1,2,3]"));
+  }
+
 }

@@ -61,6 +61,15 @@ import com.eclipsesource.json.JsonValue;
 public final class JsonFlattener {
 
   /**
+   * {@link ROOT} is the default key of the Map returned by
+   * {@link #flattenAsMap}. When {@link JsonFlattener} processes a JSON string
+   * which is not a JSON object or array, the final outcome may not suit in a
+   * Java Map. At that moment, {@link JsonFlattener} will put the result in the
+   * Map with {@link ROOT} as its key.
+   */
+  public static final String ROOT = "root";
+
+  /**
    * Returns a flattened JSON string.
    * 
    * @param json
@@ -89,9 +98,8 @@ public final class JsonFlattener {
       new JsonifyLinkedHashMap<String, Object>();
 
   private FlattenMode mode = FlattenMode.NORMAL;
-  private Character separator = '.';
   private StringEscapePolicy policy = StringEscapePolicy.NORMAL;
-
+  private Character separator = '.';
   private String flattenedJson = null;
 
   /**
@@ -118,16 +126,38 @@ public final class JsonFlattener {
     reduce(source);
   }
 
+  /**
+   * A fluent setter to setup a mode of the {@link JsonFlattener}.
+   * 
+   * @param mode
+   *          a {@link FlattenMode}
+   * @return this {@link JsonFlattener}
+   */
   public JsonFlattener withFlattenMode(FlattenMode mode) {
     this.mode = mode;
     return this;
   }
 
-  public JsonFlattener withSeparator(Character separator) {
+  /**
+   * A fluent setter to setup the separator within a key in the flattened JSON.
+   * The default separator is a dot(.).
+   * 
+   * @param separator
+   *          any character
+   * @return this {@link JsonFlattener}
+   */
+  public JsonFlattener withSeparator(char separator) {
     this.separator = separator;
     return this;
   }
 
+  /**
+   * A fluent setter to setup the JSON string escape policy.
+   * 
+   * @param policy
+   *          a {@link StringEscapePolicy}
+   * @return this {@link JsonFlattener}
+   */
   public JsonFlattener withStringEscapePolicy(StringEscapePolicy policy) {
     this.policy = policy;
     flattenedJsonMap.setTranslator(policy.getCharSequenceTranslator());

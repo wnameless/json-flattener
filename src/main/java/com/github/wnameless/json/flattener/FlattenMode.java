@@ -32,7 +32,7 @@ public enum FlattenMode {
   NORMAL,
 
   /**
-   * Flatten every objects except arrays.
+   * Flattens every objects except arrays.
    */
   KEEP_ARRAYS;
 

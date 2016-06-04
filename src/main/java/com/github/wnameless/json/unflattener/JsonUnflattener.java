@@ -38,11 +38,19 @@ public final class JsonUnflattener {
   private static final String arrayIndex = "\\[\\s*\\d+\\s*\\]";
   private static final String objectComplexKey = "\\[\\s*\".*\"\\s*\\]";
 
-  private final String json;
-  private Character separator = '.';
+  private final JsonValue root;
 
+  private Character separator = '.';
+  private String unflattenedJson = null;
+
+  /**
+   * Creates a JSON unflattener.
+   * 
+   * @param json
+   *          the JSON string
+   */
   public JsonUnflattener(String json) {
-    this.json = json;
+    root = Json.parse(json);
   }
 
   private String objectKey() {
@@ -54,7 +62,15 @@ public final class JsonUnflattener {
         + objectKey());
   }
 
-  public JsonUnflattener withSeparator(Character separator) {
+  /**
+   * A fluent setter to setup the separator within a key in the flattened JSON.
+   * The default separator is a dot(.).
+   * 
+   * @param separator
+   *          any character
+   * @return this {@link JsonUnflattener}
+   */
+  public JsonUnflattener withSeparator(char separator) {
     this.separator = separator;
     return this;
   }
@@ -76,8 +92,9 @@ public final class JsonUnflattener {
    * @return a JSON string of nested objects
    */
   public String unflatten() {
-    JsonValue root = Json.parse(json);
-    if (root.isArray()) return unflattenArray((JsonArray) root).toString();
+    if (unflattenedJson != null) return unflattenedJson;
+    if (!root.isObject()) return unflattenedJson = root.toString();
+
     JsonObject flattened = root.asObject();
     JsonValue unflattened = flattened.names().isEmpty() ? Json.object() : null;
 
@@ -96,9 +113,9 @@ public final class JsonUnflattener {
             objKey = null;
             aryIdx = extractIndex(keyPart);
           } else { // JSON object
-            if (flattened.get(key).isArray())
-              flattened
-                  .set(key, unflattenArray((JsonArray) flattened.get(key)));
+            if (flattened.get(key).isArray()) { // KEEP_ARRAYS mode
+              flattened.set(key, unflattenArray(flattened.get(key).asArray()));
+            }
             currentVal = findOrCreateJsonObject(currentVal, objKey, aryIdx);
             objKey = extractKey(keyPart);
             aryIdx = null;
@@ -121,11 +138,12 @@ public final class JsonUnflattener {
       setUnflattenedValue(flattened, key, currentVal, objKey, aryIdx);
     }
 
-    return unflattened.toString();
+    return unflattenedJson = unflattened.toString();
   }
 
   private JsonArray unflattenArray(JsonArray array) {
     JsonArray unflattenArray = Json.array().asArray();
+
     for (JsonValue value : array) {
       if (value.isArray()) {
         unflattenArray.add(unflattenArray(value.asArray()));
