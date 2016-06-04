@@ -18,6 +18,7 @@
 package com.github.wnameless.json.flattener;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -98,14 +99,6 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testCacheAndWhiteSpaces() {
-    String json = "{\"abc\":{\"def\":123}}";
-    JsonUnflattener ju = new JsonUnflattener("{ \"abc.def\": 123  }");
-    assertEquals(json, ju.unflatten());
-    assertEquals(json, ju.unflatten());
-  }
-
-  @Test
   public void testWithNonObject() {
     assertEquals("123", JsonUnflattener.unflatten("123"));
     assertEquals("\"abc\"", JsonUnflattener.unflatten("\"abc\""));
@@ -140,11 +133,12 @@ public class JsonUnflattenerTest {
     assertEquals(sw.toString(), json);
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void testPrintModeException() {
-    JsonUnflattener ju = new JsonUnflattener("[[123]]");
-    ju.unflatten();
-    ju.withPrintMode(PrintMode.PRETTY);
+  @Test
+  public void testNoCache() {
+    JsonUnflattener ju = new JsonUnflattener("{\"abc.def\":123}");
+    assertNotSame(ju.unflatten(), ju.unflatten());
+    assertEquals("{\"abc\": {\"def\": 123}}",
+        ju.withPrintMode(PrintMode.REGULAR).unflatten());
   }
 
 }

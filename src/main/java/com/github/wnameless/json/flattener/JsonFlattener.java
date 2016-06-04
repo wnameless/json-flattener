@@ -92,14 +92,12 @@ public final class JsonFlattener {
   private final JsonValue source;
   private final Deque<IndexedPeekIterator<?>> elementIters =
       new ArrayDeque<IndexedPeekIterator<?>>();
-  private final JsonifyLinkedHashMap<String, Object> flattenedMap =
-      new JsonifyLinkedHashMap<String, Object>();
 
+  private JsonifyLinkedHashMap<String, Object> flattenedMap;
   private FlattenMode flattenMode = FlattenMode.NORMAL;
   private StringEscapePolicy policy = StringEscapePolicy.NORMAL;
   private Character separator = '.';
   private PrintMode printMode = PrintMode.MINIMAL;
-  private String flattenedJson = null;
 
   /**
    * Creates a JSON flattener.
@@ -120,6 +118,18 @@ public final class JsonFlattener {
    */
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
     this.flattenMode = flattenMode;
+    return this;
+  }
+
+  /**
+   * A fluent setter to setup the JSON string escape policy.
+   * 
+   * @param policy
+   *          a {@link StringEscapePolicy}
+   * @return this {@link JsonFlattener}
+   */
+  public JsonFlattener withStringEscapePolicy(StringEscapePolicy policy) {
+    this.policy = policy;
     return this;
   }
 
@@ -145,24 +155,7 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withPrintMode(PrintMode printMode) {
-    if (flattenedJson != null) {
-      throw new IllegalStateException(
-          "Print mode can NOT be changed after flattening JSON");
-    }
     this.printMode = printMode;
-    return this;
-  }
-
-  /**
-   * A fluent setter to setup the JSON string escape policy.
-   * 
-   * @param policy
-   *          a {@link StringEscapePolicy}
-   * @return this {@link JsonFlattener}
-   */
-  public JsonFlattener withStringEscapePolicy(StringEscapePolicy policy) {
-    this.policy = policy;
-    flattenedMap.setTranslator(policy.getCharSequenceTranslator());
     return this;
   }
 
@@ -172,14 +165,12 @@ public final class JsonFlattener {
    * @return a flattened JSON string
    */
   public String flatten() {
-    if (flattenedJson != null) return flattenedJson;
-
     flattenAsMap();
 
     if (flattenedMap.containsKey(ROOT))
-      return flattenedJson = javaObj2Json(flattenedMap.get(ROOT));
+      return javaObj2Json(flattenedMap.get(ROOT));
     else
-      return flattenedJson = flattenedMap.toString(printMode);
+      return flattenedMap.toString(printMode);
   }
 
   private String javaObj2Json(Object obj) {
@@ -206,7 +197,9 @@ public final class JsonFlattener {
    * @return a flattened JSON as Map
    */
   public Map<String, Object> flattenAsMap() {
-    if (flattenedMap.isEmpty()) reduce(source);
+    flattenedMap = new JsonifyLinkedHashMap<String, Object>();
+    flattenedMap.setTranslator(policy.getCharSequenceTranslator());
+    reduce(source);
 
     while (!elementIters.isEmpty()) {
       IndexedPeekIterator<?> deepestIter = elementIters.getLast();

@@ -22,6 +22,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -255,13 +256,6 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testCache() {
-    JsonFlattener jsonFlattener = new JsonFlattener("{\"abc\":{\"def\":123}}");
-    assertEquals(jsonFlattener.flatten(), jsonFlattener.flatten());
-    assertEquals(jsonFlattener.flattenAsMap(), jsonFlattener.flattenAsMap());
-  }
-
-  @Test
   public void testPrintMode() throws IOException {
     URL url = Resources.getResource("test.json");
     String src = Resources.toString(url, Charsets.UTF_8);
@@ -305,11 +299,12 @@ public class JsonFlattenerTest {
     assertEquals(sw.toString(), json);
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void testPrintModeException() {
-    JsonFlattener jf = new JsonFlattener("null");
-    jf.flatten();
-    jf.withPrintMode(PrintMode.PRETTY);
+  @Test
+  public void testNoCache() {
+    JsonFlattener jf = new JsonFlattener("{\"abc\":{\"def\":123}}");
+    assertNotSame(jf.flattenAsMap(), jf.flattenAsMap());
+    assertNotSame(jf.flatten(), jf.flatten());
+    assertEquals("{\"abc*def\":123}", jf.withSeparator('*').flatten());
   }
 
 }

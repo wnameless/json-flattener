@@ -24,4 +24,7 @@ Version 0.2.0
 + Add FlattenMode
 + Add StringEscapePolicy
 + Add separator config
-+ Add PrintMode  
++ Add PrintMode
+
+Version 0.2.1
+* Remove cache

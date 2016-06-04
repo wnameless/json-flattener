@@ -47,7 +47,6 @@ public final class JsonUnflattener {
 
   private Character separator = '.';
   private PrintMode printMode = PrintMode.MINIMAL;
-  private String unflattenedJson = null;
 
   /**
    * Creates a JSON unflattener.
@@ -90,10 +89,6 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withPrintMode(PrintMode printMode) {
-    if (unflattenedJson != null) {
-      throw new IllegalStateException(
-          "Print mode can NOT be changed after unflattening JSON");
-    }
     this.printMode = printMode;
     return this;
   }
@@ -126,17 +121,15 @@ public final class JsonUnflattener {
    * @return a JSON string of nested objects
    */
   public String unflatten() {
-    if (unflattenedJson != null) return unflattenedJson;
-
     StringWriter sw = new StringWriter();
     if (root.isArray()) {
       try {
         unflattenArray(root.asArray()).writeTo(sw, getWriterConfig());
       } catch (IOException e) {}
-      return unflattenedJson = sw.toString();
+      return sw.toString();
     }
     if (!root.isObject()) {
-      return unflattenedJson = root.toString();
+      return root.toString();
     }
 
     JsonObject flattened = root.asObject();
@@ -185,7 +178,7 @@ public final class JsonUnflattener {
     try {
       unflattened.writeTo(sw, getWriterConfig());
     } catch (IOException e) {}
-    return unflattenedJson = sw.toString();
+    return sw.toString();
   }
 
   private JsonArray unflattenArray(JsonArray array) {
@@ -205,7 +198,7 @@ public final class JsonUnflattener {
     return unflattenArray;
   }
 
-  private static String extractKey(String keyPart) {
+  private String extractKey(String keyPart) {
     if (keyPart.matches(objectComplexKey))
       return keyPart.replaceAll("^\\[\\s*\"", "").replaceAll("\"\\s*\\]$", "");
     else
@@ -220,8 +213,8 @@ public final class JsonUnflattener {
     return keyPart.matches(arrayIndex);
   }
 
-  private static JsonValue findOrCreateJsonArray(JsonValue currentVal,
-      String objKey, Integer aryIdx) {
+  private JsonValue findOrCreateJsonArray(JsonValue currentVal, String objKey,
+      Integer aryIdx) {
     if (objKey != null) {
       JsonObject jsonObj = currentVal.asObject();
 
@@ -248,8 +241,8 @@ public final class JsonUnflattener {
     }
   }
 
-  private static JsonValue findOrCreateJsonObject(JsonValue currentVal,
-      String objKey, Integer aryIdx) {
+  private JsonValue findOrCreateJsonObject(JsonValue currentVal, String objKey,
+      Integer aryIdx) {
     if (objKey != null) {
       JsonObject jsonObj = currentVal.asObject();
 
@@ -276,7 +269,7 @@ public final class JsonUnflattener {
     }
   }
 
-  private static void setUnflattenedValue(JsonObject flattened, String key,
+  private void setUnflattenedValue(JsonObject flattened, String key,
       JsonValue currentVal, String objKey, Integer aryIdx) {
     if (objKey != null) {
       currentVal.asObject().add(objKey, flattened.get(key));
@@ -286,7 +279,7 @@ public final class JsonUnflattener {
     }
   }
 
-  private static void assureJsonArraySize(JsonArray jsonArray, Integer index) {
+  private void assureJsonArraySize(JsonArray jsonArray, Integer index) {
     while (index >= jsonArray.size()) {
       jsonArray.add(Json.NULL);
     }
