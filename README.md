@@ -49,27 +49,51 @@ System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
 
-###New Features(Since v0.2.0)
+###4 New Features(Since v0.2.0)
 ```java
 String json = null;
 
-// FlattenMode - Keep arrays or not
+// 1. FlattenMode - Keep arrays or not
 json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
 System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten());
 // Output: {"abc.def":[1,2,{"g.h":[3]}]}
 
-// StringEscapePolicy - Escape Unicodes or not
+// 2. StringEscapePolicy - Escape Unicodes or not
 json = "{\"abc\":{\"def\":\"太極\"}}";
 System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePolicy.ALL_UNICODES).flatten());
 // {"abc.def":"\u592A\u6975"}
 
-// Separator - Accept arbitrary separator
+// 3-1. Separator - Accept arbitrary separator
 json = "{\"abc\":{\"def\":123}}";
 System.out.println(new JsonFlattener(json).withSeparator('*').flatten());
 // {"abc*def":123}
 
-// Separator - Unflattener can also be set arbitrary separator
+// 3-2. Separator - Unflattener can also be set arbitrary separator
 json = "{\"abc*def\":123}";
 System.out.println(new JsonUnflattener(json).withSeparator('*').unflatten());
 // {"abc":{"def":123}}
+
+// 4-1. PrintMode - JsonFlattener
+json = "{\"abc\":{\"def\":123}}";
+System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.MINIMAL).flatten());
+// {"abc.def":123}
+System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.REGULAR).flatten());
+// { "abc.def": 123 }
+System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.PRETTY).flatten());
+// {
+//   "abc.def": 123
+// }
+
+// 4-2. PrintMode - JsonUnflattener
+json = "{\"abc.def\":123}";
+System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.MINIMAL).unflatten());
+// {"abc":{"def":123}}
+System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.REGULAR).unflatten());
+// {"abc": {"def": 123}}
+System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.PRETTY).unflatten());
+// {
+//   "abc": {
+//     "def": 123
+//   }
+// }
 ```

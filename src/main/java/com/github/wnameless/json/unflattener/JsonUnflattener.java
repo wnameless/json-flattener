@@ -17,6 +17,8 @@
  */
 package com.github.wnameless.json.unflattener;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +26,9 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import com.eclipsesource.json.PrettyPrint;
+import com.eclipsesource.json.WriterConfig;
+import com.github.wnameless.json.flattener.PrintMode;
 
 /**
  * 
@@ -41,6 +46,7 @@ public final class JsonUnflattener {
   private final JsonValue root;
 
   private Character separator = '.';
+  private PrintMode printMode = PrintMode.MINIMAL;
   private String unflattenedJson = null;
 
   /**
@@ -76,6 +82,34 @@ public final class JsonUnflattener {
   }
 
   /**
+   * A fluent setter to setup a print mode of the {@link JsonUnflattener}. The
+   * default print mode is minimal.
+   * 
+   * @param printMode
+   *          a {@link PrintMode}
+   * @return this {@link JsonUnflattener}
+   */
+  public JsonUnflattener withPrintMode(PrintMode printMode) {
+    if (unflattenedJson != null) {
+      throw new IllegalStateException(
+          "Print mode can NOT be changed after unflattening JSON");
+    }
+    this.printMode = printMode;
+    return this;
+  }
+
+  private WriterConfig getWriterConfig() {
+    switch (printMode) {
+      case REGULAR:
+        return PrettyPrint.singleLine();
+      case PRETTY:
+        return WriterConfig.PRETTY_PRINT;
+      default:
+        return WriterConfig.MINIMAL;
+    }
+  }
+
+  /**
    * Returns a JSON string of nested objects by the given flattened JSON string.
    * 
    * @param json
@@ -93,7 +127,17 @@ public final class JsonUnflattener {
    */
   public String unflatten() {
     if (unflattenedJson != null) return unflattenedJson;
-    if (!root.isObject()) return unflattenedJson = root.toString();
+
+    StringWriter sw = new StringWriter();
+    if (root.isArray()) {
+      try {
+        unflattenArray(root.asArray()).writeTo(sw, getWriterConfig());
+      } catch (IOException e) {}
+      return unflattenedJson = sw.toString();
+    }
+    if (!root.isObject()) {
+      return unflattenedJson = root.toString();
+    }
 
     JsonObject flattened = root.asObject();
     JsonValue unflattened = flattened.names().isEmpty() ? Json.object() : null;
@@ -138,7 +182,10 @@ public final class JsonUnflattener {
       setUnflattenedValue(flattened, key, currentVal, objKey, aryIdx);
     }
 
-    return unflattenedJson = unflattened.toString();
+    try {
+      unflattened.writeTo(sw, getWriterConfig());
+    } catch (IOException e) {}
+    return unflattenedJson = sw.toString();
   }
 
   private JsonArray unflattenArray(JsonArray array) {

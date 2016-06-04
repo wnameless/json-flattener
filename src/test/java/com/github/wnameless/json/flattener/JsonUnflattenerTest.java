@@ -20,10 +20,14 @@ package com.github.wnameless.json.flattener;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URL;
 
 import org.junit.Test;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.PrettyPrint;
+import com.eclipsesource.json.WriterConfig;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -107,6 +111,40 @@ public class JsonUnflattenerTest {
     assertEquals("\"abc\"", JsonUnflattener.unflatten("\"abc\""));
     assertEquals("true", JsonUnflattener.unflatten("true"));
     assertEquals("[1,2,3]", JsonUnflattener.unflatten("[1,2,3]"));
+  }
+
+  @Test
+  public void testWithNestedArrays() {
+    assertEquals("[[{\"abc\":{\"def\":123}}]]",
+        JsonUnflattener.unflatten("[[{\"abc.def\":123}]]"));
+  }
+
+  @Test
+  public void testPrintMode() throws IOException {
+    String src = "{\"abc.def\":123}";
+    String json =
+        new JsonUnflattener(src).withPrintMode(PrintMode.MINIMAL).unflatten();
+    StringWriter sw = new StringWriter();
+    Json.parse(json).writeTo(sw, WriterConfig.MINIMAL);
+    assertEquals(sw.toString(), json);
+
+    json =
+        new JsonUnflattener(src).withPrintMode(PrintMode.REGULAR).unflatten();
+    sw = new StringWriter();
+    Json.parse(json).writeTo(sw, PrettyPrint.singleLine());
+    assertEquals(sw.toString(), json);
+
+    json = new JsonUnflattener(src).withPrintMode(PrintMode.PRETTY).unflatten();
+    sw = new StringWriter();
+    Json.parse(json).writeTo(sw, WriterConfig.PRETTY_PRINT);
+    assertEquals(sw.toString(), json);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testPrintModeException() {
+    JsonUnflattener ju = new JsonUnflattener("[[123]]");
+    ju.unflatten();
+    ju.withPrintMode(PrintMode.PRETTY);
   }
 
 }

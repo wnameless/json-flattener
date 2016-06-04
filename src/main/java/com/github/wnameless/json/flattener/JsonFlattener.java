@@ -177,7 +177,7 @@ public final class JsonFlattener {
     flattenAsMap();
 
     if (flattenedMap.containsKey(ROOT))
-      return javaObj2Json(flattenedMap.get(ROOT));
+      return flattenedJson = javaObj2Json(flattenedMap.get(ROOT));
     else
       return flattenedJson = flattenedMap.toString(printMode);
   }

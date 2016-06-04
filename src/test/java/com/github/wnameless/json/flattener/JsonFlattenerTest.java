@@ -45,6 +45,22 @@ import com.google.common.io.Resources;
 public class JsonFlattenerTest {
 
   @Test
+  public void r() {
+    String json = "{\"abc\":{\"def\":123}}";
+    System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.MINIMAL)
+        .flatten());
+    // {"abc.def":123}
+
+    System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.REGULAR)
+        .flatten());
+    // { "abc.def": 123 }
+
+    System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.PRETTY)
+        .flatten());
+    // {"abc.def":123}
+  }
+
+  @Test
   public void testFlattenAsMap() throws IOException {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
@@ -287,6 +303,13 @@ public class JsonFlattenerTest {
     sw = new StringWriter();
     Json.parse(json).writeTo(sw, WriterConfig.PRETTY_PRINT);
     assertEquals(sw.toString(), json);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testPrintModeException() {
+    JsonFlattener jf = new JsonFlattener("null");
+    jf.flatten();
+    jf.withPrintMode(PrintMode.PRETTY);
   }
 
 }
