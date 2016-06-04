@@ -17,6 +17,8 @@
  */
 package com.github.wnameless.json.flattener;
 
+import static java.util.Collections.emptyMap;
+
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -94,7 +96,7 @@ public final class JsonFlattener {
   private final JsonValue source;
   private final Deque<IndexedPeekIterator<?>> elementIters =
       new ArrayDeque<IndexedPeekIterator<?>>();
-  private final JsonifyLinkedHashMap<String, Object> flattenedJsonMap =
+  private final JsonifyLinkedHashMap<String, Object> flattenedMap =
       new JsonifyLinkedHashMap<String, Object>();
 
   private FlattenMode mode = FlattenMode.NORMAL;
@@ -110,20 +112,6 @@ public final class JsonFlattener {
    */
   public JsonFlattener(String json) {
     source = Json.parse(json);
-    if (!source.isObject() && !source.isArray()) {
-      throw new IllegalArgumentException("Input must be a JSON object or array");
-    }
-
-    if (source.isObject() && !source.asObject().iterator().hasNext()) {
-      flattenedJson = "{}";
-      return;
-    }
-    if (source.isArray() && !source.asArray().iterator().hasNext()) {
-      flattenedJson = "[]";
-      return;
-    }
-
-    reduce(source);
   }
 
   /**
@@ -160,7 +148,7 @@ public final class JsonFlattener {
    */
   public JsonFlattener withStringEscapePolicy(StringEscapePolicy policy) {
     this.policy = policy;
-    flattenedJsonMap.setTranslator(policy.getCharSequenceTranslator());
+    flattenedMap.setTranslator(policy.getCharSequenceTranslator());
     return this;
   }
 
@@ -174,29 +162,18 @@ public final class JsonFlattener {
 
     flattenAsMap();
 
+    if (flattenedMap.containsKey(ROOT))
+      return javaObj2Json(flattenedMap.get(ROOT));
+
     StringBuilder sb = new StringBuilder("{");
-    for (Entry<String, Object> mem : flattenedJsonMap.entrySet()) {
+    for (Entry<String, Object> mem : flattenedMap.entrySet()) {
       String key = mem.getKey();
       Object val = mem.getValue();
       sb.append("\"");
       sb.append(key);
       sb.append("\"");
       sb.append(":");
-      if (val instanceof Boolean) {
-        sb.append(val);
-      } else if (val instanceof String) {
-        sb.append("\"");
-        sb.append(policy.getCharSequenceTranslator().translate((String) val));
-        sb.append("\"");
-      } else if (val instanceof BigDecimal) {
-        sb.append(val);
-      } else if (val instanceof List) {
-        sb.append(val);
-      } else if (val instanceof Map) {
-        sb.append(val);
-      } else {
-        sb.append("null");
-      }
+      sb.append(javaObj2Json(val));
       sb.append(",");
     }
     if (sb.length() > 1) sb.setLength(sb.length() - 1);
@@ -205,12 +182,29 @@ public final class JsonFlattener {
     return flattenedJson = sb.toString();
   }
 
+  private String javaObj2Json(Object obj) {
+    if (obj instanceof Boolean || obj instanceof BigDecimal
+        || obj instanceof List || obj instanceof Map) {
+      return obj.toString();
+    } else if (obj instanceof String) {
+      StringBuilder sb = new StringBuilder();
+      sb.append('"');
+      sb.append(policy.getCharSequenceTranslator().translate((String) obj));
+      sb.append('"');
+      return sb.toString();
+    } else {
+      return "null";
+    }
+  }
+
   /**
    * Returns a flattened JSON as Map.
    * 
    * @return a flattened JSON as Map
    */
   public Map<String, Object> flattenAsMap() {
+    if (flattenedMap.isEmpty()) reduce(source);
+
     while (!elementIters.isEmpty()) {
       IndexedPeekIterator<?> deepestIter = elementIters.getLast();
       if (!deepestIter.hasNext()) {
@@ -224,7 +218,7 @@ public final class JsonFlattener {
       }
     }
 
-    return flattenedJsonMap;
+    return flattenedMap;
   }
 
   private void reduce(JsonValue val) {
@@ -236,7 +230,7 @@ public final class JsonFlattener {
         elementIters.add(new IndexedPeekIterator<JsonValue>(val.asArray()
             .iterator()));
       } else {
-        flattenedJsonMap.put(computeKey(), new ArrayList<Object>());
+        flattenedMap.put(computeKey(), new ArrayList<Object>());
       }
     } else if (val.isArray() && mode == FlattenMode.KEEP_ARRAYS) {
       if (val.asArray().iterator().hasNext()) {
@@ -245,12 +239,16 @@ public final class JsonFlattener {
         for (JsonValue jv : val.asArray()) {
           array.add(jsonVal2Obj(jv));
         }
-        flattenedJsonMap.put(computeKey(), array);
+        flattenedMap.put(computeKey(), array);
       } else {
-        flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
+        flattenedMap.put(computeKey(), jsonVal2Obj(val));
       }
     } else {
-      flattenedJsonMap.put(computeKey(), jsonVal2Obj(val));
+      String key = computeKey();
+      Object value = jsonVal2Obj(val);
+      // Check NOT empty JSON object
+      if (!(ROOT.equals(key) && emptyMap().equals(value)))
+        flattenedMap.put(key, jsonVal2Obj(val));
     }
   }
 
@@ -284,27 +282,29 @@ public final class JsonFlattener {
   }
 
   private String computeKey() {
+    if (elementIters.isEmpty()) return ROOT;
+
     StringBuilder sb = new StringBuilder();
 
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
         String key = ((Member) iter.getCurrent()).getName();
         if (key.contains(separator.toString())) {
-          sb.append("[");
+          sb.append('[');
           sb.append('\\');
           sb.append('"');
           sb.append(policy.getCharSequenceTranslator().translate(key));
           sb.append('\\');
           sb.append('"');
-          sb.append("]");
+          sb.append(']');
         } else {
           if (sb.length() != 0) sb.append(separator);
           sb.append(policy.getCharSequenceTranslator().translate(key));
         }
       } else { // JsonValue
-        sb.append("[");
+        sb.append('[');
         sb.append(iter.getIndex());
-        sb.append("]");
+        sb.append(']');
       }
     }
 

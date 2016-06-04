@@ -17,6 +17,7 @@
  */
 package com.github.wnameless.json.flattener;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,20 +25,20 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 
 public class JsonFlattenerTest {
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testConstructorException() {
-    new JsonFlattener("123");
-  }
 
   @Test
   public void testFlattenAsMap() throws IOException {
@@ -118,16 +119,17 @@ public class JsonFlattenerTest {
   public void testWithEmptyJsonObject() throws IOException {
     String json = "{}";
     assertEquals("{}", new JsonFlattener(json).flatten());
-    assertEquals(newHashMap(), new JsonFlattener(json).flattenAsMap());
     assertEquals(json,
         JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
+    assertEquals(newHashMap(), new JsonFlattener(json).flattenAsMap());
   }
 
   @Test
   public void testWithEmptyJsonArray() throws IOException {
     String json = "[]";
     assertEquals("[]", new JsonFlattener(json).flatten());
-    assertEquals(newHashMap(), new JsonFlattener(json).flattenAsMap());
+    assertEquals(ImmutableMap.of("root", newArrayList()), new JsonFlattener(
+        json).flattenAsMap());
     assertEquals(json,
         JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
   }
@@ -196,20 +198,28 @@ public class JsonFlattenerTest {
         .withSeparator('*').flatten());
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testRootInMap() {
     assertEquals("123", JsonFlattener.flatten("123"));
-    assertEquals("123", JsonFlattener.flattenAsMap("123").get("root"));
+    assertEquals(new BigDecimal("123"),
+        JsonFlattener.flattenAsMap("123").get("root"));
     assertEquals("\"abc\"", JsonFlattener.flatten("\"abc\""));
-    assertEquals("\"abc\"", JsonFlattener.flattenAsMap("\"abc\"").get("root"));
+    assertEquals("abc", JsonFlattener.flattenAsMap("\"abc\"").get("root"));
     assertEquals("true", JsonFlattener.flatten("true"));
-    assertEquals("true", JsonFlattener.flattenAsMap("true").get("root"));
+    assertEquals(true, JsonFlattener.flattenAsMap("true").get("root"));
     assertEquals("[]", JsonFlattener.flatten("[]"));
-    assertEquals("[]", JsonFlattener.flattenAsMap("[]").get("root"));
-    assertEquals("[[{\"abc.def\":123}]]",
-        JsonFlattener.flatten("[[{\"abc\":{\"def\":123}}]]"));
-    assertEquals("[[{\"abc.def\":123}]]",
-        JsonFlattener.flattenAsMap("[[{\"abc\":{\"def\":123}}]]").get("root"));
+    assertEquals(Collections.emptyList(),
+        JsonFlattener.flattenAsMap("[]").get("root"));
+    assertEquals("[[{\"abc.def\":123}]]", new JsonFlattener(
+        "[[{\"abc\":{\"def\":123}}]]").withFlattenMode(FlattenMode.KEEP_ARRAYS)
+        .flatten());
+    List<List<Map<String, Object>>> root =
+        (List<List<Map<String, Object>>>) new JsonFlattener(
+            "[[{\"abc\":{\"def\":123}}]]")
+            .withFlattenMode(FlattenMode.KEEP_ARRAYS).flattenAsMap()
+            .get("root");
+    assertEquals(new BigDecimal(123), root.get(0).get(0).get("abc.def"));
   }
 
 }
