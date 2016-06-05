@@ -17,6 +17,7 @@
  */
 package com.github.wnameless.json.flattener;
 
+import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -203,8 +204,7 @@ public final class JsonFlattener {
   public Map<String, Object> flattenAsMap() {
     if (flattenedMap != null) return flattenedMap;
 
-    flattenedMap = new JsonifyLinkedHashMap<String, Object>();
-    flattenedMap.setTranslator(policy.getCharSequenceTranslator());
+    flattenedMap = newJsonifyLinkedHashMap();
     reduce(source);
 
     while (!elementIters.isEmpty()) {
@@ -225,21 +225,18 @@ public final class JsonFlattener {
 
   private void reduce(JsonValue val) {
     if (val.isObject() && val.asObject().iterator().hasNext()) {
-      elementIters.add(new IndexedPeekIterator<Member>(val.asObject()
-          .iterator()));
+      elementIters.add(newIndexedPeekIterator(val.asObject()));
     } else if (val.isArray() && val.asArray().iterator().hasNext()) {
       switch (flattenMode) {
         case KEEP_ARRAYS:
-          JsonifyArrayList<Object> array = new JsonifyArrayList<Object>();
-          array.setTranslator(policy.getCharSequenceTranslator());
+          JsonifyArrayList<Object> array = newJsonifyArrayList();
           for (JsonValue value : val.asArray()) {
             array.add(jsonVal2Obj(value));
           }
           flattenedMap.put(computeKey(), array);
           break;
         default:
-          elementIters.add(new IndexedPeekIterator<JsonValue>(val.asArray()
-              .iterator()));
+          elementIters.add(newIndexedPeekIterator(val.asArray()));
       }
     } else {
       String key = computeKey();
@@ -250,31 +247,25 @@ public final class JsonFlattener {
     }
   }
 
-  private Object jsonVal2Obj(JsonValue jsonValue) {
-    if (jsonValue.isBoolean()) return jsonValue.asBoolean();
-    if (jsonValue.isString()) return jsonValue.asString();
-    if (jsonValue.isNumber()) return new BigDecimal(jsonValue.toString());
+  private Object jsonVal2Obj(JsonValue val) {
+    if (val.isBoolean()) return val.asBoolean();
+    if (val.isString()) return val.asString();
+    if (val.isNumber()) return new BigDecimal(val.toString());
     switch (flattenMode) {
       case KEEP_ARRAYS:
-        if (jsonValue.isArray()) {
-          if (!jsonValue.asArray().iterator().hasNext()) {
-            return new JsonifyArrayList<Object>();
-          } else {
-            JsonifyArrayList<Object> array = new JsonifyArrayList<Object>();
-            array.setTranslator(policy.getCharSequenceTranslator());
-            for (JsonValue jv : jsonValue.asArray()) {
-              array.add(jsonVal2Obj(jv));
-            }
-            return array;
+        if (val.isArray()) {
+          JsonifyArrayList<Object> array = newJsonifyArrayList();
+          for (JsonValue value : val.asArray()) {
+            array.add(jsonVal2Obj(value));
           }
+          return array;
         } else {
-          return new JsonFlattener(jsonValue.toString()).withFlattenMode(
-              FlattenMode.KEEP_ARRAYS).flattenAsMap();
+          return new JsonFlattener(val.toString()).withFlattenMode(flattenMode)
+              .flattenAsMap();
         }
       default:
-        if (jsonValue.isArray()) return new JsonifyArrayList<Object>();
-        if (jsonValue.isObject())
-          return new JsonifyLinkedHashMap<String, Object>();
+        if (val.isArray()) return newJsonifyArrayList();
+        if (val.isObject()) return newJsonifyLinkedHashMap();
     }
 
     return null;
@@ -308,6 +299,18 @@ public final class JsonFlattener {
     }
 
     return sb.toString();
+  }
+
+  private <T> JsonifyArrayList<T> newJsonifyArrayList() {
+    JsonifyArrayList<T> array = new JsonifyArrayList<T>();
+    array.setTranslator(policy.getCharSequenceTranslator());
+    return array;
+  }
+
+  private <K, V> JsonifyLinkedHashMap<K, V> newJsonifyLinkedHashMap() {
+    JsonifyLinkedHashMap<K, V> map = new JsonifyLinkedHashMap<K, V>();
+    map.setTranslator(policy.getCharSequenceTranslator());
+    return map;
   }
 
   @Override

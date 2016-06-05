@@ -27,4 +27,5 @@ Version 0.2.0
 + Add PrintMode
 
 Version 0.2.1
-* Remove cache
+- Remove internal cache
++ Add missing hashCode, equals and toString to JsonUnflattener
