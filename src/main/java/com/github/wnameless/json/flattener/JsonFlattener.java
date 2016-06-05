@@ -18,6 +18,7 @@
 package com.github.wnameless.json.flattener;
 
 import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang3.Validate.notNull;
 
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
@@ -117,9 +118,7 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
-    if (flattenMode == null) throw new NullPointerException();
-
-    this.flattenMode = flattenMode;
+    this.flattenMode = notNull(flattenMode);
     flattenedMap = null;
     return this;
   }
@@ -132,9 +131,7 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withStringEscapePolicy(StringEscapePolicy policy) {
-    if (policy == null) throw new NullPointerException();
-
-    this.policy = policy;
+    this.policy = notNull(policy);
     flattenedMap = null;
     return this;
   }
@@ -162,9 +159,7 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withPrintMode(PrintMode printMode) {
-    if (printMode == null) throw new NullPointerException();
-
-    this.printMode = printMode;
+    this.printMode = notNull(printMode);
     return this;
   }
 
@@ -319,7 +314,6 @@ public final class JsonFlattener {
   public int hashCode() {
     int result = 27;
     result = 31 * result + source.hashCode();
-
     return result;
   }
 
@@ -327,7 +321,6 @@ public final class JsonFlattener {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof JsonFlattener)) return false;
-
     return source.equals(((JsonFlattener) o).source);
   }
 

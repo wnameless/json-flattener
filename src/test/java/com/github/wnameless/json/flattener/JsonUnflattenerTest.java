@@ -18,7 +18,10 @@
 package com.github.wnameless.json.flattener;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -78,6 +81,38 @@ public class JsonUnflattenerTest {
     String json = "{\"[\\\"b.b\\\"].aaa\":123}";
 
     assertEquals("{\"b.b\":{\"aaa\":123}}", JsonUnflattener.unflatten(json));
+  }
+
+  @Test
+  public void testHashCode() throws IOException {
+    String json1 = "[[123]]";
+    String json2 = "[[[123]]]";
+
+    JsonUnflattener unflattener = new JsonUnflattener(json1);
+    assertEquals(unflattener.hashCode(), unflattener.hashCode());
+    assertEquals(unflattener.hashCode(), new JsonUnflattener(json1).hashCode());
+    assertNotEquals(unflattener.hashCode(),
+        new JsonUnflattener(json2).hashCode());
+  }
+
+  @Test
+  public void testEquals() throws IOException {
+    String json1 = "[[123]]";
+    String json2 = "[[[123]]]";
+
+    JsonUnflattener unflattener = new JsonUnflattener(json1);
+    assertTrue(unflattener.equals(unflattener));
+    assertTrue(unflattener.equals(new JsonUnflattener(json1)));
+    assertFalse(unflattener.equals(new JsonUnflattener(json2)));
+    assertFalse(unflattener.equals(123L));
+  }
+
+  @Test
+  public void testToString() throws IOException {
+    String json = "[[123]]";
+
+    assertEquals("JsonUnflattener{root=[[123]]}",
+        new JsonUnflattener(json).toString());
   }
 
   @Test

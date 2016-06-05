@@ -48,22 +48,6 @@ import com.google.common.io.Resources;
 public class JsonFlattenerTest {
 
   @Test
-  public void r() {
-    String json = "{\"abc\":{\"def\":123}}";
-    System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.MINIMAL)
-        .flatten());
-    // {"abc.def":123}
-
-    System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.REGULAR)
-        .flatten());
-    // { "abc.def": 123 }
-
-    System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.PRETTY)
-        .flatten());
-    // {"abc.def":123}
-  }
-
-  @Test
   public void testFlattenAsMap() throws IOException {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);

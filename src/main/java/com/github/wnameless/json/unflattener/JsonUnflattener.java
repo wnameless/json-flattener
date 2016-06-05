@@ -17,6 +17,8 @@
  */
 package com.github.wnameless.json.unflattener;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.regex.Matcher;
@@ -89,9 +91,7 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withPrintMode(PrintMode printMode) {
-    if (printMode == null) throw new NullPointerException();
-
-    this.printMode = printMode;
+    this.printMode = notNull(printMode);
     return this;
   }
 
@@ -285,6 +285,25 @@ public final class JsonUnflattener {
     while (index >= jsonArray.size()) {
       jsonArray.add(Json.NULL);
     }
+  }
+
+  @Override
+  public int hashCode() {
+    int result = 27;
+    result = 31 * result + root.hashCode();
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof JsonUnflattener)) return false;
+    return root.equals(((JsonUnflattener) o).root);
+  }
+
+  @Override
+  public String toString() {
+    return "JsonUnflattener{root=" + root + "}";
   }
 
 }
