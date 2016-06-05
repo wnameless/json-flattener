@@ -29,3 +29,4 @@ Version 0.2.0
 Version 0.2.1
 - Remove internal cache
 + Add missing hashCode, equals and toString to JsonUnflattener
+* Fix the stack overflow bug in KEEP_ARRAYS mode when null value occurs

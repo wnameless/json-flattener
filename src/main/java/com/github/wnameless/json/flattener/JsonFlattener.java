@@ -259,13 +259,16 @@ public final class JsonFlattener {
             array.add(jsonVal2Obj(value));
           }
           return array;
-        } else {
+        } else if (val.isObject()) {
           return new JsonFlattener(val.toString()).withFlattenMode(flattenMode)
               .flattenAsMap();
         }
       default:
-        if (val.isArray()) return newJsonifyArrayList();
-        if (val.isObject()) return newJsonifyLinkedHashMap();
+        if (val.isArray()) {
+          return newJsonifyArrayList();
+        } else if (val.isObject()) {
+          return newJsonifyLinkedHashMap();
+        }
     }
 
     return null;
