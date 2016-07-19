@@ -310,4 +310,16 @@ public class JsonFlattenerTest {
     } catch (NullPointerException e) {}
   }
 
+  @Test
+  public void testFlattenWithNestedEmptyJsonObjectAndKeepArraysMode()
+      throws IOException {
+    URL url = Resources.getResource("test5.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    assertEquals(
+        "{\"a.b\":1,\"a.c\":null,\"a.d\":[false,{\"i.j\":[false,true]}],\"e\":\"f\",\"g\":2.3,\"z\":{}}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .flatten());
+  }
+
 }

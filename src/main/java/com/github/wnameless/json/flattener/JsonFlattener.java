@@ -260,8 +260,12 @@ public final class JsonFlattener {
           }
           return array;
         } else if (val.isObject()) {
-          return new JsonFlattener(val.toString()).withFlattenMode(flattenMode)
-              .flattenAsMap();
+          if (val.asObject().iterator().hasNext()) {
+            return new JsonFlattener(val.toString()).withFlattenMode(
+                flattenMode).flattenAsMap();
+          } else {
+            return newJsonifyLinkedHashMap();
+          }
         }
       default:
         if (val.isArray()) {
