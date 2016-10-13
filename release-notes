@@ -33,3 +33,6 @@ Version 0.2.1
 
 Version 0.2.2
 * Fix the stack overflow bug in KEEP_ARRAYS mode when empty object occurs
+
+Version 0.2.3
+* Fix internal JsonFlattener state inheritance bug during instantiation

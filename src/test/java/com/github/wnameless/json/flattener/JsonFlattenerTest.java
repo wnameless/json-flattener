@@ -135,19 +135,17 @@ public class JsonFlattenerTest {
   public void testWithEmptyJsonArray() throws IOException {
     String json = "[]";
     assertEquals("[]", new JsonFlattener(json).flatten());
-    assertEquals(ImmutableMap.of("root", newArrayList()), new JsonFlattener(
-        json).flattenAsMap());
+    assertEquals(ImmutableMap.of("root", newArrayList()),
+        new JsonFlattener(json).flattenAsMap());
     assertEquals(json,
         JsonUnflattener.unflatten(new JsonFlattener(json).flatten()));
-    assertEquals("[]",
+    assertEquals("[]", new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten());
+    assertEquals(ImmutableMap.of("root", newArrayList()),
         new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS)
-            .flatten());
-    assertEquals(ImmutableMap.of("root", newArrayList()), new JsonFlattener(
-        json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flattenAsMap());
-    assertEquals(
-        json,
-        JsonUnflattener.unflatten(new JsonFlattener(json).withFlattenMode(
-            FlattenMode.KEEP_ARRAYS).flatten()));
+            .flattenAsMap());
+    assertEquals(json, JsonUnflattener.unflatten(new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten()));
   }
 
   @Test
@@ -210,8 +208,8 @@ public class JsonFlattenerTest {
   @Test
   public void testWithSeparator() {
     String json = "{\"abc\":{\"def\":123}}";
-    assertEquals("{\"abc*def\":123}", new JsonFlattener(json)
-        .withSeparator('*').flatten());
+    assertEquals("{\"abc*def\":123}",
+        new JsonFlattener(json).withSeparator('*').flatten());
   }
 
   @SuppressWarnings("unchecked")
@@ -229,16 +227,16 @@ public class JsonFlattenerTest {
     assertEquals("[]", JsonFlattener.flatten("[]"));
     assertEquals(Collections.emptyList(),
         JsonFlattener.flattenAsMap("[]").get("root"));
-    assertEquals("[[{\"abc.def\":123}]]", new JsonFlattener(
-        "[[{\"abc\":{\"def\":123}}]]").withFlattenMode(FlattenMode.KEEP_ARRAYS)
-        .flatten());
+    assertEquals("[[{\"abc.def\":123}]]",
+        new JsonFlattener("[[{\"abc\":{\"def\":123}}]]")
+            .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten());
     List<List<Map<String, Object>>> root =
         (List<List<Map<String, Object>>>) new JsonFlattener(
             "[[{\"abc\":{\"def\":123}}]]")
-            .withFlattenMode(FlattenMode.KEEP_ARRAYS).flattenAsMap()
-            .get("root");
-    assertEquals(ImmutableMap.of("abc.def", new BigDecimal(123)), root.get(0)
-        .get(0));
+                .withFlattenMode(FlattenMode.KEEP_ARRAYS).flattenAsMap()
+                .get("root");
+    assertEquals(ImmutableMap.of("abc.def", new BigDecimal(123)),
+        root.get(0).get(0));
   }
 
   @Test
@@ -263,23 +261,20 @@ public class JsonFlattenerTest {
     assertEquals(sw.toString(), json);
 
     src = "[[123]]";
-    json =
-        new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
-            .withPrintMode(PrintMode.MINIMAL).flatten();
+    json = new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+        .withPrintMode(PrintMode.MINIMAL).flatten();
     sw = new StringWriter();
     Json.parse(json).writeTo(sw, WriterConfig.MINIMAL);
     assertEquals(sw.toString(), json);
 
-    json =
-        new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
-            .withPrintMode(PrintMode.REGULAR).flatten();
+    json = new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+        .withPrintMode(PrintMode.REGULAR).flatten();
     sw = new StringWriter();
     Json.parse(json).writeTo(sw, PrettyPrint.singleLine());
     assertEquals(sw.toString(), json);
 
-    json =
-        new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
-            .withPrintMode(PrintMode.PRETTY).flatten();
+    json = new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+        .withPrintMode(PrintMode.PRETTY).flatten();
     sw = new StringWriter();
     Json.parse(json).writeTo(sw, WriterConfig.PRETTY_PRINT);
     assertEquals(sw.toString(), json);
@@ -291,7 +286,8 @@ public class JsonFlattenerTest {
     assertSame(jf.flattenAsMap(), jf.flattenAsMap());
     assertNotSame(jf.flatten(), jf.flatten());
     assertEquals("{\"abc*def\":123}", jf.withSeparator('*').flatten());
-    assertNotEquals(jf.flatten(), jf.withPrintMode(PrintMode.REGULAR).flatten());
+    assertNotEquals(jf.flatten(),
+        jf.withPrintMode(PrintMode.REGULAR).flatten());
   }
 
   @Test
@@ -320,6 +316,16 @@ public class JsonFlattenerTest {
         "{\"a.b\":1,\"a.c\":null,\"a.d\":[false,{\"i.j\":[false,true]}],\"e\":\"f\",\"g\":2.3,\"z\":{}}",
         new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS)
             .flatten());
+  }
+
+  @Test
+  public void testWithSeparatorAndNestedObject() throws IOException {
+    URL url = Resources.getResource("test5.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+    assertEquals(
+        "{\"a_b\":1,\"a_c\":null,\"a_d\":[false,{\"i_j\":[false,true]}],\"e\":\"f\",\"g\":2.3,\"z\":{}}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withSeparator('_').flatten());
   }
 
 }

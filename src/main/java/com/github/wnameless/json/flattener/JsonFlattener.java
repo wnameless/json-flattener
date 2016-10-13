@@ -43,7 +43,8 @@ import com.eclipsesource.json.JsonValue;
  * { "a" : { "b" : 1, "c": null, "d": [false, true] }, "e": "f", "g":2.3 }<br>
  * <br>
  * can be turned into a flattened JSON <br>
- * { "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": "f", "g":2.3 } <br>
+ * { "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": "f", "g":2.3 }
+ * <br>
  * <br>
  * or into a Map<br>
  * {<br>
@@ -184,8 +185,8 @@ public final class JsonFlattener {
     } else if (obj instanceof CharSequence) {
       StringBuilder sb = new StringBuilder();
       sb.append('"');
-      sb.append(policy.getCharSequenceTranslator()
-          .translate((CharSequence) obj));
+      sb.append(
+          policy.getCharSequenceTranslator().translate((CharSequence) obj));
       sb.append('"');
       return sb.toString();
     } else if (obj instanceof JsonifyArrayList) {
@@ -261,8 +262,7 @@ public final class JsonFlattener {
           return array;
         } else if (val.isObject()) {
           if (val.asObject().iterator().hasNext()) {
-            return new JsonFlattener(val.toString()).withFlattenMode(
-                flattenMode).flattenAsMap();
+            return newJsonFlattener(val.toString()).flattenAsMap();
           } else {
             return newJsonifyLinkedHashMap();
           }
@@ -318,6 +318,12 @@ public final class JsonFlattener {
     JsonifyLinkedHashMap<K, V> map = new JsonifyLinkedHashMap<K, V>();
     map.setTranslator(policy.getCharSequenceTranslator());
     return map;
+  }
+
+  private JsonFlattener newJsonFlattener(String json) {
+    return new JsonFlattener(json).withFlattenMode(flattenMode)
+        .withSeparator(separator).withStringEscapePolicy(policy)
+        .withPrintMode(printMode);
   }
 
   @Override
