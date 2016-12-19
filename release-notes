@@ -36,3 +36,6 @@ Version 0.2.2
 
 Version 0.2.3
 * Fix internal JsonFlattener state inheritance bug during instantiation
+
+Version 0.2.4
+* Fix the bug of wrong output if ROOT value shows in source object

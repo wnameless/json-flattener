@@ -328,4 +328,11 @@ public class JsonFlattenerTest {
             .withSeparator('_').flatten());
   }
 
+  @Test
+  public void testWithRootKeyInSourceObject() {
+    String json = "{\"" + JsonFlattener.ROOT + "\":null, \"ss\":[123]}";
+    assertEquals("{\"" + JsonFlattener.ROOT + "\":null,\"ss[0]\":123}",
+        JsonFlattener.flatten(json));
+  }
+
 }

@@ -173,10 +173,14 @@ public final class JsonFlattener {
   public String flatten() {
     flattenAsMap();
 
-    if (flattenedMap.containsKey(ROOT))
-      return javaObj2Json(flattenedMap.get(ROOT));
-    else
+    if (source.isObject() || isObjectifiableArray())
       return flattenedMap.toString(printMode);
+    else
+      return javaObj2Json(flattenedMap.get(ROOT));
+  }
+
+  private boolean isObjectifiableArray() {
+    return source.isArray() && !flattenedMap.containsKey(ROOT);
   }
 
   private String javaObj2Json(Object obj) {
