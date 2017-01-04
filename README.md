@@ -40,7 +40,7 @@ System.out.println(nestedJson);
 
 // Support JSON keys which contain dots or square brackets
 String flattendJsonWithDotKey = JsonFlattener.flatten("[{\"a.a.[\":1},2,{\"c\":[3,4]}]");
-System.out.println(flatteflattendJsonWithDotKeynJsonWithDotKey);
+System.out.println(flattendJsonWithDotKey);
 // Output: {"[0][\"a.a.[\"]":12,"[1]":2,"[2].c[0]":3,"[2].c[1]":4}
 
 String nestedJsonWithDotKey = JsonUnflattener.unflatten(
