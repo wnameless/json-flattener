@@ -186,6 +186,9 @@ public class JsonFlattenerTest {
     String json = "[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]";
     assertEquals("{\"[0].abc\\t\":\" \\\" \\r \\t \1234 \"}",
         new JsonFlattener(json).flatten());
+    json = "{\" \":[123,\"abc\"]}";
+    assertEquals("{\"[\\\" \\\"][0]\":123,\"[\\\" \\\"][1]\":\"abc\"}",
+        new JsonFlattener(json).flatten());
   }
 
   @Test
