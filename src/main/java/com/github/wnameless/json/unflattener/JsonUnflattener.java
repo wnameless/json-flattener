@@ -20,6 +20,7 @@ package com.github.wnameless.json.unflattener;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,13 +43,85 @@ import com.github.wnameless.json.flattener.PrintMode;
  */
 public final class JsonUnflattener {
 
+  /**
+   * Returns a JSON string of nested objects by the given flattened JSON string.
+   * 
+   * @param json
+   *          a flattened JSON string
+   * @return a JSON string of nested objects
+   */
+  public static String unflatten(String json) {
+    return new JsonUnflattener(json).unflatten();
+  }
+
+  /**
+   * Returns a JSON Unflattener without doing any preprocessing on the input
+   * JSON string. It creates a JSON Unflattener instance way more faster than
+   * the normal constructor because it performs a LAZY initialization
+   * mechanism.<br>
+   * <br>
+   * WARN: Due to the LAZY initialization, the malformed input of JSON string
+   * cannot be detected until any unflattening has been executed.
+   * 
+   * @param json
+   *          the JSON string
+   * @return a JSON unflattener
+   */
+  public static JsonUnflattener lazy(String json) {
+    return new JsonUnflattener(json, true);
+  }
+
+  /**
+   * Returns a JSON Unflattener without doing any preprocessing on the input
+   * JSON reader. It creates a JSON Unflattener instance way more faster than
+   * the normal constructor because it performs a LAZY initialization
+   * mechanism.<br>
+   * <br>
+   * WARN: Due to the LAZY initialization, the malformed input of JSON reader
+   * cannot be detected until any unflattening has been executed.
+   * 
+   * @param jsonReader
+   *          the JSON reader
+   * @return a JSON unflattener
+   */
+  public static JsonUnflattener lazy(Reader jsonReader) {
+    return new JsonUnflattener(jsonReader, true);
+  }
+
   private static final String arrayIndex = "\\[\\s*\\d+\\s*\\]";
   private static final String objectComplexKey = "\\[\\s*\".*\"\\s*\\]";
 
-  private final JsonValue root;
+  private String rawJson;
+  private Reader jsonReader;
+  private JsonValue root;
 
   private Character separator = '.';
   private PrintMode printMode = PrintMode.MINIMAL;
+
+  private JsonValue getRoot() {
+    if (root == null) {
+      if (rawJson != null) {
+        root = Json.parse(rawJson);
+      } else {
+        try {
+          root = Json.parse(jsonReader);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+    return root;
+  }
+
+  private JsonUnflattener(String json, boolean isLazy) {
+    rawJson = notNull(json);
+    if (!isLazy) getRoot();
+  }
+
+  private JsonUnflattener(Reader jsonReader, boolean isLazy) {
+    this.jsonReader = notNull(jsonReader);
+    if (!isLazy) getRoot();
+  }
 
   /**
    * Creates a JSON unflattener.
@@ -57,7 +130,19 @@ public final class JsonUnflattener {
    *          the JSON string
    */
   public JsonUnflattener(String json) {
-    root = Json.parse(json);
+    rawJson = notNull(json);
+    getRoot();
+  }
+
+  /**
+   * Creates a JSON unflattener.
+   * 
+   * @param jsonReader
+   *          the JSON reader
+   */
+  public JsonUnflattener(Reader jsonReader) {
+    this.jsonReader = notNull(jsonReader);
+    getRoot();
   }
 
   private String objectKey() {
@@ -65,8 +150,8 @@ public final class JsonUnflattener {
   }
 
   private Pattern keyPartPattern() {
-    return Pattern.compile(arrayIndex + "|" + objectComplexKey + "|"
-        + objectKey());
+    return Pattern
+        .compile(arrayIndex + "|" + objectComplexKey + "|" + objectKey());
   }
 
   /**
@@ -109,32 +194,21 @@ public final class JsonUnflattener {
   /**
    * Returns a JSON string of nested objects by the given flattened JSON string.
    * 
-   * @param json
-   *          a flattened JSON string
-   * @return a JSON string of nested objects
-   */
-  public static String unflatten(String json) {
-    return new JsonUnflattener(json).unflatten();
-  }
-
-  /**
-   * Returns a JSON string of nested objects by the given flattened JSON string.
-   * 
    * @return a JSON string of nested objects
    */
   public String unflatten() {
     StringWriter sw = new StringWriter();
-    if (root.isArray()) {
+    if (getRoot().isArray()) {
       try {
-        unflattenArray(root.asArray()).writeTo(sw, getWriterConfig());
+        unflattenArray(getRoot().asArray()).writeTo(sw, getWriterConfig());
       } catch (IOException e) {}
       return sw.toString();
     }
-    if (!root.isObject()) {
-      return root.toString();
+    if (!getRoot().isObject()) {
+      return getRoot().toString();
     }
 
-    JsonObject flattened = root.asObject();
+    JsonObject flattened = getRoot().asObject();
     JsonValue unflattened = flattened.names().isEmpty() ? Json.object() : null;
 
     for (String key : flattened.names()) {
@@ -200,7 +274,7 @@ public final class JsonUnflattener {
     return unflattenArray;
   }
 
-  private String extractKey(String keyPart) {
+  private static String extractKey(String keyPart) {
     if (keyPart.matches(objectComplexKey))
       return keyPart.replaceAll("^\\[\\s*\"", "").replaceAll("\"\\s*\\]$", "");
     else
@@ -290,7 +364,7 @@ public final class JsonUnflattener {
   @Override
   public int hashCode() {
     int result = 27;
-    result = 31 * result + root.hashCode();
+    result = 31 * result + getRoot().hashCode();
     return result;
   }
 
@@ -298,12 +372,12 @@ public final class JsonUnflattener {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof JsonUnflattener)) return false;
-    return root.equals(((JsonUnflattener) o).root);
+    return getRoot().equals(((JsonUnflattener) o).getRoot());
   }
 
   @Override
   public String toString() {
-    return "JsonUnflattener{root=" + root + "}";
+    return "JsonUnflattener{root=" + getRoot() + "}";
   }
 
 }

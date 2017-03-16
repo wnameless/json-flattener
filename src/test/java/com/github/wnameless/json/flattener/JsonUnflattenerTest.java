@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 
@@ -42,21 +43,17 @@ public class JsonUnflattenerTest {
   public void testUnflatten() {
     assertEquals(
         "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}",
-        JsonUnflattener
-            .unflatten("{\"a.b\":1,\"a.c\":null,\"a.d[1]\":true,\"a.d[0]\":false,\"a.d[2].sss\":777,\"a.d[2].vvv\":888,\"e\":\"f\",\"g\":2.3}"));
+        JsonUnflattener.unflatten(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[1]\":true,\"a.d[0]\":false,\"a.d[2].sss\":777,\"a.d[2].vvv\":888,\"e\":\"f\",\"g\":2.3}"));
 
-    assertEquals(
-        "[1,[2,3],4,{\"abc\":5}]",
-        JsonUnflattener
-            .unflatten("{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3].abc\":5}"));
+    assertEquals("[1,[2,3],4,{\"abc\":5}]", JsonUnflattener.unflatten(
+        "{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3].abc\":5}"));
   }
 
   @Test
   public void testUnflattenWithKeyContainsDotAndSquareBracket() {
-    assertEquals(
-        "[1,[2,3],4,{\"ab.c.[\":5}]",
-        JsonUnflattener
-            .unflatten("{\"[1][0]\":2,\"[ 0 ]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][ \\\"ab.c.[\\\" ]\":5}"));
+    assertEquals("[1,[2,3],4,{\"ab.c.[\":5}]", JsonUnflattener.unflatten(
+        "{\"[1][0]\":2,\"[ 0 ]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][ \\\"ab.c.[\\\" ]\":5}"));
   }
 
   @Test
@@ -120,17 +117,17 @@ public class JsonUnflattenerTest {
     URL url = Resources.getResource("test4.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
-    assertEquals(
-        json,
-        JsonUnflattener.unflatten(new JsonFlattener(json).withFlattenMode(
-            FlattenMode.KEEP_ARRAYS).flatten()));
+    assertEquals(json, JsonUnflattener.unflatten(new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten()));
   }
 
   @Test
   public void testWithSeparater() {
     String json = "{\"abc\":{\"def\":123}}";
-    assertEquals(json, new JsonUnflattener(new JsonFlattener(json)
-        .withSeparator('*').flatten()).withSeparator('*').unflatten());
+    assertEquals(json,
+        new JsonUnflattener(
+            new JsonFlattener(json).withSeparator('*').flatten())
+                .withSeparator('*').unflatten());
   }
 
   @Test
@@ -179,6 +176,37 @@ public class JsonUnflattenerTest {
   @Test(expected = NullPointerException.class)
   public void testNullPointerException() {
     new JsonUnflattener("{\"abc.def\":123}").withPrintMode(null);
+  }
+
+  @Test
+  public void testLazy() throws IOException {
+    URL url = Resources.getResource("test.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    long t = System.currentTimeMillis();
+    for (int i = 0; i < 100; i++) {
+      new JsonUnflattener(json);
+    }
+    long normalTime = System.currentTimeMillis() - t;
+
+    t = System.currentTimeMillis();
+    for (int i = 0; i < 1000; i++) {
+      JsonUnflattener.lazy(json);
+    }
+    long lazyTime = System.currentTimeMillis() - t;
+
+    assertTrue(normalTime > lazyTime);
+  }
+
+  @Test
+  public void testInitByReader() throws IOException {
+    StringReader sr = new StringReader("{\"abc.def\":123}");
+
+    assertEquals(new JsonUnflattener(sr),
+        new JsonUnflattener("{\"abc.def\":123}"));
+    sr.reset();
+    assertEquals(JsonUnflattener.lazy(sr),
+        new JsonUnflattener("{\"abc.def\":123}"));
   }
 
 }

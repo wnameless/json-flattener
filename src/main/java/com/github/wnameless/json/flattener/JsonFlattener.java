@@ -21,6 +21,8 @@ import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexed
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.Validate.notNull;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -92,15 +94,76 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private final JsonValue source;
+  /**
+   * Returns a JSON flattener without doing any preprocessing on the input JSON
+   * string. It creates a JSON flattener instance way more faster than the
+   * normal constructor because it performs a LAZY initialization mechanism.<br>
+   * <br>
+   * WARN: Due to the LAZY initialization, the malformed input of JSON string
+   * cannot be detected until any flattening has been executed.
+   * 
+   * @param json
+   *          the JSON string
+   * @return a JSON flattener
+   */
+  public static JsonFlattener lazy(String json) {
+    return new JsonFlattener(json, true);
+  }
+
+  /**
+   * Returns a JSON flattener without doing any preprocessing on the input JSON
+   * reader. It creates a JSON flattener instance way more faster than the
+   * normal constructor because it performs a LAZY initialization mechanism.
+   * <br>
+   * <br>
+   * WARN: Due to the LAZY initialization, the malformed input of JSON reader
+   * cannot be detected until any flattening has been executed.
+   * 
+   * @param jsonReader
+   *          the JSON reader
+   * @return a JSON flattener
+   */
+  public static JsonFlattener lazy(Reader jsonReader) {
+    return new JsonFlattener(jsonReader, true);
+  }
+
+  private String rawJson;
+  private Reader jsonReader;
+  private JsonValue source;
+
   private final Deque<IndexedPeekIterator<?>> elementIters =
       new ArrayDeque<IndexedPeekIterator<?>>();
-
   private JsonifyLinkedHashMap<String, Object> flattenedMap;
+
   private FlattenMode flattenMode = FlattenMode.NORMAL;
   private StringEscapePolicy policy = StringEscapePolicy.NORMAL;
   private Character separator = '.';
   private PrintMode printMode = PrintMode.MINIMAL;
+
+  private JsonValue getSource() {
+    if (source == null) {
+      if (rawJson != null) {
+        source = Json.parse(rawJson);
+      } else {
+        try {
+          source = Json.parse(jsonReader);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+    return source;
+  }
+
+  private JsonFlattener(String json, boolean isLazy) {
+    rawJson = notNull(json);
+    if (!isLazy) getSource();
+  }
+
+  private JsonFlattener(Reader jsonReader, boolean isLazy) {
+    this.jsonReader = notNull(jsonReader);
+    if (!isLazy) getSource();
+  }
 
   /**
    * Creates a JSON flattener.
@@ -109,7 +172,19 @@ public final class JsonFlattener {
    *          the JSON string
    */
   public JsonFlattener(String json) {
-    source = Json.parse(json);
+    rawJson = notNull(json);
+    getSource();
+  }
+
+  /**
+   * Creates a JSON flattener.
+   * 
+   * @param jsonReader
+   *          the JSON reader
+   */
+  public JsonFlattener(Reader jsonReader) {
+    this.jsonReader = notNull(jsonReader);
+    getSource();
   }
 
   /**
@@ -173,14 +248,14 @@ public final class JsonFlattener {
   public String flatten() {
     flattenAsMap();
 
-    if (source.isObject() || isObjectifiableArray())
+    if (getSource().isObject() || isObjectifiableArray())
       return flattenedMap.toString(printMode);
     else
       return javaObj2Json(flattenedMap.get(ROOT));
   }
 
   private boolean isObjectifiableArray() {
-    return source.isArray() && !flattenedMap.containsKey(ROOT);
+    return getSource().isArray() && !flattenedMap.containsKey(ROOT);
   }
 
   private String javaObj2Json(Object obj) {
@@ -210,7 +285,7 @@ public final class JsonFlattener {
     if (flattenedMap != null) return flattenedMap;
 
     flattenedMap = newJsonifyLinkedHashMap();
-    reduce(source);
+    reduce(getSource());
 
     while (!elementIters.isEmpty()) {
       IndexedPeekIterator<?> deepestIter = elementIters.getLast();
@@ -333,7 +408,7 @@ public final class JsonFlattener {
   @Override
   public int hashCode() {
     int result = 27;
-    result = 31 * result + source.hashCode();
+    result = 31 * result + getSource().hashCode();
     return result;
   }
 
@@ -341,12 +416,12 @@ public final class JsonFlattener {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof JsonFlattener)) return false;
-    return source.equals(((JsonFlattener) o).source);
+    return getSource().equals(((JsonFlattener) o).getSource());
   }
 
   @Override
   public String toString() {
-    return "JsonFlattener{source=" + source + "}";
+    return "JsonFlattener{source=" + getSource() + "}";
   }
 
 }
