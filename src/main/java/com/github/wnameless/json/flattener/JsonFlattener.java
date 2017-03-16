@@ -96,6 +96,39 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
+  /**
+   * Returns a JSON flattener without doing any preprocessing on the input JSON
+   * string. It creates a JSON flattener instance way more faster than the
+   * normal constructor because it performs a LAZY initialization mechanism.<br>
+   * <br>
+   * WARN: Due to the LAZY initialization, the malformed input of JSON string
+   * cannot be detected until any flattening has been executed.
+   * 
+   * @param json
+   *          the JSON string
+   * @return a JSON flattener
+   */
+  public static JsonFlattener lazy(String json) {
+    return new JsonFlattener(json, true);
+  }
+
+  /**
+   * Returns a JSON flattener without doing any preprocessing on the input JSON
+   * reader. It creates a JSON flattener instance way more faster than the
+   * normal constructor because it performs a LAZY initialization mechanism.
+   * <br>
+   * <br>
+   * WARN: Due to the LAZY initialization, the malformed input of JSON reader
+   * cannot be detected until any flattening has been executed.
+   * 
+   * @param jsonReader
+   *          the JSON reader
+   * @return a JSON flattener
+   */
+  public static JsonFlattener lazy(Reader jsonReader) {
+    return new JsonFlattener(jsonReader, true);
+  }
+
   private String rawJson;
   private Reader jsonReader;
   private JsonValue source;
@@ -126,6 +159,16 @@ public final class JsonFlattener {
     return source;
   }
 
+  private JsonFlattener(String json, boolean isLazy) {
+    rawJson = notNull(json);
+    if (!isLazy) getSource();
+  }
+
+  private JsonFlattener(Reader jsonReader, boolean isLazy) {
+    this.jsonReader = notNull(jsonReader);
+    if (!isLazy) getSource();
+  }
+
   /**
    * Creates a JSON flattener.
    * 
@@ -134,6 +177,7 @@ public final class JsonFlattener {
    */
   public JsonFlattener(String json) {
     rawJson = notNull(json);
+    getSource();
   }
 
   /**
@@ -144,6 +188,7 @@ public final class JsonFlattener {
    */
   public JsonFlattener(Reader jsonReader) {
     this.jsonReader = notNull(jsonReader);
+    getSource();
   }
 
   /**
