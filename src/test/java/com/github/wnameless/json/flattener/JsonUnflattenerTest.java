@@ -22,6 +22,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -128,6 +129,93 @@ public class JsonUnflattenerTest {
         new JsonUnflattener(
             new JsonFlattener(json).withSeparator('*').flatten())
                 .withSeparator('*').unflatten());
+  }
+
+  @Test
+  public void testWithSeparaterExceptions() {
+    String json = "{\"abc\":{\"def\":123}}";
+    try {
+      new JsonUnflattener(json).withSeparator('"');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withSeparator(' ');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withSeparator('[');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withSeparator(']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  @Test
+  public void testWithLeftAndRightBrackets() {
+    String json = "{\"abc[\\\"A.\\\"][0]\":123}";
+    assertEquals("{\"abc\":{\"A.\":[123]}}", new JsonUnflattener(json)
+        .withLeftAndRightBrackets('[', ']').unflatten());
+
+    json = "{\"abc{\\\"A.\\\"}{0}\":123}";
+    assertEquals("{\"abc\":{\"A.\":[123]}}", new JsonUnflattener(json)
+        .withLeftAndRightBrackets('{', '}').unflatten());
+  }
+
+  @Test
+  public void testWithLeftAndRightBracketsExceptions() {
+    String json = "{\"abc\":{\"def\":123}}";
+    try {
+      new JsonUnflattener(json).withLeftAndRightBrackets('#', '#');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withLeftAndRightBrackets('"', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withLeftAndRightBrackets(' ', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withLeftAndRightBrackets('.', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withLeftAndRightBrackets('[', '"');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withLeftAndRightBrackets('[', ' ');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonUnflattener(json).withLeftAndRightBrackets('[', '.');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
   }
 
   @Test

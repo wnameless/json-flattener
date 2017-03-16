@@ -17,6 +17,7 @@
  */
 package com.github.wnameless.json.unflattener;
 
+import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
@@ -88,14 +89,13 @@ public final class JsonUnflattener {
     return new JsonUnflattener(jsonReader, true);
   }
 
-  private static final String arrayIndex = "\\[\\s*\\d+\\s*\\]";
-  private static final String objectComplexKey = "\\[\\s*\".*\"\\s*\\]";
-
   private String rawJson;
   private Reader jsonReader;
   private JsonValue root;
 
   private Character separator = '.';
+  private Character leftBracket = '[';
+  private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
 
   private JsonValue getRoot() {
@@ -145,13 +145,25 @@ public final class JsonUnflattener {
     getRoot();
   }
 
+  private String arrayIndex() {
+    return Pattern.quote(leftBracket.toString()) + "\\s*\\d+\\s*"
+        + Pattern.quote(rightBracket.toString());
+  }
+
+  private String objectComplexKey() {
+    return Pattern.quote(leftBracket.toString()) + "\\s*\".*\"\\s*"
+        + Pattern.quote(rightBracket.toString());
+  }
+
   private String objectKey() {
-    return "[^" + Pattern.quote(separator.toString()) + "\\[\\]]+";
+    return "[^" + Pattern.quote(separator.toString())
+        + Pattern.quote(leftBracket.toString())
+        + Pattern.quote(rightBracket.toString()) + "]+";
   }
 
   private Pattern keyPartPattern() {
     return Pattern
-        .compile(arrayIndex + "|" + objectComplexKey + "|" + objectKey());
+        .compile(arrayIndex() + "|" + objectComplexKey() + "|" + objectKey());
   }
 
   /**
@@ -163,7 +175,44 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withSeparator(char separator) {
+    isTrue(!Character.toString(separator).matches("[\"\\s]"),
+        "Separator contains illegal chracter(%s)",
+        Character.toString(separator));
+    isTrue(!leftBracket.equals(separator) && !rightBracket.equals(separator),
+        "Separator(%s) is already used in brackets",
+        Character.toString(separator));
+
     this.separator = separator;
+    return this;
+  }
+
+  private String illegalBracketsRegex() {
+    return "[\"\\s" + Pattern.quote(separator.toString()) + "]";
+  }
+
+  /**
+   * A fluent setter to setup the left and right brackets within a key in the
+   * flattened JSON. The default left and right brackets are left square
+   * bracket([) and right square bracket(]).
+   * 
+   * @param leftBracket
+   *          any character
+   * @param rightBracket
+   *          any character
+   * @return this {@link JsonUnflattener}
+   */
+  public JsonUnflattener withLeftAndRightBrackets(char leftBracket,
+      char rightBracket) {
+    isTrue(leftBracket != rightBracket, "Both brackets cannot be the same");
+    isTrue(!Character.toString(leftBracket).matches(illegalBracketsRegex()),
+        "Left bracket contains illegal chracter(%s)",
+        Character.toString(leftBracket));
+    isTrue(!Character.toString(rightBracket).matches(illegalBracketsRegex()),
+        "Right bracket contains illegal chracter(%s)",
+        Character.toString(rightBracket));
+
+    this.leftBracket = leftBracket;
+    this.rightBracket = rightBracket;
     return this;
   }
 
@@ -219,6 +268,7 @@ public final class JsonUnflattener {
       Matcher matcher = keyPartPattern().matcher(key);
       while (matcher.find()) {
         String keyPart = matcher.group();
+        System.out.println(keyPart);
 
         if (objKey != null ^ aryIdx != null) {
           if (isJsonArray(keyPart)) {
@@ -274,19 +324,25 @@ public final class JsonUnflattener {
     return unflattenArray;
   }
 
-  private static String extractKey(String keyPart) {
-    if (keyPart.matches(objectComplexKey))
-      return keyPart.replaceAll("^\\[\\s*\"", "").replaceAll("\"\\s*\\]$", "");
+  private String extractKey(String keyPart) {
+    if (keyPart.matches(objectComplexKey()))
+      return keyPart
+          .replaceAll("^" + Pattern.quote(leftBracket.toString()) + "\\s*\"",
+              "")
+          .replaceAll("\"\\s*" + Pattern.quote(rightBracket.toString()) + "$",
+              "");
     else
       return keyPart;
   }
 
-  private static Integer extractIndex(String keyPart) {
-    return Integer.valueOf(keyPart.replaceAll("[\\[\\]\\s]", ""));
+  private Integer extractIndex(String keyPart) {
+    return Integer
+        .valueOf(keyPart.replaceAll("[" + Pattern.quote(leftBracket.toString())
+            + Pattern.quote(rightBracket.toString()) + "\\s]", ""));
   }
 
-  private static boolean isJsonArray(String keyPart) {
-    return keyPart.matches(arrayIndex);
+  private boolean isJsonArray(String keyPart) {
+    return keyPart.matches(arrayIndex());
   }
 
   private JsonValue findOrCreateJsonArray(JsonValue currentVal, String objKey,

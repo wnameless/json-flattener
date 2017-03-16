@@ -49,6 +49,11 @@ import com.google.common.io.Resources;
 public class JsonFlattenerTest {
 
   @Test
+  public void test() {
+    System.out.println(JsonFlattener.flatten("{ \"abc\": { \" [\": 123 } }"));
+  }
+
+  @Test
   public void testFlattenAsMap() throws IOException {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
@@ -211,6 +216,89 @@ public class JsonFlattenerTest {
     String json = "{\"abc\":{\"def\":123}}";
     assertEquals("{\"abc*def\":123}",
         new JsonFlattener(json).withSeparator('*').flatten());
+  }
+
+  @Test
+  public void testWithSeparatorExceptions() {
+    String json = "{\"abc\":{\"def\":123}}";
+    try {
+      new JsonFlattener(json).withSeparator('"');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withSeparator(' ');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withSeparator('[');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withSeparator(']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  @Test
+  public void testWithLeftAndRightBracket() {
+    String json = "{\"abc\":{\"A.\":[123]}}";
+    assertEquals("{\"abc{\\\"A.\\\"}{0}\":123}",
+        new JsonFlattener(json).withLeftAndRightBrackets('{', '}').flatten());
+  }
+
+  @Test
+  public void testWithLeftAndRightBracketsExceptions() {
+    String json = "{\"abc\":{\"def\":123}}";
+    try {
+      new JsonFlattener(json).withLeftAndRightBrackets('#', '#');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withLeftAndRightBrackets('"', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withLeftAndRightBrackets(' ', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withLeftAndRightBrackets('.', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withLeftAndRightBrackets('[', '"');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withLeftAndRightBrackets('[', ' ');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+    try {
+      new JsonFlattener(json).withLeftAndRightBrackets('[', '.');
+      fail();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
   }
 
   @SuppressWarnings("unchecked")

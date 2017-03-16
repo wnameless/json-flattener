@@ -19,6 +19,7 @@ package com.github.wnameless.json.flattener;
 
 import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
 import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject.Member;
@@ -138,6 +140,8 @@ public final class JsonFlattener {
   private FlattenMode flattenMode = FlattenMode.NORMAL;
   private StringEscapePolicy policy = StringEscapePolicy.NORMAL;
   private Character separator = '.';
+  private Character leftBracket = '[';
+  private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
 
   private JsonValue getSource() {
@@ -222,7 +226,45 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withSeparator(char separator) {
+    isTrue(!Character.toString(separator).matches("[\"\\s]"),
+        "Separator contains illegal chracter(%s)",
+        Character.toString(separator));
+    isTrue(!leftBracket.equals(separator) && !rightBracket.equals(separator),
+        "Separator(%s) is already used in brackets",
+        Character.toString(separator));
+
     this.separator = separator;
+    flattenedMap = null;
+    return this;
+  }
+
+  private String illegalBracketsRegex() {
+    return "[\"\\s" + Pattern.quote(separator.toString()) + "]";
+  }
+
+  /**
+   * A fluent setter to setup the left and right brackets within a key in the
+   * flattened JSON. The default left and right brackets are left square
+   * bracket([) and right square bracket(]).
+   * 
+   * @param leftBracket
+   *          any character
+   * @param rightBracket
+   *          any character
+   * @return this {@link JsonFlattener}
+   */
+  public JsonFlattener withLeftAndRightBrackets(char leftBracket,
+      char rightBracket) {
+    isTrue(leftBracket != rightBracket, "Both brackets cannot be the same");
+    isTrue(!Character.toString(leftBracket).matches(illegalBracketsRegex()),
+        "Left bracket contains illegal chracter(%s)",
+        Character.toString(leftBracket));
+    isTrue(!Character.toString(rightBracket).matches(illegalBracketsRegex()),
+        "Right bracket contains illegal chracter(%s)",
+        Character.toString(rightBracket));
+
+    this.leftBracket = leftBracket;
+    this.rightBracket = rightBracket;
     flattenedMap = null;
     return this;
   }
@@ -365,22 +407,24 @@ public final class JsonFlattener {
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
         String key = ((Member) iter.getCurrent()).getName();
-        if (key.contains(separator.toString())) {
-          sb.append('[');
+        if (key.contains(separator.toString())
+            || key.contains(leftBracket.toString())
+            || key.contains(rightBracket.toString()) || key.matches("\\s")) {
+          sb.append(leftBracket);
           sb.append('\\');
           sb.append('"');
           sb.append(policy.getCharSequenceTranslator().translate(key));
           sb.append('\\');
           sb.append('"');
-          sb.append(']');
+          sb.append(rightBracket);
         } else {
           if (sb.length() != 0) sb.append(separator);
           sb.append(policy.getCharSequenceTranslator().translate(key));
         }
       } else { // JsonValue
-        sb.append('[');
+        sb.append(leftBracket);
         sb.append(iter.getIndex());
-        sb.append(']');
+        sb.append(rightBracket);
       }
     }
 
