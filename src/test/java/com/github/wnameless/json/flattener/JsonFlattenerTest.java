@@ -199,7 +199,7 @@ public class JsonFlattenerTest {
     URL url = Resources.getResource("test4.json");
     String json = Resources.toString(url, Charsets.UTF_8);
     assertEquals(
-        "{\"a.b\":1,\"a.c\":null,\"a.d\":[false,{\"i.j\":[false,true]}],\"e\":\"f\",\"g\":2.3,\"z\":[]}",
+        "{\"a.b\":1,\"a.c\":null,\"a.d\":[false,{\"i.j\":[false,true,\"xy\"]}],\"e\":\"f\",\"g\":2.3,\"z\":[]}",
         new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS)
             .flatten());
   }
@@ -249,8 +249,8 @@ public class JsonFlattenerTest {
 
   @Test
   public void testWithLeftAndRightBracket() {
-    String json = "{\"abc\":{\"A.\":[123]}}";
-    assertEquals("{\"abc{\\\"A.\\\"}{0}\":123}",
+    String json = "{\"abc\":{\"A.\":[123,\"def\"]}}";
+    assertEquals("{\"abc{\\\"A.\\\"}{0}\":123,\"abc{\\\"A.\\\"}{1}\":\"def\"}",
         new JsonFlattener(json).withLeftAndRightBrackets('{', '}').flatten());
   }
 
