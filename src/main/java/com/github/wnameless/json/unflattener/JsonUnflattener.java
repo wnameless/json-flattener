@@ -268,7 +268,6 @@ public final class JsonUnflattener {
       Matcher matcher = keyPartPattern().matcher(key);
       while (matcher.find()) {
         String keyPart = matcher.group();
-        System.out.println(keyPart);
 
         if (objKey != null ^ aryIdx != null) {
           if (isJsonArray(keyPart)) {
