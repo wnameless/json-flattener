@@ -55,40 +55,6 @@ public final class JsonUnflattener {
     return new JsonUnflattener(json).unflatten();
   }
 
-  /**
-   * Returns a JSON Unflattener without doing any preprocessing on the input
-   * JSON string. It creates a JSON Unflattener instance way more faster than
-   * the normal constructor because it performs a LAZY initialization
-   * mechanism.<br>
-   * <br>
-   * WARN: Due to the LAZY initialization, the malformed input of JSON string
-   * cannot be detected until any unflattening has been executed.
-   * 
-   * @param json
-   *          the JSON string
-   * @return a JSON unflattener
-   */
-  public static JsonUnflattener lazy(String json) {
-    return new JsonUnflattener(json, true);
-  }
-
-  /**
-   * Returns a JSON Unflattener without doing any preprocessing on the input
-   * JSON reader. It creates a JSON Unflattener instance way more faster than
-   * the normal constructor because it performs a LAZY initialization
-   * mechanism.<br>
-   * <br>
-   * WARN: Due to the LAZY initialization, the malformed input of JSON reader
-   * cannot be detected until any unflattening has been executed.
-   * 
-   * @param jsonReader
-   *          the JSON reader
-   * @return a JSON unflattener
-   */
-  public static JsonUnflattener lazy(Reader jsonReader) {
-    return new JsonUnflattener(jsonReader, true);
-  }
-
   private String rawJson;
   private Reader jsonReader;
   private JsonValue root;
@@ -113,16 +79,6 @@ public final class JsonUnflattener {
     return root;
   }
 
-  private JsonUnflattener(String json, boolean isLazy) {
-    rawJson = notNull(json);
-    if (!isLazy) getRoot();
-  }
-
-  private JsonUnflattener(Reader jsonReader, boolean isLazy) {
-    this.jsonReader = notNull(jsonReader);
-    if (!isLazy) getRoot();
-  }
-
   /**
    * Creates a JSON unflattener.
    * 
@@ -131,7 +87,6 @@ public final class JsonUnflattener {
    */
   public JsonUnflattener(String json) {
     rawJson = notNull(json);
-    getRoot();
   }
 
   /**
@@ -142,7 +97,6 @@ public final class JsonUnflattener {
    */
   public JsonUnflattener(Reader jsonReader) {
     this.jsonReader = notNull(jsonReader);
-    getRoot();
   }
 
   private String arrayIndex() {

@@ -425,26 +425,6 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testLazy() throws IOException {
-    URL url = Resources.getResource("test.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
-
-    long t = System.currentTimeMillis();
-    for (int i = 0; i < 100; i++) {
-      new JsonFlattener(json);
-    }
-    long normalTime = System.currentTimeMillis() - t;
-
-    t = System.currentTimeMillis();
-    for (int i = 0; i < 1000; i++) {
-      JsonFlattener.lazy(json);
-    }
-    long lazyTime = System.currentTimeMillis() - t;
-
-    assertTrue(normalTime > lazyTime);
-  }
-
-  @Test
   public void testInitByReader() throws IOException {
     URL url = Resources.getResource("test.json");
     String json = Resources.toString(url, Charsets.UTF_8);
@@ -452,8 +432,6 @@ public class JsonFlattenerTest {
     JsonFlattener jf =
         new JsonFlattener(new InputStreamReader(url.openStream()));
     assertEquals(jf, new JsonFlattener(json));
-    assertEquals(JsonFlattener.lazy(new InputStreamReader(url.openStream())),
-        new JsonFlattener(json));
   }
 
 }
