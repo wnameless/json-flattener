@@ -69,7 +69,7 @@ public final class JsonUnflattener {
    *          the JSON string
    */
   public JsonUnflattener(String json) {
-    root = Json.parse(notNull(json));
+    root = Json.parse(json);
   }
 
   /**
@@ -81,7 +81,7 @@ public final class JsonUnflattener {
    *           if jsonReader cannot be read
    */
   public JsonUnflattener(Reader jsonReader) throws IOException {
-    root = Json.parse(notNull(jsonReader));
+    root = Json.parse(jsonReader);
   }
 
   private String arrayIndex() {
