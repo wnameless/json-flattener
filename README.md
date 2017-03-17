@@ -73,19 +73,6 @@ JsonFlattener jf = new JsonFlattener(reader);
 JsonUnflattener ju = new JsonUnflattener(reader);
 ```
 
-### Lazy
-```java
-// The static method ::lazy won't doing any preprocessing on the input JSON
-// It should be much faster than the normal constructor, but use it carefully
-// WARN: Due to the LAZY initialization,
-//       the malformed input of JSON string cannot be detected until any (un)flattening has been executed
-String json = "{\"abc\":{\"def\":[123]}}";
-JsonFlattener lazyFlat = JsonFlattener.lazy(json);
-
-json = "{"abc.def(0)":123}";
-JsonUnflattener lazyUnflat = JsonUnflattener.lazy(json);
-```
-
 ## New Features (since v0.2.0)
 ### FlattenMode
 ```java

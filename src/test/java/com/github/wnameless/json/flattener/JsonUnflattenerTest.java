@@ -277,33 +277,10 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testLazy() throws IOException {
-    URL url = Resources.getResource("test.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
-
-    long t = System.currentTimeMillis();
-    for (int i = 0; i < 100; i++) {
-      new JsonUnflattener(json);
-    }
-    long normalTime = System.currentTimeMillis() - t;
-
-    t = System.currentTimeMillis();
-    for (int i = 0; i < 1000; i++) {
-      JsonUnflattener.lazy(json);
-    }
-    long lazyTime = System.currentTimeMillis() - t;
-
-    assertTrue(normalTime > lazyTime);
-  }
-
-  @Test
   public void testInitByReader() throws IOException {
     StringReader sr = new StringReader("{\"abc.def\":123}");
 
     assertEquals(new JsonUnflattener(sr),
-        new JsonUnflattener("{\"abc.def\":123}"));
-    sr.reset();
-    assertEquals(JsonUnflattener.lazy(sr),
         new JsonUnflattener("{\"abc.def\":123}"));
   }
 

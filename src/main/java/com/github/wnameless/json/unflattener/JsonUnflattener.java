@@ -55,73 +55,12 @@ public final class JsonUnflattener {
     return new JsonUnflattener(json).unflatten();
   }
 
-  /**
-   * Returns a JSON Unflattener without doing any preprocessing on the input
-   * JSON string. It creates a JSON Unflattener instance way more faster than
-   * the normal constructor because it performs a LAZY initialization
-   * mechanism.<br>
-   * <br>
-   * WARN: Due to the LAZY initialization, the malformed input of JSON string
-   * cannot be detected until any unflattening has been executed.
-   * 
-   * @param json
-   *          the JSON string
-   * @return a JSON unflattener
-   */
-  public static JsonUnflattener lazy(String json) {
-    return new JsonUnflattener(json, true);
-  }
-
-  /**
-   * Returns a JSON Unflattener without doing any preprocessing on the input
-   * JSON reader. It creates a JSON Unflattener instance way more faster than
-   * the normal constructor because it performs a LAZY initialization
-   * mechanism.<br>
-   * <br>
-   * WARN: Due to the LAZY initialization, the malformed input of JSON reader
-   * cannot be detected until any unflattening has been executed.
-   * 
-   * @param jsonReader
-   *          the JSON reader
-   * @return a JSON unflattener
-   */
-  public static JsonUnflattener lazy(Reader jsonReader) {
-    return new JsonUnflattener(jsonReader, true);
-  }
-
-  private String rawJson;
-  private Reader jsonReader;
-  private JsonValue root;
+  private final JsonValue root;
 
   private Character separator = '.';
   private Character leftBracket = '[';
   private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
-
-  private JsonValue getRoot() {
-    if (root == null) {
-      if (rawJson != null) {
-        root = Json.parse(rawJson);
-      } else {
-        try {
-          root = Json.parse(jsonReader);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-    return root;
-  }
-
-  private JsonUnflattener(String json, boolean isLazy) {
-    rawJson = notNull(json);
-    if (!isLazy) getRoot();
-  }
-
-  private JsonUnflattener(Reader jsonReader, boolean isLazy) {
-    this.jsonReader = notNull(jsonReader);
-    if (!isLazy) getRoot();
-  }
 
   /**
    * Creates a JSON unflattener.
@@ -130,8 +69,7 @@ public final class JsonUnflattener {
    *          the JSON string
    */
   public JsonUnflattener(String json) {
-    rawJson = notNull(json);
-    getRoot();
+    root = Json.parse(notNull(json));
   }
 
   /**
@@ -139,10 +77,11 @@ public final class JsonUnflattener {
    * 
    * @param jsonReader
    *          the JSON reader
+   * @throws IOException
+   *           if jsonReader cannot be read
    */
-  public JsonUnflattener(Reader jsonReader) {
-    this.jsonReader = notNull(jsonReader);
-    getRoot();
+  public JsonUnflattener(Reader jsonReader) throws IOException {
+    root = Json.parse(notNull(jsonReader));
   }
 
   private String arrayIndex() {
@@ -247,17 +186,17 @@ public final class JsonUnflattener {
    */
   public String unflatten() {
     StringWriter sw = new StringWriter();
-    if (getRoot().isArray()) {
+    if (root.isArray()) {
       try {
-        unflattenArray(getRoot().asArray()).writeTo(sw, getWriterConfig());
+        unflattenArray(root.asArray()).writeTo(sw, getWriterConfig());
       } catch (IOException e) {}
       return sw.toString();
     }
-    if (!getRoot().isObject()) {
-      return getRoot().toString();
+    if (!root.isObject()) {
+      return root.toString();
     }
 
-    JsonObject flattened = getRoot().asObject();
+    JsonObject flattened = root.asObject();
     JsonValue unflattened = flattened.names().isEmpty() ? Json.object() : null;
 
     for (String key : flattened.names()) {
@@ -419,7 +358,7 @@ public final class JsonUnflattener {
   @Override
   public int hashCode() {
     int result = 27;
-    result = 31 * result + getRoot().hashCode();
+    result = 31 * result + root.hashCode();
     return result;
   }
 
@@ -427,12 +366,12 @@ public final class JsonUnflattener {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof JsonUnflattener)) return false;
-    return getRoot().equals(((JsonUnflattener) o).getRoot());
+    return root.equals(((JsonUnflattener) o).root);
   }
 
   @Override
   public String toString() {
-    return "JsonUnflattener{root=" + getRoot() + "}";
+    return "JsonUnflattener{root=" + root + "}";
   }
 
 }

@@ -41,6 +41,5 @@ Version 0.2.4
 * Fix the bug of wrong output if ROOT value shows in source object
 
 Version 0.3.0
-+ Add lazy initialization feature
 + Support Reader as inputs
 + Add #withLeftAndRightBrackets

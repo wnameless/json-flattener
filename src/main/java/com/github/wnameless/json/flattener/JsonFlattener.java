@@ -98,42 +98,7 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  /**
-   * Returns a JSON flattener without doing any preprocessing on the input JSON
-   * string. It creates a JSON flattener instance way more faster than the
-   * normal constructor because it performs a LAZY initialization mechanism.<br>
-   * <br>
-   * WARN: Due to the LAZY initialization, the malformed input of JSON string
-   * cannot be detected until any flattening has been executed.
-   * 
-   * @param json
-   *          the JSON string
-   * @return a JSON flattener
-   */
-  public static JsonFlattener lazy(String json) {
-    return new JsonFlattener(json, true);
-  }
-
-  /**
-   * Returns a JSON flattener without doing any preprocessing on the input JSON
-   * reader. It creates a JSON flattener instance way more faster than the
-   * normal constructor because it performs a LAZY initialization mechanism.
-   * <br>
-   * <br>
-   * WARN: Due to the LAZY initialization, the malformed input of JSON reader
-   * cannot be detected until any flattening has been executed.
-   * 
-   * @param jsonReader
-   *          the JSON reader
-   * @return a JSON flattener
-   */
-  public static JsonFlattener lazy(Reader jsonReader) {
-    return new JsonFlattener(jsonReader, true);
-  }
-
-  private String rawJson;
-  private Reader jsonReader;
-  private JsonValue source;
+  private final JsonValue source;
 
   private JsonifyLinkedHashMap<String, Object> flattenedMap;
   private final Deque<IndexedPeekIterator<?>> elementIters =
@@ -146,31 +111,6 @@ public final class JsonFlattener {
   private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
 
-  private JsonValue getSource() {
-    if (source == null) {
-      if (rawJson != null) {
-        source = Json.parse(rawJson);
-      } else {
-        try {
-          source = Json.parse(jsonReader);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-    return source;
-  }
-
-  private JsonFlattener(String json, boolean isLazy) {
-    rawJson = notNull(json);
-    if (!isLazy) getSource();
-  }
-
-  private JsonFlattener(Reader jsonReader, boolean isLazy) {
-    this.jsonReader = notNull(jsonReader);
-    if (!isLazy) getSource();
-  }
-
   /**
    * Creates a JSON flattener.
    * 
@@ -178,8 +118,7 @@ public final class JsonFlattener {
    *          the JSON string
    */
   public JsonFlattener(String json) {
-    rawJson = notNull(json);
-    getSource();
+    source = Json.parse(json);
   }
 
   /**
@@ -187,10 +126,11 @@ public final class JsonFlattener {
    * 
    * @param jsonReader
    *          the JSON reader
+   * @throws IOException
+   *           if jsonReader cannot be read
    */
-  public JsonFlattener(Reader jsonReader) {
-    this.jsonReader = notNull(jsonReader);
-    getSource();
+  public JsonFlattener(Reader jsonReader) throws IOException {
+    source = Json.parse(jsonReader);
   }
 
   /**
@@ -292,14 +232,14 @@ public final class JsonFlattener {
   public String flatten() {
     flattenAsMap();
 
-    if (getSource().isObject() || isObjectifiableArray())
+    if (source.isObject() || isObjectifiableArray())
       return flattenedMap.toString(printMode);
     else
       return javaObj2Json(flattenedMap.get(ROOT));
   }
 
   private boolean isObjectifiableArray() {
-    return getSource().isArray() && !flattenedMap.containsKey(ROOT);
+    return source.isArray() && !flattenedMap.containsKey(ROOT);
   }
 
   private String javaObj2Json(Object obj) {
@@ -329,7 +269,7 @@ public final class JsonFlattener {
     if (flattenedMap != null) return flattenedMap;
 
     flattenedMap = newJsonifyLinkedHashMap();
-    reduce(getSource());
+    reduce(source);
 
     while (!elementIters.isEmpty()) {
       IndexedPeekIterator<?> deepestIter = elementIters.getLast();
@@ -453,7 +393,7 @@ public final class JsonFlattener {
   @Override
   public int hashCode() {
     int result = 27;
-    result = 31 * result + getSource().hashCode();
+    result = 31 * result + source.hashCode();
     return result;
   }
 
@@ -461,12 +401,12 @@ public final class JsonFlattener {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof JsonFlattener)) return false;
-    return getSource().equals(((JsonFlattener) o).getSource());
+    return source.equals(((JsonFlattener) o).source);
   }
 
   @Override
   public String toString() {
-    return "JsonFlattener{source=" + getSource() + "}";
+    return "JsonFlattener{source=" + source + "}";
   }
 
 }
