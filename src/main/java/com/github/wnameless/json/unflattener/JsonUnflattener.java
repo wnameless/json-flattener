@@ -158,7 +158,7 @@ public final class JsonUnflattener {
   private String objectKey() {
     return "[^" + Pattern.quote(separator.toString())
         + Pattern.quote(leftBracket.toString())
-        + Pattern.quote(rightBracket.toString()) + "]+";
+        + Pattern.quote(rightBracket.toString()) + "\\s]+";
   }
 
   private Pattern keyPartPattern() {
