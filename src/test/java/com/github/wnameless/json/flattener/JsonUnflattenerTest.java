@@ -49,6 +49,16 @@ public class JsonUnflattenerTest {
 
     assertEquals("[1,[2,3],4,{\"abc\":5}]", JsonUnflattener.unflatten(
         "{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3].abc\":5}"));
+
+    assertEquals("{\" \\\"abc\":{\"def \":123}}", JsonUnflattener
+        .unflatten(JsonFlattener.flatten("{\" \\\"abc\":{\"def \":123}}")));
+
+    assertEquals("{\" ].$f\":{\"abc\":{\"def\":[123]}}}",
+        JsonUnflattener.unflatten("{\"[\\\" ].$f\\\"].abc.def[0]\":123}"));
+
+    assertEquals("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]",
+        JsonUnflattener.unflatten(
+            JsonFlattener.flatten("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]")));
   }
 
   @Test

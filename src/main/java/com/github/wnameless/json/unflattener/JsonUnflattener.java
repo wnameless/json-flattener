@@ -151,7 +151,7 @@ public final class JsonUnflattener {
   }
 
   private String objectComplexKey() {
-    return Pattern.quote(leftBracket.toString()) + "\\s*\".*\"\\s*"
+    return Pattern.quote(leftBracket.toString()) + "\\s*\".+?\"\\s*"
         + Pattern.quote(rightBracket.toString());
   }
 

@@ -30,6 +30,8 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
@@ -407,9 +409,8 @@ public final class JsonFlattener {
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
         String key = ((Member) iter.getCurrent()).getName();
-        if (key.contains(separator.toString())
-            || key.contains(leftBracket.toString())
-            || key.contains(rightBracket.toString()) || key.matches("\\s")) {
+        if (StringUtils.containsAny(key, separator, leftBracket, rightBracket)
+            || StringUtils.containsWhitespace(key)) {
           sb.append(leftBracket);
           sb.append('\\');
           sb.append('"');
