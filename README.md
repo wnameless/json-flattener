@@ -4,7 +4,7 @@ json-flattener
 =============
 A Java utility used to FLATTEN nested JSON objects and even more to UNFLATTEN it back
 
-##Purpose
+## Purpose
 Converts a nested JSON<br />
 &nbsp;&nbsp;{ "a": { "b": 1, "c": null, "d": [false, true] }, "e": "f", "g": 2.3 }<br />
 into a flattened JSON<br />
@@ -12,7 +12,7 @@ into a flattened JSON<br />
 or a Java Map<br />
 &nbsp;&nbsp;{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
 
-##Maven Repo
+## Maven Repo
 ```xml
 <dependency>
 	<groupId>com.github.wnameless</groupId>
@@ -22,7 +22,7 @@ or a Java Map<br />
 ```
 
 
-##Quick Start
+## Quick Start
 ```java
 String json = "{ \"a\" : { \"b\" : 1, \"c\": null, \"d\": [false, true] }, \"e\": \"f\", \"g\":2.3 }";
 Map<String, Object> flattenJson = JsonFlattener.flattenAsMap(json);
@@ -49,8 +49,8 @@ System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
 
-##New Features (since v0.3.0)
-###LeftAndRightBrackets
+## New Features (since v0.3.0)
+### LeftAndRightBrackets
 ```java
 // JsonFlattener - Brackets can be changed from square brackets([]) to any 2 arbitrary characters
 String json = "{\"abc\":{\"def\":[123]}}";
@@ -63,7 +63,7 @@ System.out.println(new JsonUnflattener(json).withLeftAndRightBrackets('(', ')').
 // {"abc":{"def":[123]}}
 ```
 
-###Reader
+### Reader
 ```java
 InputStream inputStream = new FileInputStream("simple.json");
 Reader reader = new InputStreamReader(inputStream);
@@ -73,12 +73,12 @@ JsonFlattener jf = new JsonFlattener(reader);
 JsonUnflattener ju = new JsonUnflattener(reader);
 ```
 
-###Lazy
+### Lazy
 ```java
 // The static method ::lazy won't doing any preprocessing on the input JSON
-// It should be much faster than normal constructor, but use it carefully
+// It should be much faster than the normal constructor, but use it carefully
 // WARN: Due to the LAZY initialization,
-//       the malformed input of JSON string cannot be detected until any flattening has been executed
+//       the malformed input of JSON string cannot be detected until any (un)flattening has been executed
 String json = "{\"abc\":{\"def\":[123]}}";
 JsonFlattener lazyFlat = JsonFlattener.lazy(json);
 
@@ -86,8 +86,8 @@ json = "{"abc.def(0)":123}";
 JsonUnflattener lazyUnflat = JsonUnflattener.lazy(json);
 ```
 
-##New Features (since v0.2.0)
-###FlattenMode
+## New Features (since v0.2.0)
+### FlattenMode
 ```java
 String json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
 
@@ -104,7 +104,7 @@ Map<String, Object> map = new JsonFlattener("[[123]]").withFlattenMode(FlattenMo
 System.out.println(map.get("root"));
 // [[123]]
 ```
-###StringEscapePolicy
+### StringEscapePolicy
 ```java
 String json = "{\"abc\":{\"def\":\"太極\\t\"}}";
 
@@ -116,7 +116,7 @@ System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePo
 System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePolicy.ALL_UNICODES).flatten());
 // {"abc.def":"\u592A\u6975\t"}
 ```
-###Separator
+### Separator
 ```java
 // JsonFlattener - separator can be changed from dot(.) to an arbitrary character
 String json = "{\"abc\":{\"def\":123}}";
@@ -128,7 +128,7 @@ json = "{\"abc*def\":123}";
 System.out.println(new JsonUnflattener(json).withSeparator('*').unflatten());
 // {"abc":{"def":123}}
 ```
-###PrintMode
+### PrintMode
 ```java
 String json = "{\"abc\":{\"def\":123}}";
 
