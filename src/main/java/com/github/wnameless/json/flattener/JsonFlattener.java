@@ -133,9 +133,9 @@ public final class JsonFlattener {
   private Reader jsonReader;
   private JsonValue source;
 
+  private JsonifyLinkedHashMap<String, Object> flattenedMap;
   private final Deque<IndexedPeekIterator<?>> elementIters =
       new ArrayDeque<IndexedPeekIterator<?>>();
-  private JsonifyLinkedHashMap<String, Object> flattenedMap;
 
   private FlattenMode flattenMode = FlattenMode.NORMAL;
   private StringEscapePolicy policy = StringEscapePolicy.NORMAL;

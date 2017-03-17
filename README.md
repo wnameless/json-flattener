@@ -49,6 +49,43 @@ System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
 
+##New Features (since v0.3.0)
+###LeftAndRightBrackets
+```java
+// JsonFlattener - Brackets can be changed from square brackets([]) to any 2 arbitrary characters
+String json = "{\"abc\":{\"def\":[123]}}";
+System.out.println(new JsonFlattener(json).withLeftAndRightBrackets('(', ')').flatten());
+// {"abc.def(0)":123}
+
+// JsonUnflattener - if special brackets are using, it should be set into the unflattener as well
+json = "{"abc.def(0)":123}";
+System.out.println(new JsonUnflattener(json).withLeftAndRightBrackets('(', ')').unflatten());
+// {"abc":{"def":[123]}}
+```
+
+###Reader
+```java
+InputStream inputStream = new FileInputStream("simple.json");
+Reader reader = new InputStreamReader(inputStream);
+
+// Support Reader as input 
+JsonFlattener jf = new JsonFlattener(reader);
+JsonUnflattener ju = new JsonUnflattener(reader);
+```
+
+###Lazy
+```java
+// The static method ::lazy won't doing any preprocessing on the input JSON
+// It should be much faster than normal constructor, but use it carefully
+// WARN: Due to the LAZY initialization,
+//       the malformed input of JSON string cannot be detected until any flattening has been executed
+String json = "{\"abc\":{\"def\":[123]}}";
+JsonFlattener lazyFlat = JsonFlattener.lazy(json);
+
+json = "{"abc.def(0)":123}";
+JsonUnflattener lazyUnflat = JsonUnflattener.lazy(json);
+```
+
 ##New Features (since v0.2.0)
 ###FlattenMode
 ```java

@@ -49,11 +49,6 @@ import com.google.common.io.Resources;
 public class JsonFlattenerTest {
 
   @Test
-  public void test() {
-    System.out.println(JsonFlattener.flatten("{ \"abc\": { \" [\": 123 } }"));
-  }
-
-  @Test
   public void testFlattenAsMap() throws IOException {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
