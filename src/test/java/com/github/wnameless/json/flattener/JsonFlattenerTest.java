@@ -223,25 +223,25 @@ public class JsonFlattenerTest {
       new JsonFlattener(json).withSeparator('"');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Separator contains illegal chracter(\")", e.getMessage());
     }
     try {
       new JsonFlattener(json).withSeparator(' ');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Separator contains illegal chracter( )", e.getMessage());
     }
     try {
       new JsonFlattener(json).withSeparator('[');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Separator([) is already used in brackets", e.getMessage());
     }
     try {
       new JsonFlattener(json).withSeparator(']');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Separator(]) is already used in brackets", e.getMessage());
     }
   }
 
@@ -259,43 +259,47 @@ public class JsonFlattenerTest {
       new JsonFlattener(json).withLeftAndRightBrackets('#', '#');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Both brackets cannot be the same", e.getMessage());
     }
     try {
       new JsonFlattener(json).withLeftAndRightBrackets('"', ']');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Left bracket contains illegal chracter(\")",
+          e.getMessage());
     }
     try {
       new JsonFlattener(json).withLeftAndRightBrackets(' ', ']');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Left bracket contains illegal chracter( )", e.getMessage());
     }
     try {
       new JsonFlattener(json).withLeftAndRightBrackets('.', ']');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Left bracket contains illegal chracter(.)", e.getMessage());
     }
     try {
       new JsonFlattener(json).withLeftAndRightBrackets('[', '"');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Right bracket contains illegal chracter(\")",
+          e.getMessage());
     }
     try {
       new JsonFlattener(json).withLeftAndRightBrackets('[', ' ');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Right bracket contains illegal chracter( )",
+          e.getMessage());
     }
     try {
       new JsonFlattener(json).withLeftAndRightBrackets('[', '.');
       fail();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      assertEquals("Right bracket contains illegal chracter(.)",
+          e.getMessage());
     }
   }
 
