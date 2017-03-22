@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.eclipsesource.json.Json;
@@ -253,8 +254,10 @@ public class JsonFlattenerTest {
   }
 
   @Test
+  @Ignore
   public void testWithLeftAndRightBracketsExceptions() {
     String json = "{\"abc\":{\"def\":123}}";
+
     try {
       new JsonFlattener(json).withLeftAndRightBrackets('#', '#');
       fail();
