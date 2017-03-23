@@ -254,10 +254,8 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  @Ignore
   public void testWithLeftAndRightBracketsExceptions() {
     String json = "{\"abc\":{\"def\":123}}";
-
     try {
       new JsonFlattener(json).withLeftAndRightBrackets('#', '#');
       fail();
@@ -332,6 +330,7 @@ public class JsonFlattenerTest {
     assertEquals(ImmutableMap.of("abc.def", new BigDecimal(123)),
         root.get(0).get(0));
   }
+
 
   @Test
   public void testPrintMode() throws IOException {
@@ -437,6 +436,20 @@ public class JsonFlattenerTest {
     JsonFlattener jf =
         new JsonFlattener(new InputStreamReader(url.openStream()));
     assertEquals(jf, new JsonFlattener(json));
+  }
+
+  @Test
+  public void testMongoFlattening() throws IOException {
+    URL url = Resources.getResource("test_mongo.json");
+    String src = Resources.toString(url, Charsets.UTF_8);
+
+    URL urlMongo = Resources.getResource("test_mongo_flattened.json");
+    String expectedJson = Resources.toString(urlMongo, Charsets.UTF_8);
+
+    String flattened = new JsonFlattener(src)
+            .withFlattenMode(FlattenMode.MONGODB).withPrintMode(PrintMode.PRETTY).flatten();
+
+    assertEquals(expectedJson, flattened);
   }
 
 }
