@@ -142,6 +142,10 @@ public final class JsonFlattener {
    */
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
     this.flattenMode = notNull(flattenMode);
+    if(flattenMode.equals(FlattenMode.MONGODB)) {
+      this.separator = '.';
+      this.leftBracket = '.';
+    }
     flattenedMap = null;
     return this;
   }
@@ -181,7 +185,12 @@ public final class JsonFlattener {
   }
 
   private String illegalBracketsRegex() {
-    return "[\"\\s" + Pattern.quote(separator.toString()) + "]";
+    if(this.flattenMode.equals(FlattenMode.MONGODB)) {
+      //allow . as separator, needed for arrays
+      return "[\"\\s" +  "]";
+    } else {
+      return "[\"\\s" + Pattern.quote(this.separator.toString()) + "]";
+    }
   }
 
   /**
@@ -197,7 +206,7 @@ public final class JsonFlattener {
    */
   public JsonFlattener withLeftAndRightBrackets(char leftBracket,
       char rightBracket) {
-    isTrue(leftBracket != rightBracket, "Both brackets cannot be the same");
+    isTrue(!this.flattenMode.equals(FlattenMode.MONGODB) && (leftBracket != rightBracket), "Both brackets cannot be the same");
     isTrue(!Character.toString(leftBracket).matches(illegalBracketsRegex()),
         "Left bracket contains illegal chracter(%s)",
         Character.toString(leftBracket));
@@ -357,7 +366,9 @@ public final class JsonFlattener {
           sb.append(policy.getCharSequenceTranslator().translate(key));
           sb.append('\\');
           sb.append('"');
-          sb.append(rightBracket);
+          if(!this.flattenMode.equals(FlattenMode.MONGODB)) {
+            sb.append(rightBracket);
+          }
         } else {
           if (sb.length() != 0) sb.append(separator);
           sb.append(policy.getCharSequenceTranslator().translate(key));
@@ -365,7 +376,9 @@ public final class JsonFlattener {
       } else { // JsonValue
         sb.append(leftBracket);
         sb.append(iter.getIndex());
-        sb.append(rightBracket);
+        if(!this.flattenMode.equals(FlattenMode.MONGODB)) {
+          sb.append(rightBracket);
+        }
       }
     }
 

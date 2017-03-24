@@ -1,0 +1,15 @@
+{
+  "glossary.title": "example glossary",
+  "glossary.GlossDiv.title": "S",
+  "glossary.GlossDiv.GlossList.GlossEntry.ID": "SGML",
+  "glossary.GlossDiv.GlossList.GlossEntry.SortAs": "SGML",
+  "glossary.GlossDiv.GlossList.GlossEntry.GlossTerm": "Standard Generalized Markup Language",
+  "glossary.GlossDiv.GlossList.GlossEntry.Acronym": "SGML",
+  "glossary.GlossDiv.GlossList.GlossEntry.Abbrev": "ISO 8879:1986",
+  "glossary.GlossDiv.GlossList.GlossEntry.GlossDef.para": "A meta-markup language, used to create markup languages such as DocBook.",
+  "glossary.GlossDiv.GlossList.GlossEntry.GlossDef.GlossSeeAlso.0": "GML",
+  "glossary.GlossDiv.GlossList.GlossEntry.GlossDef.GlossSeeAlso.1": "XML",
+  "glossary.GlossDiv.GlossList.GlossEntry.GlossSee": "markup",
+  "glossary.GlossDiv.GlossList.GlossEntry.GlossArray.0.a": 1,
+  "glossary.GlossDiv.GlossList.GlossEntry.GlossArray.1.a": 2
+}

@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.eclipsesource.json.Json;
@@ -330,6 +331,7 @@ public class JsonFlattenerTest {
         root.get(0).get(0));
   }
 
+
   @Test
   public void testPrintMode() throws IOException {
     URL url = Resources.getResource("test.json");
@@ -434,6 +436,20 @@ public class JsonFlattenerTest {
     JsonFlattener jf =
         new JsonFlattener(new InputStreamReader(url.openStream()));
     assertEquals(jf, new JsonFlattener(json));
+  }
+
+  @Test
+  public void testMongoFlattening() throws IOException {
+    URL url = Resources.getResource("test_mongo.json");
+    String src = Resources.toString(url, Charsets.UTF_8);
+
+    URL urlMongo = Resources.getResource("test_mongo_flattened.json");
+    String expectedJson = Resources.toString(urlMongo, Charsets.UTF_8);
+
+    String flattened = new JsonFlattener(src)
+            .withFlattenMode(FlattenMode.MONGODB).withPrintMode(PrintMode.PRETTY).flatten();
+
+    assertEquals(expectedJson, flattened);
   }
 
 }

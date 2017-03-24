@@ -34,6 +34,11 @@ public enum FlattenMode {
   /**
    * Flattens every objects except arrays.
    */
-  KEEP_ARRAYS;
+  KEEP_ARRAYS,
+
+  /**
+   * Conforms to MongoDB dot.notation to update also nested documents.
+   */
+  MONGODB;
 
 }
