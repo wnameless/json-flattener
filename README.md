@@ -74,25 +74,30 @@ System.out.println(new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB
 ### KeyTransformer
 ```java
 String json = "{\"abc\":{\"de.f\":123}}";
-
 JsonFlattener jf = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB);
 
 // This will throw an exception because FlattenMode.MONGODB won't support separator(.) in the key
 jf.flatten();
 
+// KeyTransformer can be used to manipulate keys before flattening 
 KeyTransformer kt = new KeyTransformer() {
   @Override
   public String transform(String key) {
     return key.replace('.', '_');
   }
 };
-
 jf.withKeyTransformer(kt);
-
 System.out.println(jf.flatten());
 // {"abc.de_f":123}
 
 // KeyTransformer should be set in JsonUnflattener as well
+json = "{\"abc.de_f\":123}";
+kt = new KeyTransformer() {
+  @Override
+  public String transform(String key) {
+    return key.replace('_', '.');
+  }
+};
 JsonUnflattener ju = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).withKeyTransformer(kt);
 System.out.println(ju.unflatten());
 // {"abc":{"de.f":123}}
