@@ -100,12 +100,15 @@ public final class JsonUnflattener {
   private String objectKey() {
     return "[^" + Pattern.quote(separator.toString())
         + Pattern.quote(leftBracket.toString())
-        + Pattern.quote(rightBracket.toString()) + "\\s]+";
+        + Pattern.quote(rightBracket.toString()) + "]+";
   }
 
   private Pattern keyPartPattern() {
-    return Pattern
-        .compile(arrayIndex() + "|" + objectComplexKey() + "|" + objectKey());
+    if (flattenMode.equals(MONGODB))
+      return Pattern.compile("[^" + Pattern.quote(separator.toString()) + "]+");
+    else
+      return Pattern
+          .compile(arrayIndex() + "|" + objectComplexKey() + "|" + objectKey());
   }
 
   /**
@@ -290,7 +293,7 @@ public final class JsonUnflattener {
 
   private Integer extractIndex(String keyPart) {
     if (flattenMode.equals(MONGODB))
-      return Integer.valueOf(keyPart.replaceAll("\\s", ""));
+      return Integer.valueOf(keyPart);
     else
       return Integer.valueOf(
           keyPart.replaceAll("[" + Pattern.quote(leftBracket.toString())

@@ -342,6 +342,13 @@ public final class JsonFlattener {
     return null;
   }
 
+  private boolean hasReservedCharacters(String key) {
+    if (flattenMode.equals(MONGODB))
+      return StringUtils.containsAny(key, separator);
+    else
+      return StringUtils.containsAny(key, separator, leftBracket, rightBracket);
+  }
+
   private String computeKey() {
     if (elementIters.isEmpty()) return ROOT;
 
@@ -350,8 +357,7 @@ public final class JsonFlattener {
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
         String key = ((Member) iter.getCurrent()).getName();
-        if (StringUtils.containsAny(key, separator, leftBracket, rightBracket)
-            || StringUtils.containsWhitespace(key)) {
+        if (hasReservedCharacters(key)) {
           sb.append(flattenMode.equals(MONGODB) ? separator : leftBracket);
           sb.append('\\');
           sb.append('"');
