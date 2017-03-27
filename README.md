@@ -77,7 +77,7 @@ String json = "{\"abc\":{\"de.f\":123}}";
 
 JsonFlattener jf = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB);
 
-// This will throw an exception because FlattenMode.MONGODB won't support dot(.) in the key
+// This will throw an exception because FlattenMode.MONGODB won't support separator(.) in the key
 jf.flatten();
 
 KeyTransformer kt = new KeyTransformer() {
