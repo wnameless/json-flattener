@@ -18,7 +18,7 @@ or a Java Map<br />
 <dependency>
 	<groupId>com.github.wnameless</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.3.1</version>
+	<version>0.4.0</version>
 </dependency>
 ```
 
@@ -50,7 +50,7 @@ System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
 
-## New Features (since v0.3.1)
+## New Features (since v0.4.0)
 ### FlattenMode.MONGODB (dot notation)
 ```java
 String json = "{\"abc\":{\"def\":[123]}}";
@@ -69,6 +69,33 @@ System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).
 json = "{\"abc*def*0\":123}";
 System.out.println(new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB).withSeparator('*').unflatten());
 // {"abc":{"def":[123]}}
+```
+
+### KeyTransformer
+```java
+String json = "{\"abc\":{\"de.f\":123}}";
+
+JsonFlattener jf = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB);
+
+// This will throw an exception because FlattenMode.MONGODB won't support dot(.) in the key
+jf.flatten();
+
+KeyTransformer kt = new KeyTransformer() {
+  @Override
+  public String transform(String key) {
+    return key.replace('.', '_');
+  }
+};
+
+jf.withKeyTransformer(kt);
+
+System.out.println(jf.flatten());
+// {"abc.de_f":123}
+
+// KeyTransformer should be set in JsonUnflattener as well
+JsonUnflattener ju = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).withKeyTransformer(kt);
+System.out.println(ju.unflatten());
+// {"abc":{"de.f":123}}
 ```
 
 ## New Features (since v0.3.0)

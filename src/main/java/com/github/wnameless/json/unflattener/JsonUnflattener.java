@@ -34,6 +34,7 @@ import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.PrettyPrint;
 import com.eclipsesource.json.WriterConfig;
 import com.github.wnameless.json.flattener.FlattenMode;
+import com.github.wnameless.json.flattener.KeyTransformer;
 import com.github.wnameless.json.flattener.PrintMode;
 
 /**
@@ -64,6 +65,7 @@ public final class JsonUnflattener {
   private Character leftBracket = '[';
   private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
+  private KeyTransformer keyTrans = null;
 
   /**
    * Creates a JSON unflattener.
@@ -186,6 +188,19 @@ public final class JsonUnflattener {
     return this;
   }
 
+  /**
+   * A fluent setter to setup a {@link KeyTransformer} of the
+   * {@link JsonUnflattener}.
+   * 
+   * @param keyTrans
+   *          a {@link KeyTransformer}
+   * @return this {@link JsonUnflattener}
+   */
+  public JsonUnflattener withKeyTransformer(KeyTransformer keyTrans) {
+    this.keyTrans = notNull(keyTrans);
+    return this;
+  }
+
   private WriterConfig getWriterConfig() {
     switch (printMode) {
       case REGULAR:
@@ -281,14 +296,13 @@ public final class JsonUnflattener {
   }
 
   private String extractKey(String keyPart) {
-    if (keyPart.matches(objectComplexKey()))
-      return keyPart
-          .replaceAll("^" + Pattern.quote(leftBracket.toString()) + "\\s*\"",
-              "")
-          .replaceAll("\"\\s*" + Pattern.quote(rightBracket.toString()) + "$",
-              "");
-    else
-      return keyPart;
+    if (keyPart.matches(objectComplexKey())) {
+      keyPart = keyPart.replaceAll(
+          "^" + Pattern.quote(leftBracket.toString()) + "\\s*\"", "");
+      keyPart = keyPart.replaceAll(
+          "\"\\s*" + Pattern.quote(rightBracket.toString()) + "$", "");
+    }
+    return keyTrans != null ? keyTrans.transform(keyPart) : keyPart;
   }
 
   private Integer extractIndex(String keyPart) {

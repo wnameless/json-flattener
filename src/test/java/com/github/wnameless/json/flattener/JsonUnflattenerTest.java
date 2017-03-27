@@ -289,7 +289,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testMongoUnflattening() throws IOException {
+  public void testFlattenModeMongodb() throws IOException {
     URL url = Resources.getResource("test_mongo.json");
     String expectedJson = Resources.toString(url, Charsets.UTF_8);
 
@@ -299,6 +299,22 @@ public class JsonUnflattenerTest {
     JsonUnflattener ju =
         new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB);
     assertEquals(Json.parse(expectedJson).toString(), ju.unflatten());
+  }
+
+  @Test
+  public void testWithKeyTransformer() {
+    String json = "{\"abc.de_f\":123}";
+    JsonUnflattener ju =
+        new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB)
+            .withKeyTransformer(new KeyTransformer() {
+
+              @Override
+              public String transform(String key) {
+                return key.replace('_', '.');
+              }
+
+            });
+    assertEquals("{\"abc\":{\"de.f\":123}}", ju.unflatten());
   }
 
 }

@@ -437,7 +437,7 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testMongoFlattening() throws IOException {
+  public void testFlattenModeMongodb() throws IOException {
     URL url = Resources.getResource("test_mongo.json");
     String src = Resources.toString(url, Charsets.UTF_8);
 
@@ -449,6 +449,36 @@ public class JsonFlattenerTest {
             .withPrintMode(PrintMode.PRETTY).flatten();
 
     assertEquals(expectedJson, flattened);
+  }
+
+  @Test
+  public void testFlattenModeMongodbException() {
+    String json = "{\"abc\":{\"de.f\":123}}";
+    JsonFlattener jf =
+        new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB);
+    try {
+      jf.flatten();
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Key cannot contain separator(.) in FlattenMode.MONGODB",
+          e.getMessage());
+    }
+  }
+
+  @Test
+  public void testWithKeyTransformer() {
+    String json = "{\"abc\":{\"de.f\":123}}";
+    JsonFlattener jf =
+        new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB)
+            .withKeyTransformer(new KeyTransformer() {
+
+              @Override
+              public String transform(String key) {
+                return key.replace('.', '_');
+              }
+
+            });
+    assertEquals("{\"abc.de_f\":123}", jf.flatten());
   }
 
 }

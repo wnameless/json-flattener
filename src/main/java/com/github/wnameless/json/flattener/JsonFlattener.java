@@ -111,6 +111,7 @@ public final class JsonFlattener {
   private Character leftBracket = '[';
   private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
+  private KeyTransformer keyTrans = null;
 
   /**
    * Creates a JSON flattener.
@@ -222,6 +223,20 @@ public final class JsonFlattener {
    */
   public JsonFlattener withPrintMode(PrintMode printMode) {
     this.printMode = notNull(printMode);
+    return this;
+  }
+
+  /**
+   * A fluent setter to setup a {@link KeyTransformer} of the
+   * {@link JsonFlattener}.
+   * 
+   * @param keyTrans
+   *          a {@link KeyTransformer}
+   * @return this {@link JsonFlattener}
+   */
+  public JsonFlattener withKeyTransformer(KeyTransformer keyTrans) {
+    this.keyTrans = notNull(keyTrans);
+    flattenedMap = null;
     return this;
   }
 
@@ -343,10 +358,11 @@ public final class JsonFlattener {
   }
 
   private boolean hasReservedCharacters(String key) {
-    if (flattenMode.equals(MONGODB))
-      return StringUtils.containsAny(key, separator);
-    else
-      return StringUtils.containsAny(key, separator, leftBracket, rightBracket);
+    if (flattenMode.equals(MONGODB) && StringUtils.containsAny(key, separator))
+      throw new IllegalArgumentException("Key cannot contain separator("
+          + separator + ") in FlattenMode." + MONGODB);
+
+    return StringUtils.containsAny(key, separator, leftBracket, rightBracket);
   }
 
   private String computeKey() {
@@ -357,14 +373,15 @@ public final class JsonFlattener {
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Member) {
         String key = ((Member) iter.getCurrent()).getName();
+        if (keyTrans != null) key = keyTrans.transform(key);
         if (hasReservedCharacters(key)) {
-          sb.append(flattenMode.equals(MONGODB) ? separator : leftBracket);
+          sb.append(leftBracket);
           sb.append('\\');
           sb.append('"');
           sb.append(policy.getCharSequenceTranslator().translate(key));
           sb.append('\\');
           sb.append('"');
-          sb.append(flattenMode.equals(MONGODB) ? "" : rightBracket);
+          sb.append(rightBracket);
         } else {
           if (sb.length() != 0) sb.append(separator);
           sb.append(policy.getCharSequenceTranslator().translate(key));
