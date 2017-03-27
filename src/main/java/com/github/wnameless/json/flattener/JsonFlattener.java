@@ -17,6 +17,7 @@
  */
 package com.github.wnameless.json.flattener;
 
+import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
 import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.Validate.isTrue;
@@ -142,10 +143,6 @@ public final class JsonFlattener {
    */
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
     this.flattenMode = notNull(flattenMode);
-    if(flattenMode.equals(FlattenMode.MONGODB)) {
-      this.separator = '.';
-      this.leftBracket = '.';
-    }
     flattenedMap = null;
     return this;
   }
@@ -185,12 +182,7 @@ public final class JsonFlattener {
   }
 
   private String illegalBracketsRegex() {
-    if(this.flattenMode.equals(FlattenMode.MONGODB)) {
-      //allow . as separator, needed for arrays
-      return "[\"\\s" +  "]";
-    } else {
-      return "[\"\\s" + Pattern.quote(this.separator.toString()) + "]";
-    }
+    return "[\"\\s" + Pattern.quote(this.separator.toString()) + "]";
   }
 
   /**
@@ -206,7 +198,7 @@ public final class JsonFlattener {
    */
   public JsonFlattener withLeftAndRightBrackets(char leftBracket,
       char rightBracket) {
-    isTrue(!this.flattenMode.equals(FlattenMode.MONGODB) && (leftBracket != rightBracket), "Both brackets cannot be the same");
+    isTrue(leftBracket != rightBracket, "Both brackets cannot be the same");
     isTrue(!Character.toString(leftBracket).matches(illegalBracketsRegex()),
         "Left bracket contains illegal chracter(%s)",
         Character.toString(leftBracket));
@@ -360,25 +352,21 @@ public final class JsonFlattener {
         String key = ((Member) iter.getCurrent()).getName();
         if (StringUtils.containsAny(key, separator, leftBracket, rightBracket)
             || StringUtils.containsWhitespace(key)) {
-          sb.append(leftBracket);
+          sb.append(flattenMode.equals(MONGODB) ? separator : leftBracket);
           sb.append('\\');
           sb.append('"');
           sb.append(policy.getCharSequenceTranslator().translate(key));
           sb.append('\\');
           sb.append('"');
-          if(!this.flattenMode.equals(FlattenMode.MONGODB)) {
-            sb.append(rightBracket);
-          }
+          sb.append(flattenMode.equals(MONGODB) ? "" : rightBracket);
         } else {
           if (sb.length() != 0) sb.append(separator);
           sb.append(policy.getCharSequenceTranslator().translate(key));
         }
       } else { // JsonValue
-        sb.append(leftBracket);
+        sb.append(flattenMode.equals(MONGODB) ? separator : leftBracket);
         sb.append(iter.getIndex());
-        if(!this.flattenMode.equals(FlattenMode.MONGODB)) {
-          sb.append(rightBracket);
-        }
+        sb.append(flattenMode.equals(MONGODB) ? "" : rightBracket);
       }
     }
 

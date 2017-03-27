@@ -17,6 +17,7 @@
  */
 package com.github.wnameless.json.unflattener;
 
+import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
 import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -32,6 +33,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.PrettyPrint;
 import com.eclipsesource.json.WriterConfig;
+import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.PrintMode;
 
 /**
@@ -57,6 +59,7 @@ public final class JsonUnflattener {
 
   private final JsonValue root;
 
+  private FlattenMode flattenMode = FlattenMode.NORMAL;
   private Character separator = '.';
   private Character leftBracket = '[';
   private Character rightBracket = ']';
@@ -103,6 +106,18 @@ public final class JsonUnflattener {
   private Pattern keyPartPattern() {
     return Pattern
         .compile(arrayIndex() + "|" + objectComplexKey() + "|" + objectKey());
+  }
+
+  /**
+   * A fluent setter to setup a mode of the {@link JsonUnflattener}.
+   * 
+   * @param flattenMode
+   *          a {@link FlattenMode}
+   * @return this {@link JsonUnflattener}
+   */
+  public JsonUnflattener withFlattenMode(FlattenMode flattenMode) {
+    this.flattenMode = notNull(flattenMode);
+    return this;
   }
 
   /**
@@ -274,13 +289,17 @@ public final class JsonUnflattener {
   }
 
   private Integer extractIndex(String keyPart) {
-    return Integer
-        .valueOf(keyPart.replaceAll("[" + Pattern.quote(leftBracket.toString())
-            + Pattern.quote(rightBracket.toString()) + "\\s]", ""));
+    if (flattenMode.equals(MONGODB))
+      return Integer.valueOf(keyPart.replaceAll("\\s", ""));
+    else
+      return Integer.valueOf(
+          keyPart.replaceAll("[" + Pattern.quote(leftBracket.toString())
+              + Pattern.quote(rightBracket.toString()) + "\\s]", ""));
   }
 
   private boolean isJsonArray(String keyPart) {
-    return keyPart.matches(arrayIndex());
+    return keyPart.matches(arrayIndex())
+        || (flattenMode.equals(MONGODB) && keyPart.matches("\\d+"));
   }
 
   private JsonValue findOrCreateJsonArray(JsonValue currentVal, String objKey,

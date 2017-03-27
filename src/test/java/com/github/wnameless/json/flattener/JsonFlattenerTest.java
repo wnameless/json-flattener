@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.eclipsesource.json.Json;
@@ -331,7 +330,6 @@ public class JsonFlattenerTest {
         root.get(0).get(0));
   }
 
-
   @Test
   public void testPrintMode() throws IOException {
     URL url = Resources.getResource("test.json");
@@ -446,10 +444,34 @@ public class JsonFlattenerTest {
     URL urlMongo = Resources.getResource("test_mongo_flattened.json");
     String expectedJson = Resources.toString(urlMongo, Charsets.UTF_8);
 
-    String flattened = new JsonFlattener(src)
-            .withFlattenMode(FlattenMode.MONGODB).withPrintMode(PrintMode.PRETTY).flatten();
+    String flattened =
+        new JsonFlattener(src).withFlattenMode(FlattenMode.MONGODB)
+            .withPrintMode(PrintMode.PRETTY).flatten();
 
     assertEquals(expectedJson, flattened);
+  }
+
+  @Test
+  public void test() {
+    String json = "{\"abc\":{\"def\":[123]}}";
+    System.out.println(
+        new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten());
+    // {"abc.def.0":123}
+
+    json = "{\"abc.def.0\":123}";
+    System.out.println(new JsonUnflattener(json)
+        .withFlattenMode(FlattenMode.MONGODB).unflatten());
+    // {"abc":{"def":[123]}}
+
+    json = "{\"abc\":{\"def\":[123]}}";
+    System.out.println(new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.MONGODB).withSeparator('*').flatten());
+    // {"abc*def*0":123}
+
+    json = "{\"abc*def*0\":123}";
+    System.out.println(new JsonUnflattener(json)
+        .withFlattenMode(FlattenMode.MONGODB).withSeparator('*').unflatten());
+    // {"abc":{"def":[123]}}
   }
 
 }

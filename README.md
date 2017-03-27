@@ -18,7 +18,7 @@ or a Java Map<br />
 <dependency>
 	<groupId>com.github.wnameless</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.3.0</version>
+	<version>0.3.1</version>
 </dependency>
 ```
 
@@ -48,6 +48,27 @@ String nestedJsonWithDotKey = JsonUnflattener.unflatten(
         "{\"[1][0];\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.[\\\"]\":5}");
 System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
+```
+
+## New Features (since v0.3.1)
+### FlattenMode.MONGODB (dot annotation)
+```java
+String json = "{\"abc\":{\"def\":[123]}}";
+System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten());
+// {"abc.def.0":123}
+
+json = "{\"abc.def.0\":123}";
+System.out.println(new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB).unflatten());
+// {"abc":{"def":[123]}}
+
+// With FlattenMode.MONGODB, separator can sill be changed
+json = "{\"abc\":{\"def\":[123]}}";
+System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).withSeparator('*').flatten());
+// {"abc*def*0":123}
+
+json = "{\"abc*def*0\":123}";
+System.out.println(new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB).withSeparator('*').unflatten());
+// {"abc":{"def":[123]}}
 ```
 
 ## New Features (since v0.3.0)

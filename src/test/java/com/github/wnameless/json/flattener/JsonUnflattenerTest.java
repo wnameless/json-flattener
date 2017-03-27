@@ -288,4 +288,17 @@ public class JsonUnflattenerTest {
         new JsonUnflattener("{\"abc.def\":123}"));
   }
 
+  @Test
+  public void testMongoUnflattening() throws IOException {
+    URL url = Resources.getResource("test_mongo.json");
+    String expectedJson = Resources.toString(url, Charsets.UTF_8);
+
+    URL urlMongo = Resources.getResource("test_mongo_flattened.json");
+    String json = Resources.toString(urlMongo, Charsets.UTF_8);
+
+    JsonUnflattener ju =
+        new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB);
+    assertEquals(Json.parse(expectedJson).toString(), ju.unflatten());
+  }
+
 }
