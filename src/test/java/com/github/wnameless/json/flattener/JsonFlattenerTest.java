@@ -451,27 +451,4 @@ public class JsonFlattenerTest {
     assertEquals(expectedJson, flattened);
   }
 
-  @Test
-  public void test() {
-    String json = "{\"abc\":{\"def\":[123]}}";
-    System.out.println(
-        new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten());
-    // {"abc.def.0":123}
-
-    json = "{\"abc.def.0\":123}";
-    System.out.println(new JsonUnflattener(json)
-        .withFlattenMode(FlattenMode.MONGODB).unflatten());
-    // {"abc":{"def":[123]}}
-
-    json = "{\"abc\":{\"def\":[123]}}";
-    System.out.println(new JsonFlattener(json)
-        .withFlattenMode(FlattenMode.MONGODB).withSeparator('*').flatten());
-    // {"abc*def*0":123}
-
-    json = "{\"abc*def*0\":123}";
-    System.out.println(new JsonUnflattener(json)
-        .withFlattenMode(FlattenMode.MONGODB).withSeparator('*').unflatten());
-    // {"abc":{"def":[123]}}
-  }
-
 }
