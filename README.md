@@ -51,7 +51,7 @@ System.out.println(nestedJsonWithDotKey);
 ```
 
 ## New Features (since v0.3.1)
-### FlattenMode.MONGODB (dot annotation)
+### FlattenMode.MONGODB (dot notation)
 ```java
 String json = "{\"abc\":{\"def\":[123]}}";
 System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten());
