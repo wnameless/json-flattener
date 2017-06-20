@@ -22,7 +22,6 @@
 		<connection>scm:git:git@github.com:wnameless/json-flattener.git</connection>
 		<developerConnection>scm:git:git@github.com:wnameless/json-flattener.git</developerConnection>
 		<url>git@github.com:wnameless/json-flattener.git</url>
-		<tag>HEAD</tag>
 	</scm>
 
 	<developers>
