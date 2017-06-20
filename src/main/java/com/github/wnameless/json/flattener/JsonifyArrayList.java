@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
+import org.apache.commons.text.translate.CharSequenceTranslator;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.PrettyPrint;
@@ -40,8 +40,8 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
 
   private static final long serialVersionUID = 1L;
 
-  private CharSequenceTranslator translator = StringEscapePolicy.NORMAL
-      .getCharSequenceTranslator();
+  private CharSequenceTranslator translator =
+      StringEscapePolicy.NORMAL.getCharSequenceTranslator();
 
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
