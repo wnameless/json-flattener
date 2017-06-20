@@ -5,7 +5,7 @@
 	<artifactId>json-flattener-java7</artifactId>
 	<version>0.4.0-SNAPSHOT</version>
 
-	<name>json-flattener</name>
+	<name>json-flattener-java7</name>
 	<description>A Java utility used to flatten nested JSON objects and even more to unflatten it back</description>
 	<url>https://github.com/wnameless/json-flattener</url>
 
