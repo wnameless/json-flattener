@@ -105,6 +105,7 @@ public final class JsonFlattener {
   private final Deque<IndexedPeekIterator<?>> elementIters =
       new ArrayDeque<IndexedPeekIterator<?>>();
 
+  private boolean useBrackets = true;
   private FlattenMode flattenMode = FlattenMode.NORMAL;
   private StringEscapePolicy policy = StringEscapePolicy.NORMAL;
   private Character separator = '.';
@@ -133,6 +134,23 @@ public final class JsonFlattener {
    */
   public JsonFlattener(Reader jsonReader) throws IOException {
     source = Json.parse(jsonReader);
+  }
+
+  /**
+   * A fluent setter to setup whether to useBrackets a key or not
+   *
+   * Warn: you possibly won't be able to unflatten json back if you're using this option
+   * and separator in key names
+   *
+   * @param useBrackets
+   *          true - use brackets
+   *          false - don't use brackets
+   * @return this {@link JsonFlattener}
+   */
+  public JsonFlattener withBrackets(boolean useBrackets) {
+    this.useBrackets = useBrackets;
+    flattenedMap = null;
+    return this;
   }
 
   /**
@@ -374,7 +392,7 @@ public final class JsonFlattener {
       if (iter.getCurrent() instanceof Member) {
         String key = ((Member) iter.getCurrent()).getName();
         if (keyTrans != null) key = keyTrans.transform(key);
-        if (hasReservedCharacters(key)) {
+        if (hasReservedCharacters(key) && useBrackets) {
           sb.append(leftBracket);
           sb.append('\\');
           sb.append('"');

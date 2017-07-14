@@ -481,4 +481,10 @@ public class JsonFlattenerTest {
     assertEquals("{\"abc.de_f\":123}", jf.flatten());
   }
 
+  @Test
+  public void testWithoutKeyEscape() {
+    String json = "{\"ab.c\":{\"de.f\":123}}";
+    JsonFlattener jf = new JsonFlattener(json).withBrackets(false);
+    assertEquals("{\"ab.c.de.f\":123}", jf.flatten());
+  }
 }
