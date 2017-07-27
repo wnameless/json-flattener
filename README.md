@@ -18,7 +18,18 @@ or a Java Map<br />
 <dependency>
 	<groupId>com.github.wnameless</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.4.0</version>
+	<version>0.4.1</version>
+</dependency>
+```
+
+This version is used to solve the conflict("missing ESCAPE_JSON field") between Apache common-lang3 and common-lang.<br />
+If you don't face such a problem, you should use the original version instead.<br />
+BTW, this version needs Java 7 obviously.
+```xml
+<dependency>
+	<groupId>com.github.wnameless</groupId>
+	<artifactId>json-flattener-java7</artifactId>
+	<version>0.4.1</version>
 </dependency>
 ```
 

@@ -41,6 +41,19 @@ import com.google.common.io.Resources;
 public class JsonUnflattenerTest {
 
   @Test
+  public void testUnflattenWithArrayOfNestedObjectsInValByKeepArraysMode()
+      throws IOException {
+    URL url = Resources.getResource("test6.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    String flattendJson = new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten();
+    assertEquals("{\"a\":[1,2,3],\"b\":[{\"c.d\":[1,2]}]}", flattendJson);
+    assertEquals("{\"a\":[1,2,3],\"b\":[{\"c\":{\"d\":[1,2]}}]}",
+        JsonUnflattener.unflatten(flattendJson));
+  }
+
+  @Test
   public void testUnflatten() {
     assertEquals(
         "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}",
