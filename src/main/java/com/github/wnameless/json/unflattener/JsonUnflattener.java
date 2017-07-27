@@ -377,12 +377,32 @@ public final class JsonUnflattener {
 
   private void setUnflattenedValue(JsonObject flattened, String key,
       JsonValue currentVal, String objKey, Integer aryIdx) {
+    JsonValue val = flattened.get(key);
     if (objKey != null) {
-      currentVal.asObject().add(objKey, flattened.get(key));
+      if (val.isArray()) {
+        JsonValue jsonArray = Json.array();
+        for (JsonValue arrayVal : val.asArray()) {
+          jsonArray.asArray().add(
+              Json.parse(newJsonUnflattener(arrayVal.toString()).unflatten()));
+        }
+        currentVal.asObject().add(objKey, jsonArray);
+      } else {
+        currentVal.asObject().add(objKey, val);
+      }
     } else { // aryIdx != null
       assureJsonArraySize(currentVal.asArray(), aryIdx);
-      currentVal.asArray().set(aryIdx, flattened.get(key));
+      currentVal.asArray().set(aryIdx, val);
     }
+  }
+
+  private JsonUnflattener newJsonUnflattener(String json) {
+    JsonUnflattener jf = new JsonUnflattener(json);
+    if (flattenMode != null) jf.withFlattenMode(flattenMode);
+    if (keyTrans != null) jf.withKeyTransformer(keyTrans);
+    if (leftBracket != null && rightBracket != null)
+      jf.withLeftAndRightBrackets(leftBracket, rightBracket);
+    if (separator != null) jf.withSeparator(separator);
+    return jf;
   }
 
   private void assureJsonArraySize(JsonArray jsonArray, Integer index) {

@@ -47,3 +47,6 @@ Version 0.3.0
 Version 0.4.0
 + Add new FlattenMode.MONGODB
 + Add #withKeyTransformer
+
+Version 0.4.1
+* Fix the bug of unable to use JsonUnflattener to unflatten json made form KEEP_ARRAYS mode correctly if flattened objects exist in an array
