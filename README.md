@@ -18,7 +18,7 @@ or a Java Map<br />
 <dependency>
 	<groupId>com.github.wnameless</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.4.0</version>
+	<version>0.4.1</version>
 </dependency>
 ```
 
@@ -29,7 +29,7 @@ BTW, this version needs Java 7 obviously.
 <dependency>
 	<groupId>com.github.wnameless</groupId>
 	<artifactId>json-flattener-java7</artifactId>
-	<version>0.4.0</version>
+	<version>0.4.1</version>
 </dependency>
 ```
 
