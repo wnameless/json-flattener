@@ -40,7 +40,7 @@ import com.eclipsesource.json.JsonValue;
 /**
  * 
  * {@link JsonFlattener} flattens any JSON nested objects or arrays into a
- * flattened JSON string or a Map{@literal <Stirng, Object>}. The String key
+ * flattened JSON string or a Map{@literal <String, Object>}. The String key
  * will represents the corresponding position of value in the original nested
  * objects or arrays and the Object value are either String, Boolean, Long,
  * Double or null. <br>
