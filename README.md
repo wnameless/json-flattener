@@ -6,11 +6,11 @@ json-flattener
 A Java utility used to FLATTEN nested JSON objects and even more to UNFLATTEN it back
 
 ## Purpose
-Converts a nested JSON<br />
-&nbsp;&nbsp;{ "a": { "b": 1, "c": null, "d": [false, true] }, "e": "f", "g": 2.3 }<br />
-into a flattened JSON<br />
-&nbsp;&nbsp;{ "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": f, "g": 2.3 }<br />
-or a Java Map<br />
+Converts a nested JSON<br>
+&nbsp;&nbsp;{ "a": { "b": 1, "c": null, "d": [false, true] }, "e": "f", "g": 2.3 }<br>
+into a flattened JSON<br>
+&nbsp;&nbsp;{ "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": f, "g": 2.3 }<br>
+or a Java Map<br>
 &nbsp;&nbsp;{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
 
 ## Maven Repo
@@ -18,20 +18,10 @@ or a Java Map<br />
 <dependency>
 	<groupId>com.github.wnameless</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.4.1</version>
+	<version>0.5.0</version>
 </dependency>
 ```
-
-This version is used to solve the conflict("missing ESCAPE_JSON field") between Apache common-lang3 and common-lang.<br />
-If you don't face such a problem, you should use the original version instead.<br />
-BTW, this version needs Java 7 obviously.
-```xml
-<dependency>
-	<groupId>com.github.wnameless</groupId>
-	<artifactId>json-flattener-java7</artifactId>
-	<version>0.4.1</version>
-</dependency>
-```
+Since v0.5.0, Java 8 required
 
 
 ## Quick Start
@@ -61,6 +51,13 @@ System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
 
+## New Features (since v0.5.0)
+### CharSequenceTranslatorFactory
+```java
+public class MyStringEscapePolicy implements CharSequenceTranslatorFactory { ... }
+```
+StringEscapePolicy can be customized by implementing the CharSequenceTranslatorFactory interface
+
 ## New Features (since v0.4.0)
 ### FlattenMode.MONGODB (dot notation)
 ```java
@@ -72,7 +69,7 @@ json = "{\"abc.def.0\":123}";
 System.out.println(new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB).unflatten());
 // {"abc":{"def":[123]}}
 
-// With FlattenMode.MONGODB, separator can sill be changed
+// With FlattenMode.MONGODB, separator can still be changed
 json = "{\"abc\":{\"def\":[123]}}";
 System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).withSeparator('*').flatten());
 // {"abc*def*0":123}

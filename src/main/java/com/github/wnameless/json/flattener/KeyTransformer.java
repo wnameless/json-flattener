@@ -27,6 +27,7 @@ import com.github.wnameless.json.unflattener.JsonUnflattener;
  * @author Wei-Ming Wu
  *
  */
+@FunctionalInterface
 public interface KeyTransformer {
 
   /**

@@ -102,11 +102,10 @@ public final class JsonFlattener {
   private final JsonValue source;
 
   private JsonifyLinkedHashMap<String, Object> flattenedMap;
-  private final Deque<IndexedPeekIterator<?>> elementIters =
-      new ArrayDeque<IndexedPeekIterator<?>>();
+  private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
 
   private FlattenMode flattenMode = FlattenMode.NORMAL;
-  private StringEscapePolicy policy = StringEscapePolicy.NORMAL;
+  private CharSequenceTranslatorFactory policy = StringEscapePolicy.NORMAL;
   private Character separator = '.';
   private Character leftBracket = '[';
   private Character rightBracket = ']';
@@ -152,10 +151,12 @@ public final class JsonFlattener {
    * A fluent setter to setup the JSON string escape policy.
    * 
    * @param policy
-   *          a {@link StringEscapePolicy}
+   *          any {@link CharSequenceTranslatorFactory} or a
+   *          {@link StringEscapePolicy}
    * @return this {@link JsonFlattener}
    */
-  public JsonFlattener withStringEscapePolicy(StringEscapePolicy policy) {
+  public JsonFlattener withStringEscapePolicy(
+      CharSequenceTranslatorFactory policy) {
     this.policy = notNull(policy);
     flattenedMap = null;
     return this;
@@ -397,13 +398,13 @@ public final class JsonFlattener {
   }
 
   private <T> JsonifyArrayList<T> newJsonifyArrayList() {
-    JsonifyArrayList<T> array = new JsonifyArrayList<T>();
+    JsonifyArrayList<T> array = new JsonifyArrayList<>();
     array.setTranslator(policy.getCharSequenceTranslator());
     return array;
   }
 
   private <K, V> JsonifyLinkedHashMap<K, V> newJsonifyLinkedHashMap() {
-    JsonifyLinkedHashMap<K, V> map = new JsonifyLinkedHashMap<K, V>();
+    JsonifyLinkedHashMap<K, V> map = new JsonifyLinkedHashMap<>();
     map.setTranslator(policy.getCharSequenceTranslator());
     return map;
   }

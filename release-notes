@@ -50,3 +50,8 @@ Version 0.4.0
 
 Version 0.4.1
 * Fix the bug of unable to use JsonUnflattener to unflatten json made form KEEP_ARRAYS mode correctly if flattened objects exist in an array
+
+Version 0.5.0
+* Using Apache common-text instead of common-lang3
+* Java 8 required
++ Add CharSequenceTranslatorFactory interface

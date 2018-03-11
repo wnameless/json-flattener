@@ -17,11 +17,13 @@
  */
 package com.github.wnameless.json.flattener;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.text.translate.AggregateTranslator;
-import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
-import org.apache.commons.lang3.text.translate.EntityArrays;
-import org.apache.commons.lang3.text.translate.LookupTranslator;
+import java.util.HashMap;
+
+import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.text.translate.AggregateTranslator;
+import org.apache.commons.text.translate.CharSequenceTranslator;
+import org.apache.commons.text.translate.EntityArrays;
+import org.apache.commons.text.translate.LookupTranslator;
 
 /**
  * 
@@ -31,14 +33,19 @@ import org.apache.commons.lang3.text.translate.LookupTranslator;
  * @author Wei-Ming Wu
  *
  */
-public enum StringEscapePolicy {
+public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
 
   /**
    * Escapes JSON special characters.
    */
-  NORMAL(new AggregateTranslator(new LookupTranslator(new String[][] {
-      { "\"", "\\\"" }, { "\\", "\\\\" }, { "/", "\\/" } }),
-      new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE()))),
+  NORMAL(new AggregateTranslator(new LookupTranslator(new HashMap<CharSequence, CharSequence>() {
+    private static final long serialVersionUID = 1L;
+    {
+      put("\"", "\\\"");
+      put("\\", "\\\\");
+      put("/", "\\/");
+    }
+  }), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE))),
 
   /**
    * Escapes JSON special characters and Unicode characters.
@@ -51,6 +58,7 @@ public enum StringEscapePolicy {
     this.translator = translator;
   }
 
+  @Override
   public CharSequenceTranslator getCharSequenceTranslator() {
     return translator;
   }
