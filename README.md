@@ -58,7 +58,7 @@ public class MyStringEscapePolicy implements CharSequenceTranslatorFactory { ...
 ```
 StringEscapePolicy can be customized by implementing the CharSequenceTranslatorFactory interface
 
-For example, if you don't want the slash(/) and backslash(\) to be escaped:
+For example, if you don't want the slash(/) and backslash(\\) to be escaped:
 ```java
 new JsonFlattener(YOUR_JSON)
 
