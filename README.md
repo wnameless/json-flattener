@@ -58,6 +58,28 @@ public class MyStringEscapePolicy implements CharSequenceTranslatorFactory { ...
 ```
 StringEscapePolicy can be customized by implementing the CharSequenceTranslatorFactory interface
 
+For example, if you don't want the slash(/) and backslash(\) to be escaped:
+```java
+new JsonFlattener(YOUR_JSON)
+
+        .withStringEscapePolicy(new CharSequenceTranslatorFactory() {
+
+          @Override
+          public CharSequenceTranslator getCharSequenceTranslator() {
+            return new AggregateTranslator(
+                new LookupTranslator(new HashMap<CharSequence, CharSequence>() {
+                  private static final long serialVersionUID = 1L;
+                  {
+                    put("\"", "\\\"");
+                    // put("\\", "\\\\");
+                    // put("/", "\\/"); 
+                  }
+                }), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE));
+          }
+
+        });
+```
+
 ## New Features (since v0.4.0)
 ### FlattenMode.MONGODB (dot notation)
 ```java
