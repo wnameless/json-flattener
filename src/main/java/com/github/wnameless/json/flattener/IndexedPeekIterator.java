@@ -39,6 +39,8 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
   /**
    * Creates an {@link IndexedPeekIterator} by given Iterable.
    * 
+   * @param <T>
+   *          the type of elements
    * @param iter
    *          any Iterable
    * @return an {@link IndexedPeekIterator}
