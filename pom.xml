@@ -23,7 +23,7 @@
 		<connection>scm:git:git@github.com:wnameless/json-flattener.git</connection>
 		<developerConnection>scm:git:git@github.com:wnameless/json-flattener.git</developerConnection>
 		<url>git@github.com:wnameless/json-flattener.git</url>
-		<tag>json-flattener-0.5.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<developers>
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>24.0-jre</version>
+			<version>26.0-jre</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -81,7 +81,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>3.8.0</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -125,7 +125,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
