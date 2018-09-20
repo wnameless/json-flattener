@@ -17,6 +17,8 @@
  */
 package com.github.wnameless.json.flattener;
 
+import static java.util.Collections.unmodifiableMap;
+
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -40,7 +42,7 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
   /**
    * Escapes all JSON special characters but Unicode.
    * 
-   * @deprecated use {@link StringEscapePolicy.ALL_BUT_UNICODE} instead
+   * @deprecated use {@link StringEscapePolicy#ALL_BUT_UNICODE} instead
    */
   @Deprecated
   NORMAL(new AggregateTranslator(
@@ -56,7 +58,7 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
   /**
    * Escapes all JSON special characters and Unicode.
    * 
-   * @deprecated use {@link StringEscapePolicy.ALL} instead
+   * @deprecated use {@link StringEscapePolicy#ALL} instead
    */
   @Deprecated
   ALL_UNICODES(StringEscapeUtils.ESCAPE_JSON),
@@ -70,7 +72,7 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
    * Escapes all JSON special characters and Unicode but slash('/').
    */
   ALL_BUT_SLASH(new AggregateTranslator(new LookupTranslator(
-      Collections.unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
+      unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
         private static final long serialVersionUID = 1L;
         {
           put("\"", "\\\"");
@@ -83,7 +85,7 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
    * Escapes all JSON special characters but Unicode.
    */
   ALL_BUT_UNICODE(new AggregateTranslator(new LookupTranslator(
-      Collections.unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
+      unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
         private static final long serialVersionUID = 1L;
         {
           put("\"", "\\\"");
@@ -108,7 +110,7 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
    * Escapes all JSON special characters but slash('/') and Unicode.
    */
   DEFAULT(new AggregateTranslator(new LookupTranslator(
-      Collections.unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
+      unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
         private static final long serialVersionUID = 1L;
         {
           put("\"", "\\\"");
