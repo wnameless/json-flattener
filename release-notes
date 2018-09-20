@@ -55,3 +55,11 @@ Version 0.5.0
 * Using Apache common-text instead of common-lang3
 * Java 8 required
 + Add CharSequenceTranslatorFactory interface
+
+Version 0.6.0
++ Add StringEscapePolicy.ALL
++ Add StringEscapePolicy.ALL_BUT_SLASH
++ Add StringEscapePolicy.ALL_BUT_UNICODD
++ Add StringEscapePolicy.ALL_BUT_SLASH_AND_UNICODE
++ Add StringEscapePolicy.DEFAULT
+* Make StringEscapePolicy.DEFAULT as the default StringEscapePolicy of JsonFlattener

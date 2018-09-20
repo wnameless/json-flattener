@@ -17,12 +17,14 @@
  */
 package com.github.wnameless.json.flattener;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.translate.AggregateTranslator;
 import org.apache.commons.text.translate.CharSequenceTranslator;
 import org.apache.commons.text.translate.EntityArrays;
+import org.apache.commons.text.translate.JavaUnicodeEscaper;
 import org.apache.commons.text.translate.LookupTranslator;
 
 /**
@@ -36,21 +38,83 @@ import org.apache.commons.text.translate.LookupTranslator;
 public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
 
   /**
-   * Escapes JSON special characters.
+   * Escapes all JSON special characters but Unicode.
+   * 
+   * @deprecated use {@link StringEscapePolicy.ALL_BUT_UNICODE} instead
    */
-  NORMAL(new AggregateTranslator(new LookupTranslator(new HashMap<CharSequence, CharSequence>() {
-    private static final long serialVersionUID = 1L;
-    {
-      put("\"", "\\\"");
-      put("\\", "\\\\");
-      put("/", "\\/");
-    }
-  }), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE))),
+  @Deprecated
+  NORMAL(new AggregateTranslator(
+      new LookupTranslator(new HashMap<CharSequence, CharSequence>() {
+        private static final long serialVersionUID = 1L;
+        {
+          put("\"", "\\\"");
+          put("\\", "\\\\");
+          put("/", "\\/");
+        }
+      }), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE))),
 
   /**
-   * Escapes JSON special characters and Unicode characters.
+   * Escapes all JSON special characters and Unicode.
+   * 
+   * @deprecated use {@link StringEscapePolicy.ALL} instead
    */
-  ALL_UNICODES(StringEscapeUtils.ESCAPE_JSON);
+  @Deprecated
+  ALL_UNICODES(StringEscapeUtils.ESCAPE_JSON),
+
+  /**
+   * Escapes all JSON special characters and Unicode.
+   */
+  ALL(StringEscapeUtils.ESCAPE_JSON),
+
+  /**
+   * Escapes all JSON special characters and Unicode but slash('/').
+   */
+  ALL_BUT_SLASH(new AggregateTranslator(new LookupTranslator(
+      Collections.unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
+        private static final long serialVersionUID = 1L;
+        {
+          put("\"", "\\\"");
+          put("\\", "\\\\");
+        }
+      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE),
+      JavaUnicodeEscaper.outsideOf(32, 0x7f))),
+
+  /**
+   * Escapes all JSON special characters but Unicode.
+   */
+  ALL_BUT_UNICODE(new AggregateTranslator(new LookupTranslator(
+      Collections.unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
+        private static final long serialVersionUID = 1L;
+        {
+          put("\"", "\\\"");
+          put("\\", "\\\\");
+          put("/", "\\/");
+        }
+      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE))),
+
+  /**
+   * Escapes all JSON special characters but slash('/') and Unicode.
+   */
+  ALL_BUT_SLASH_AND_UNICODE(new AggregateTranslator(new LookupTranslator(
+      Collections.unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
+        private static final long serialVersionUID = 1L;
+        {
+          put("\"", "\\\"");
+          put("\\", "\\\\");
+        }
+      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE))),
+
+  /**
+   * Escapes all JSON special characters but slash('/') and Unicode.
+   */
+  DEFAULT(new AggregateTranslator(new LookupTranslator(
+      Collections.unmodifiableMap(new HashMap<CharSequence, CharSequence>() {
+        private static final long serialVersionUID = 1L;
+        {
+          put("\"", "\\\"");
+          put("\\", "\\\\");
+        }
+      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE)));
 
   private final CharSequenceTranslator translator;
 

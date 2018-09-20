@@ -3,7 +3,7 @@
 
 json-flattener
 =============
-A Java utility used to FLATTEN nested JSON objects and even more to UNFLATTEN it back
+A Java utility used to FLATTEN nested JSON objects and even more to UNFLATTEN it back.
 
 ## Purpose
 Converts a nested JSON<br>
@@ -18,10 +18,11 @@ or a Java Map<br>
 <dependency>
 	<groupId>com.github.wnameless</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.5.0</version>
+	<version>0.6.0</version>
 </dependency>
 ```
-Since v0.5.0, Java 8 required
+Since v0.5.0, Java 8 required.
+Since v0.6.0, StringEscapePolicy.DEFAULT, which escapes all special characters but slash('/') and Unicode, becomes the default setting.
 
 
 ## Quick Start
@@ -51,12 +52,20 @@ System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
 
+## New Features (since v0.6.0)
+### More options in StringEscapePolicy enum
+StringEscapePolicy.ALL                       - Escapes all JSON special characters and Unicode.
+StringEscapePolicy.ALL_BUT_SLASH             - Escapes all JSON special characters and Unicode but slash('/').
+StringEscapePolicy.ALL_BUT_UNICODE           - Escapes all JSON special characters but Unicode.
+StringEscapePolicy.ALL_BUT_SLASH_AND_UNICODE - Escapes all JSON special characters but slash('/') and Unicode.
+StringEscapePolicy.DEFAULT                   - Escapes all JSON special characters but slash('/') and Unicode.
+
 ## New Features (since v0.5.0)
 ### CharSequenceTranslatorFactory
 ```java
 public class MyStringEscapePolicy implements CharSequenceTranslatorFactory { ... }
 ```
-StringEscapePolicy can be customized by implementing the CharSequenceTranslatorFactory interface
+StringEscapePolicy can be customized by implementing the CharSequenceTranslatorFactory interface.
 
 For example, if you don't want the slash(/) and backslash(\\) to be escaped:
 ```java

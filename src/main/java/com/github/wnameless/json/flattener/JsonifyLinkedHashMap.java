@@ -44,7 +44,7 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
   private static final long serialVersionUID = 1L;
 
   private CharSequenceTranslator translator =
-      StringEscapePolicy.NORMAL.getCharSequenceTranslator();
+      StringEscapePolicy.DEFAULT.getCharSequenceTranslator();
 
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;

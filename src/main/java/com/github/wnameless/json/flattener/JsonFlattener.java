@@ -82,7 +82,7 @@ public final class JsonFlattener {
    * 
    * @param json
    *          the JSON string
-   * @return a flattened JSON string.
+   * @return a flattened JSON string
    */
   public static String flatten(String json) {
     return new JsonFlattener(json).flatten();
@@ -105,7 +105,7 @@ public final class JsonFlattener {
   private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
 
   private FlattenMode flattenMode = FlattenMode.NORMAL;
-  private CharSequenceTranslatorFactory policy = StringEscapePolicy.NORMAL;
+  private CharSequenceTranslatorFactory policy = StringEscapePolicy.DEFAULT;
   private Character separator = '.';
   private Character leftBracket = '[';
   private Character rightBracket = ']';

@@ -41,7 +41,7 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
   private static final long serialVersionUID = 1L;
 
   private CharSequenceTranslator translator =
-      StringEscapePolicy.NORMAL.getCharSequenceTranslator();
+      StringEscapePolicy.DEFAULT.getCharSequenceTranslator();
 
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;

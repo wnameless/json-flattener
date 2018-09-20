@@ -23,4 +23,4 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ JsonFlattenerTest.class, JsonUnflattenerTest.class })
-public class AllTests {}
+public class AllJsonFlattenerTests {}

@@ -202,11 +202,44 @@ public class JsonFlattenerTest {
             .flatten());
   }
 
+  @SuppressWarnings("deprecation")
   @Test
-  public void testWithStringEscapePolicy() {
+  public void testWithStringEscapePolicyALL_UNICODES() {
     String json = "{\"abc\":{\"def\":\"太極\"}}";
     assertEquals("{\"abc.def\":\"\\u592A\\u6975\"}", new JsonFlattener(json)
         .withStringEscapePolicy(StringEscapePolicy.ALL_UNICODES).flatten());
+  }
+
+  @Test
+  public void testWithStringEscapePolicyALL() {
+    String json = "{\"abc\":{\"def\":\"太極/兩儀\"}}";
+    assertEquals("{\"abc.def\":\"\\u592A\\u6975\\/\\u5169\\u5100\"}",
+        new JsonFlattener(json).withStringEscapePolicy(StringEscapePolicy.ALL)
+            .flatten());
+  }
+
+  @Test
+  public void testWithStringEscapePolicyALL_BUT_SLASH() {
+    String json = "{\"abc\":{\"def\":\"太極/兩儀\"}}";
+    assertEquals("{\"abc.def\":\"\\u592A\\u6975/\\u5169\\u5100\"}",
+        new JsonFlattener(json)
+            .withStringEscapePolicy(StringEscapePolicy.ALL_BUT_SLASH)
+            .flatten());
+  }
+
+  @Test
+  public void testWithStringEscapePolicyALL_BUT_UNICODE() {
+    String json = "{\"abc\":{\"def\":\"太極/兩儀\"}}";
+    assertEquals("{\"abc.def\":\"太極\\/兩儀\"}", new JsonFlattener(json)
+        .withStringEscapePolicy(StringEscapePolicy.ALL_BUT_UNICODE).flatten());
+  }
+
+  @Test
+  public void testWithStringEscapePolicyALL_BUT_SLASH_AND_UNICODE() {
+    String json = "{\"abc\":{\"def\":\"太極/兩儀\"}}";
+    assertEquals("{\"abc.def\":\"太極/兩儀\"}", new JsonFlattener(json)
+        .withStringEscapePolicy(StringEscapePolicy.ALL_BUT_SLASH_AND_UNICODE)
+        .flatten());
   }
 
   @Test
