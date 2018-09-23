@@ -54,11 +54,13 @@ System.out.println(nestedJsonWithDotKey);
 
 ## New Features (since v0.6.0)
 ### More options in StringEscapePolicy enum
-StringEscapePolicy.ALL - Escapes all JSON special characters and Unicode.<br>
-StringEscapePolicy.ALL_BUT_SLASH - Escapes all JSON special characters and Unicode but slash('/').<br>
-StringEscapePolicy.ALL_BUT_UNICODE - Escapes all JSON special characters but Unicode.<br>
-StringEscapePolicy.ALL_BUT_SLASH_AND_UNICODE - Escapes all JSON special characters but slash('/') and Unicode.<br>
-StringEscapePolicy.DEFAULT - Escapes all JSON special characters but slash('/') and Unicode.
+```java
+StringEscapePolicy.ALL //                       Escapes all JSON special characters and Unicode
+StringEscapePolicy.ALL_BUT_SLASH //             Escapes all JSON special characters and Unicode but slash('/')
+StringEscapePolicy.ALL_BUT_UNICODE //           Escapes all JSON special characters but Unicode
+StringEscapePolicy.ALL_BUT_SLASH_AND_UNICODE // Escapes all JSON special characters but slash('/') and Unicode
+StringEscapePolicy.DEFAULT //                   Escapes all JSON special characters but slash('/') and Unicode
+```
 
 ## New Features (since v0.5.0)
 ### CharSequenceTranslatorFactory
