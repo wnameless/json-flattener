@@ -92,6 +92,7 @@ public class JsonFlattenerTest {
     assertNotEquals(flattener.hashCode(), new JsonFlattener(json2).hashCode());
   }
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   public void testEquals() throws IOException {
     URL url1 = Resources.getResource("test.json");

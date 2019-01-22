@@ -116,6 +116,7 @@ public class JsonUnflattenerTest {
         new JsonUnflattener(json2).hashCode());
   }
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   public void testEquals() throws IOException {
     String json1 = "[[123]]";
