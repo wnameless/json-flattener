@@ -58,14 +58,14 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
-			<version>1.4</version>
+			<version>1.6</version>
 		</dependency>
 
 		<!-- Test -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>26.0-jre</version>
+			<version>27.0.1-jre</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
