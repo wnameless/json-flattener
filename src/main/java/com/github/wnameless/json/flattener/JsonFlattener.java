@@ -117,6 +117,16 @@ public final class JsonFlattener {
    * Creates a JSON flattener.
    * 
    * @param json
+   *          a {@link JsonValueBase}
+   */
+  public JsonFlattener(JsonValueBase json) {
+    source = notNull(json);
+  }
+
+  /**
+   * Creates a JSON flattener.
+   * 
+   * @param json
    *          the JSON string
    */
   public JsonFlattener(String json) {

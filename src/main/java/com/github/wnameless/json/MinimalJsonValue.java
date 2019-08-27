@@ -51,16 +51,6 @@ public final class MinimalJsonValue implements JsonValueBase {
   }
 
   @Override
-  public boolean isTrue() {
-    return jsonValue.isTrue();
-  }
-
-  @Override
-  public boolean isFalse() {
-    return jsonValue.isFalse();
-  }
-
-  @Override
   public boolean isNull() {
     return jsonValue.isNull();
   }
@@ -83,11 +73,6 @@ public final class MinimalJsonValue implements JsonValueBase {
   @Override
   public long asLong() {
     return jsonValue.asLong();
-  }
-
-  @Override
-  public float asFloat() {
-    return jsonValue.asFloat();
   }
 
   @Override

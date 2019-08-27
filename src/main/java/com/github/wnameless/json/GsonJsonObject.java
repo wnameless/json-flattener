@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class GsonJsonObject implements JsonObjectBase<GsonJsonValue> {
+public final class GsonJsonObject implements JsonObjectBase<GsonJsonValue> {
 
   private final JsonObject jsonObject;
 
@@ -43,11 +43,6 @@ public class GsonJsonObject implements JsonObjectBase<GsonJsonValue> {
   @Override
   public long asLong() {
     return jsonObject.getAsLong();
-  }
-
-  @Override
-  public float asFloat() {
-    return jsonObject.getAsFloat();
   }
 
   @Override

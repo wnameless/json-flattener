@@ -54,24 +54,6 @@ public final class GsonJsonValue implements JsonValueBase {
   }
 
   @Override
-  public boolean isTrue() {
-    if (jsonValue.isJsonPrimitive()
-        && jsonValue.getAsJsonPrimitive().isBoolean()) {
-      return jsonValue.getAsJsonPrimitive().getAsBoolean();
-    }
-    return false;
-  }
-
-  @Override
-  public boolean isFalse() {
-    if (jsonValue.isJsonPrimitive()
-        && jsonValue.getAsJsonPrimitive().isBoolean()) {
-      return !jsonValue.getAsJsonPrimitive().getAsBoolean();
-    }
-    return false;
-  }
-
-  @Override
   public boolean isNull() {
     return jsonValue.isJsonNull();
   }
@@ -94,11 +76,6 @@ public final class GsonJsonValue implements JsonValueBase {
   @Override
   public long asLong() {
     return jsonValue.getAsLong();
-  }
-
-  @Override
-  public float asFloat() {
-    return jsonValue.getAsFloat();
   }
 
   @Override

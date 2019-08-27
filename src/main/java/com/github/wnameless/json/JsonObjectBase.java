@@ -26,8 +26,6 @@ public interface JsonObjectBase<JV extends JsonValueBase>
 
   public long asLong();
 
-  public float asFloat();
-
   public double asDouble();
 
   public boolean asBoolean();

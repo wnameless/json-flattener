@@ -47,11 +47,6 @@ public final class MinimalJsonObject
   }
 
   @Override
-  public float asFloat() {
-    return jsonObject.asFloat();
-  }
-
-  @Override
   public double asDouble() {
     return jsonObject.asDouble();
   }

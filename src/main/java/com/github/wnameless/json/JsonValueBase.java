@@ -27,10 +27,6 @@ public interface JsonValueBase {
 
   public boolean isBoolean();
 
-  public boolean isTrue();
-
-  public boolean isFalse();
-
   public boolean isNull();
 
   public JsonObjectBase<?> asObject();
@@ -40,8 +36,6 @@ public interface JsonValueBase {
   public int asInt();
 
   public long asLong();
-
-  public float asFloat();
 
   public double asDouble();
 
