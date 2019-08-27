@@ -37,33 +37,33 @@ public final class MinimalJsonObject
   }
 
   @Override
-  public int getInt(String name, int defaultValue) {
-    return jsonObject.getInt(name, defaultValue);
+  public int asInt() {
+    return jsonObject.asInt();
   }
 
   @Override
-  public long getLong(String name, long defaultValue) {
-    return jsonObject.getLong(name, defaultValue);
+  public long asLong() {
+    return jsonObject.asLong();
   }
 
   @Override
-  public float getFloat(String name, float defaultValue) {
-    return jsonObject.getFloat(name, defaultValue);
+  public float asFloat() {
+    return jsonObject.asFloat();
   }
 
   @Override
-  public double getDouble(String name, double defaultValue) {
-    return jsonObject.getDouble(name, defaultValue);
+  public double asDouble() {
+    return jsonObject.asDouble();
   }
 
   @Override
-  public boolean getBoolean(String name, boolean defaultValue) {
-    return jsonObject.getBoolean(name, defaultValue);
+  public boolean asBoolean() {
+    return jsonObject.asBoolean();
   }
 
   @Override
-  public String getString(String name, String defaultValue) {
-    return jsonObject.getString(name, defaultValue);
+  public String asString() {
+    return jsonObject.asString();
   }
 
   @Override

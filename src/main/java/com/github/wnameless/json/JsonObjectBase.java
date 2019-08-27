@@ -22,16 +22,16 @@ public interface JsonObjectBase<JV extends JsonValueBase>
 
   public JsonValueBase get(String name);
 
-  public int getInt(String name, int defaultValue);
+  public int asInt();
 
-  public long getLong(String name, long defaultValue);
+  public long asLong();
 
-  public float getFloat(String name, float defaultValue);
+  public float asFloat();
 
-  public double getDouble(String name, double defaultValue);
+  public double asDouble();
 
-  public boolean getBoolean(String name, boolean defaultValue);
+  public boolean asBoolean();
 
-  public String getString(String name, String defaultValue);
+  public String asString();
 
 }
