@@ -29,13 +29,14 @@ import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject.Member;
-import com.eclipsesource.json.JsonValue;
+import com.github.wnameless.json.JsonValueBase;
+import com.github.wnameless.json.MinimalJsonValue;
 
 /**
  * 
@@ -99,7 +100,7 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private final JsonValue source;
+  private final JsonValueBase source;
 
   private JsonifyLinkedHashMap<String, Object> flattenedMap;
   private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
@@ -119,7 +120,7 @@ public final class JsonFlattener {
    *          the JSON string
    */
   public JsonFlattener(String json) {
-    source = Json.parse(json);
+    source = new MinimalJsonValue(Json.parse(json));
   }
 
   /**
@@ -131,7 +132,7 @@ public final class JsonFlattener {
    *           if jsonReader cannot be read
    */
   public JsonFlattener(Reader jsonReader) throws IOException {
-    source = Json.parse(jsonReader);
+    source = new MinimalJsonValue(Json.parse(jsonReader));
   }
 
   /**
@@ -292,11 +293,13 @@ public final class JsonFlattener {
       IndexedPeekIterator<?> deepestIter = elementIters.getLast();
       if (!deepestIter.hasNext()) {
         elementIters.removeLast();
-      } else if (deepestIter.peek() instanceof Member) {
-        Member mem = (Member) deepestIter.next();
+      } else if (deepestIter.peek() instanceof Entry) {
+        @SuppressWarnings("unchecked")
+        Entry<String, ? extends JsonValueBase> mem =
+            (Entry<String, ? extends JsonValueBase>) deepestIter.next();
         reduce(mem.getValue());
       } else { // JsonValue
-        JsonValue val = (JsonValue) deepestIter.next();
+        JsonValueBase val = (JsonValueBase) deepestIter.next();
         reduce(val);
       }
     }
@@ -304,14 +307,14 @@ public final class JsonFlattener {
     return flattenedMap;
   }
 
-  private void reduce(JsonValue val) {
+  private void reduce(JsonValueBase val) {
     if (val.isObject() && val.asObject().iterator().hasNext()) {
       elementIters.add(newIndexedPeekIterator(val.asObject()));
     } else if (val.isArray() && val.asArray().iterator().hasNext()) {
       switch (flattenMode) {
         case KEEP_ARRAYS:
           JsonifyArrayList<Object> array = newJsonifyArrayList();
-          for (JsonValue value : val.asArray()) {
+          for (JsonValueBase value : val.asArray()) {
             array.add(jsonVal2Obj(value));
           }
           flattenedMap.put(computeKey(), array);
@@ -328,7 +331,7 @@ public final class JsonFlattener {
     }
   }
 
-  private Object jsonVal2Obj(JsonValue val) {
+  private Object jsonVal2Obj(JsonValueBase val) {
     if (val.isBoolean()) return val.asBoolean();
     if (val.isString()) return val.asString();
     if (val.isNumber()) return new BigDecimal(val.toString());
@@ -336,7 +339,7 @@ public final class JsonFlattener {
       case KEEP_ARRAYS:
         if (val.isArray()) {
           JsonifyArrayList<Object> array = newJsonifyArrayList();
-          for (JsonValue value : val.asArray()) {
+          for (JsonValueBase value : val.asArray()) {
             array.add(jsonVal2Obj(value));
           }
           return array;
@@ -372,8 +375,11 @@ public final class JsonFlattener {
     StringBuilder sb = new StringBuilder();
 
     for (IndexedPeekIterator<?> iter : elementIters) {
-      if (iter.getCurrent() instanceof Member) {
-        String key = ((Member) iter.getCurrent()).getName();
+      if (iter.getCurrent() instanceof Entry) {
+        @SuppressWarnings("unchecked")
+        String key =
+            ((Entry<String, ? extends JsonValueBase>) iter.getCurrent())
+                .getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
         if (hasReservedCharacters(key)) {
           sb.append(leftBracket);
