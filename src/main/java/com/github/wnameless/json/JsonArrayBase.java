@@ -19,7 +19,7 @@ import java.util.Iterator;
 
 public interface JsonArrayBase<JV extends JsonValueBase> extends Iterable<JV> {
 
-  public JsonValueBase get(int index);
+  public JV get(int index);
 
   public Iterator<JV> iterator();
 

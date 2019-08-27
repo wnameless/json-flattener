@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 public interface JsonObjectBase<JV extends JsonValueBase>
     extends Iterable<Entry<String, JV>> {
 
-  public JsonValueBase get(String name);
+  public JV get(String name);
 
   public int asInt();
 
