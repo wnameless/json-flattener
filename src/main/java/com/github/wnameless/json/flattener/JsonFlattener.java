@@ -100,7 +100,7 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private final JsonValueBase source;
+  private final JsonValueBase<?> source;
 
   private JsonifyLinkedHashMap<String, Object> flattenedMap;
   private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
@@ -119,7 +119,7 @@ public final class JsonFlattener {
    * @param json
    *          a {@link JsonValueBase}
    */
-  public JsonFlattener(JsonValueBase json) {
+  public JsonFlattener(JsonValueBase<?> json) {
     source = notNull(json);
   }
 
@@ -305,11 +305,11 @@ public final class JsonFlattener {
         elementIters.removeLast();
       } else if (deepestIter.peek() instanceof Entry) {
         @SuppressWarnings("unchecked")
-        Entry<String, ? extends JsonValueBase> mem =
-            (Entry<String, ? extends JsonValueBase>) deepestIter.next();
+        Entry<String, ? extends JsonValueBase<?>> mem =
+            (Entry<String, ? extends JsonValueBase<?>>) deepestIter.next();
         reduce(mem.getValue());
       } else { // JsonValue
-        JsonValueBase val = (JsonValueBase) deepestIter.next();
+        JsonValueBase<?> val = (JsonValueBase<?>) deepestIter.next();
         reduce(val);
       }
     }
@@ -317,14 +317,14 @@ public final class JsonFlattener {
     return flattenedMap;
   }
 
-  private void reduce(JsonValueBase val) {
+  private void reduce(JsonValueBase<?> val) {
     if (val.isObject() && val.asObject().iterator().hasNext()) {
       elementIters.add(newIndexedPeekIterator(val.asObject()));
     } else if (val.isArray() && val.asArray().iterator().hasNext()) {
       switch (flattenMode) {
         case KEEP_ARRAYS:
           JsonifyArrayList<Object> array = newJsonifyArrayList();
-          for (JsonValueBase value : val.asArray()) {
+          for (JsonValueBase<?> value : val.asArray()) {
             array.add(jsonVal2Obj(value));
           }
           flattenedMap.put(computeKey(), array);
@@ -341,7 +341,7 @@ public final class JsonFlattener {
     }
   }
 
-  private Object jsonVal2Obj(JsonValueBase val) {
+  private Object jsonVal2Obj(JsonValueBase<?> val) {
     if (val.isBoolean()) return val.asBoolean();
     if (val.isString()) return val.asString();
     if (val.isNumber()) return new BigDecimal(val.toString());
@@ -349,7 +349,7 @@ public final class JsonFlattener {
       case KEEP_ARRAYS:
         if (val.isArray()) {
           JsonifyArrayList<Object> array = newJsonifyArrayList();
-          for (JsonValueBase value : val.asArray()) {
+          for (JsonValueBase<?> value : val.asArray()) {
             array.add(jsonVal2Obj(value));
           }
           return array;
@@ -388,7 +388,7 @@ public final class JsonFlattener {
       if (iter.getCurrent() instanceof Entry) {
         @SuppressWarnings("unchecked")
         String key =
-            ((Entry<String, ? extends JsonValueBase>) iter.getCurrent())
+            ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent())
                 .getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
         if (hasReservedCharacters(key)) {
