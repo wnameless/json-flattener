@@ -23,7 +23,9 @@ or a Java Map<br>
 ```
 Since v0.5.0, Java 8 required.<br>
 Since v0.6.0, StringEscapePolicy.DEFAULT, which escapes all special characters but slash('/') and Unicode, becomes the default setting.<br>
-Since v0.7.0, group ID is changed from [com.github.wnameless] to [com.github.wnameless.json].
+```diff
+! Since v0.7.0, group ID is changed from [com.github.wnameless] to [com.github.wnameless.json].
+```
 
 
 ## Quick Start
