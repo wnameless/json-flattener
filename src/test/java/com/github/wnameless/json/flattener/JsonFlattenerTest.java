@@ -39,8 +39,10 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.PrettyPrint;
 import com.eclipsesource.json.WriterConfig;
+import com.github.wnameless.json.MinimalJsonValue;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
@@ -66,6 +68,20 @@ public class JsonFlattenerTest {
     assertEquals(
         "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
         JsonFlattener.flatten(json));
+
+    assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
+        JsonFlattener.flatten("[{\"a\":1},2,{\"c\":[3,4]}]"));
+  }
+
+  @Test
+  public void testFlattenWithJsonValueBase() throws IOException {
+    URL url = Resources.getResource("test2.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    JsonValue jsonVal = Json.parse(json);
+    assertEquals(
+        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
+        JsonFlattener.flatten(new MinimalJsonValue(jsonVal)));
 
     assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         JsonFlattener.flatten("[{\"a\":1},2,{\"c\":[3,4]}]"));

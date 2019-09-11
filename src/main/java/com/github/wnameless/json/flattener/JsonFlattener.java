@@ -81,6 +81,17 @@ public final class JsonFlattener {
   /**
    * Returns a flattened JSON string.
    * 
+   * @param jsonVal
+   *          a JSON data which wraps by {@link JsonValueBase}
+   * @return a flattened JSON string
+   */
+  public static String flatten(JsonValueBase<?> jsonVal) {
+    return new JsonFlattener(jsonVal).flatten();
+  }
+
+  /**
+   * Returns a flattened JSON string.
+   * 
    * @param json
    *          the JSON string
    * @return a flattened JSON string
