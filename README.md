@@ -1,4 +1,4 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless/json-flattener/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless/json-flattener)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless.json/json-flattener/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless.json/json-flattener)
 [![codecov](https://codecov.io/gh/wnameless/json-flattener/branch/master/graph/badge.svg)](https://codecov.io/gh/wnameless/json-flattener)
 
 json-flattener
@@ -16,13 +16,14 @@ or a Java Map<br>
 ## Maven Repo
 ```xml
 <dependency>
-	<groupId>com.github.wnameless</groupId>
+	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.6.0</version>
+	<version>0.7.0</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>
-Since v0.6.0, StringEscapePolicy.DEFAULT, which escapes all special characters but slash('/') and Unicode, becomes the default setting.
+Since v0.6.0, StringEscapePolicy.DEFAULT, which escapes all special characters but slash('/') and Unicode, becomes the default setting.<br>
+Since v0.7.0, group ID is changed from [com.github.wnameless] to [com.github.wnameless.json].
 
 
 ## Quick Start
@@ -51,6 +52,27 @@ String nestedJsonWithDotKey = JsonUnflattener.unflatten(
 System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
+
+## New Features (since v0.7.0)
+### JsonValueBase, which comes from json-base lib, is introduced to improve performance
+```java
+JsonValueBase<?> jsonVal;
+
+// GsonJsonValue, which is provided by json-base lib, can wrap Gson jsonElement to JsonValueBase
+jsonVal = new GsonJsonValue(jsonElement);
+
+// JacksonJsonValue, which is provided by json-base lib, can wrap Jackson jsonNode to JsonValueBase
+jsonVal = new JacksonJsonValue(jsonNode);
+
+// MinimalJsonValue, which is provided by json-base lib, can wrap MinimalJson jsonValue to JsonValueBase
+jsonVal = new MinimalJsonValue(jsonValue);
+
+// You can also implement the JsonValueBase interface for any JSON lib you are using
+jsonVal = new CostumeJsonValue(yourJsonVal);
+
+new JsonFlattener(jsonVal);
+```
+
 
 ## New Features (since v0.6.0)
 ### More options in StringEscapePolicy enum

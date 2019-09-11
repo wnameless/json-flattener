@@ -63,3 +63,7 @@ Version 0.6.0
 + Add StringEscapePolicy.ALL_BUT_SLASH_AND_UNICODE
 + Add StringEscapePolicy.DEFAULT
 * Make StringEscapePolicy.DEFAULT as the default StringEscapePolicy of JsonFlattener
+
+Version 0.7.0
+* Change Group ID from com.github.wnameless to com.github.wnameless.json
++ Accept Gson, Jackson, minimal-json objects by applying json-base libarary
