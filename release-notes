@@ -67,6 +67,3 @@ Version 0.6.0
 Version 0.7.0
 * Change Group ID from com.github.wnameless to com.github.wnameless.json
 + Accept Gson, Jackson, minimal-json objects by applying json-base libarary
-
-Version 0.7.1
-+ Add relocation to pom
