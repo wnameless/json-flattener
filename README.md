@@ -1,4 +1,4 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless/json-flattener/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless/json-flattener)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless.json/json-flattener/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless.json/json-flattener)
 [![codecov](https://codecov.io/gh/wnameless/json-flattener/branch/master/graph/badge.svg)](https://codecov.io/gh/wnameless/json-flattener)
 
 json-flattener
@@ -16,13 +16,16 @@ or a Java Map<br>
 ## Maven Repo
 ```xml
 <dependency>
-	<groupId>com.github.wnameless</groupId>
+	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.7.0</version>
+	<version>0.7.1</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>
 Since v0.6.0, StringEscapePolicy.DEFAULT, which escapes all special characters but slash('/') and Unicode, becomes the default setting.<br>
+```diff
+! Since v0.7.0, group ID is changed from [com.github.wnameless] to [com.github.wnameless.json].
+```
 
 ## Quick Start
 ```java
