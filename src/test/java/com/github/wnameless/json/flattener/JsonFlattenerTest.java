@@ -541,7 +541,7 @@ public class JsonFlattenerTest {
     String expectedJson = Resources.toString(urlKBA, Charsets.UTF_8);
 
     JsonFlattener jf =
-        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_BOTTOM_ARRAYS)
+        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS)
             .withPrintMode(PrintMode.PRETTY);
     String flattened = jf.flatten();
 

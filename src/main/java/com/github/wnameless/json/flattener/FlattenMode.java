@@ -42,8 +42,9 @@ public enum FlattenMode {
   MONGODB,
 
   /**
-   * Flattens every objects except bottom arrays.
+   * Flattens every objects except arrays which contain only primitive
+   * types(strings, numbers, booleans, and null).
    */
-  KEEP_BOTTOM_ARRAYS;
+  KEEP_PRIMITIVE_ARRAYS;
 
 }

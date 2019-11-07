@@ -333,7 +333,7 @@ public final class JsonFlattener {
       elementIters.add(newIndexedPeekIterator(val.asObject()));
     } else if (val.isArray() && val.asArray().iterator().hasNext()) {
       switch (flattenMode) {
-        case KEEP_BOTTOM_ARRAYS:
+        case KEEP_PRIMITIVE_ARRAYS:
           boolean allPrimitive = true;
           for (JsonValueBase<?> value : val.asArray()) {
             if (value.isArray() || value.isObject()) {

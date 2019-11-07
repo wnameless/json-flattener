@@ -341,7 +341,7 @@ public class JsonUnflattenerTest {
     String json = Resources.toString(urlKBA, Charsets.UTF_8);
 
     JsonUnflattener ju = new JsonUnflattener(json)
-        .withFlattenMode(FlattenMode.KEEP_BOTTOM_ARRAYS);
+        .withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS);
     assertEquals(Json.parse(expectedJson).toString(), ju.unflatten());
   }
 

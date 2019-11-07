@@ -18,7 +18,7 @@ or a Java Map<br>
 <dependency>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.7.1</version>
+	<version>0.8.0</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>
@@ -53,6 +53,15 @@ String nestedJsonWithDotKey = JsonUnflattener.unflatten(
 System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
+## New Features (since v0.8.0)
+### FlattenMode.KEEP_PRIMITIVE_ARRAYS 
+### This mode only keeps arrays which contain only primitive types(strings, numbers, booleans, and null)
+```java
+String json = "{\"ary\":[true,[1, 2, 3],false]}";
+System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS).flatten());
+// {"ary[0]":true,"ary[1]":[1,2,3],"ary[2]":false}
+```
+
 
 ## New Features (since v0.7.0)
 ### JsonValueBase, which comes from json-base lib, is introduced to improve performance
