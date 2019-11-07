@@ -533,16 +533,16 @@ public class JsonFlattenerTest {
 
   @Test
   public void testWithFlattenModeKeepBottomArrays() throws IOException {
-    URL url = Resources.getResource("test_keep_bottom_arrays.json");
+    URL url = Resources.getResource("test_keep_primitive_arrays.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
     URL urlKBA =
-        Resources.getResource("test_keep_bottom_arrays_flattened.json");
+        Resources.getResource("test_keep_primitive_arrays_flattened.json");
     String expectedJson = Resources.toString(urlKBA, Charsets.UTF_8);
 
-    JsonFlattener jf =
-        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS)
-            .withPrintMode(PrintMode.PRETTY);
+    JsonFlattener jf = new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS)
+        .withPrintMode(PrintMode.PRETTY);
     String flattened = jf.flatten();
 
     assertEquals(expectedJson, flattened);
