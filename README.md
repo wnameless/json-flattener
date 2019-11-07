@@ -6,10 +6,27 @@ json-flattener
 A Java utility used to FLATTEN nested JSON objects and even more to UNFLATTEN it back.
 
 ## Purpose
-Converts a nested JSON<br>
-&nbsp;&nbsp;{ "a": { "b": 1, "c": null, "d": [false, true] }, "e": "f", "g": 2.3 }<br>
-into a flattened JSON<br>
-&nbsp;&nbsp;{ "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": f, "g": 2.3 }<br>
+Converts a nested JSON
+```json
+{ "a":
+  { "b": 1,
+    "c": null,
+    "d": [false, true]
+  },
+  "e": "f",
+  "g": 2.3
+}
+```
+into a flattened JSON
+```json
+{ "a.b": 1,
+  "a.c": null,
+  "a.d[0]": false,
+  "a.d[1]": true,
+  "e": "f",
+  "g": 2.3
+}
+```
 or a Java Map<br>
 &nbsp;&nbsp;{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
 
@@ -54,13 +71,13 @@ System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
 ## New Features (since v0.8.0)
-### FlattenMode.KEEP_PRIMITIVE_ARRAYS 
-### This mode only keeps arrays which contain only primitive types(strings, numbers, booleans, and null)
+### FlattenMode.KEEP_PRIMITIVE_ARRAYS
 ```java
 String json = "{\"ary\":[true,[1, 2, 3],false]}";
 System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS).flatten());
 // {"ary[0]":true,"ary[1]":[1,2,3],"ary[2]":false}
 ```
+This mode only keeps arrays which contain only primitive types(strings, numbers, booleans, and null).
 
 
 ## New Features (since v0.7.0)
