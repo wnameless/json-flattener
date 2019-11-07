@@ -1,0 +1,38 @@
+{
+	"arrayOfObjects": [
+		true,
+		{
+			"x": 1,
+			"y": 2,
+			"z": [
+				3,
+				4,
+				5
+			]
+		},
+		[
+			6,
+			7,
+			8
+		],
+		[
+			[
+				9,
+				10
+			],
+			11,
+			12
+		],
+		false
+	],
+	"boolean": true,
+	"color": "#82b92c",
+	"null": null,
+	"number": 123,
+	"object": {
+		"a": "b",
+		"c": "d",
+		"e": "f"
+	},
+	"string": "Hello World"
+}

@@ -331,4 +331,18 @@ public class JsonUnflattenerTest {
     assertEquals("{\"abc\":{\"de.f\":123}}", ju.unflatten());
   }
 
+  @Test
+  public void testWithFlattenModeKeepBottomArrays() throws IOException {
+    URL url = Resources.getResource("test_keep_bottom_arrays.json");
+    String expectedJson = Resources.toString(url, Charsets.UTF_8);
+
+    URL urlKBA =
+        Resources.getResource("test_keep_bottom_arrays_flattened.json");
+    String json = Resources.toString(urlKBA, Charsets.UTF_8);
+
+    JsonUnflattener ju = new JsonUnflattener(json)
+        .withFlattenMode(FlattenMode.KEEP_BOTTOM_ARRAYS);
+    assertEquals(Json.parse(expectedJson).toString(), ju.unflatten());
+  }
+
 }

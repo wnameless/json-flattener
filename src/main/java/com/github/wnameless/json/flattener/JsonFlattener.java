@@ -333,6 +333,25 @@ public final class JsonFlattener {
       elementIters.add(newIndexedPeekIterator(val.asObject()));
     } else if (val.isArray() && val.asArray().iterator().hasNext()) {
       switch (flattenMode) {
+        case KEEP_BOTTOM_ARRAYS:
+          boolean allPrimitive = true;
+          for (JsonValueBase<?> value : val.asArray()) {
+            if (value.isArray() || value.isObject()) {
+              allPrimitive = false;
+              break;
+            }
+          }
+
+          if (allPrimitive) {
+            JsonifyArrayList<Object> array = newJsonifyArrayList();
+            for (JsonValueBase<?> value : val.asArray()) {
+              array.add(jsonVal2Obj(value));
+            }
+            flattenedMap.put(computeKey(), array);
+          } else {
+            elementIters.add(newIndexedPeekIterator(val.asArray()));
+          }
+          break;
         case KEEP_ARRAYS:
           JsonifyArrayList<Object> array = newJsonifyArrayList();
           for (JsonValueBase<?> value : val.asArray()) {
