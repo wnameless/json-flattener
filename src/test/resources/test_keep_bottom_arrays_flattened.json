@@ -1,0 +1,30 @@
+{
+  "arrayOfObjects[0]": true,
+  "arrayOfObjects[1].x": 1,
+  "arrayOfObjects[1].y": 2,
+  "arrayOfObjects[1].z": [
+    3,
+    4,
+    5
+  ],
+  "arrayOfObjects[2]": [
+    6,
+    7,
+    8
+  ],
+  "arrayOfObjects[3][0]": [
+    9,
+    10
+  ],
+  "arrayOfObjects[3][1]": 11,
+  "arrayOfObjects[3][2]": 12,
+  "arrayOfObjects[4]": false,
+  "boolean": true,
+  "color": "#82b92c",
+  "null": null,
+  "number": 123,
+  "object.a": "b",
+  "object.c": "d",
+  "object.e": "f",
+  "string": "Hello World"
+}
