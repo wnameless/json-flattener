@@ -103,6 +103,17 @@ public final class JsonFlattener {
   /**
    * Returns a flattened JSON as Map.
    * 
+   * @param jsonVal
+   *          a JSON data which wraps by {@link JsonValueBase}
+   * @return a flattened JSON as Map
+   */
+  public static Map<String, Object> flattenAsMap(JsonValueBase<?> jsonVal) {
+    return new JsonFlattener(jsonVal).flattenAsMap();
+  }
+
+  /**
+   * Returns a flattened JSON as Map.
+   * 
    * @param json
    *          the JSON string
    * @return a flattened JSON as Map
