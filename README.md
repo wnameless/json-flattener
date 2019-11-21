@@ -91,7 +91,6 @@ System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIM
 ```
 This mode only keeps arrays which contain only primitive types(strings, numbers, booleans, and null).
 
-
 ## New Features (since v0.7.0)
 ### JsonValueBase, which comes from json-base lib, is introduced to improve performance
 ```java
@@ -111,7 +110,6 @@ jsonVal = new CostumeJsonValue(yourJsonVal);
 
 new JsonFlattener(jsonVal);
 ```
-
 
 ## New Features (since v0.6.0)
 ### More options in StringEscapePolicy enum
