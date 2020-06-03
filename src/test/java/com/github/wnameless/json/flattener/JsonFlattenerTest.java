@@ -42,7 +42,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.PrettyPrint;
 import com.eclipsesource.json.WriterConfig;
-import com.github.wnameless.json.MinimalJsonValue;
+import com.github.wnameless.json.base.ext.MinimalJsonValue;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;

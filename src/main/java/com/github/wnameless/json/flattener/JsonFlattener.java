@@ -35,8 +35,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.eclipsesource.json.Json;
-import com.github.wnameless.json.JsonValueBase;
-import com.github.wnameless.json.MinimalJsonValue;
+import com.github.wnameless.json.base.JsonValueBase;
+import com.github.wnameless.json.base.ext.MinimalJsonValue;
 
 /**
  * 
