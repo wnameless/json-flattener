@@ -17,18 +17,19 @@
  */
 package com.github.wnameless.json.flattener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
@@ -284,9 +285,11 @@ public class JsonUnflattenerTest {
         ju.withPrintMode(PrintMode.REGULAR).unflatten());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testNullPointerException() {
-    new JsonUnflattener("{\"abc.def\":123}").withPrintMode(null);
+    assertThrows(NullPointerException.class, () -> {
+      new JsonUnflattener("{\"abc.def\":123}").withPrintMode(null);
+    });
   }
 
   @Test
