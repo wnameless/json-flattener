@@ -18,14 +18,9 @@
 package com.github.wnameless.json.flattener;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
-
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.PrettyPrint;
-import com.eclipsesource.json.WriterConfig;
 
 /**
  * {@link JsonifyArrayList} is simply a ArrayList but with an override jsonify
@@ -47,22 +42,27 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
     this.translator = translator;
   }
 
+  @SuppressWarnings("deprecation")
   public String toString(PrintMode printMode) {
-    StringWriter sw = new StringWriter();
     try {
       switch (printMode) {
         case REGULAR:
-          Json.parse(toString()).writeTo(sw, PrettyPrint.singleLine());
-          break;
+          return ObjectMapperFactory.getWriter()
+              .writeValueAsString(ObjectMapperFactory.get(translator)
+                  .readValue(toString(), Object.class));
         case PRETTY:
-          Json.parse(toString()).writeTo(sw, WriterConfig.PRETTY_PRINT);
-          break;
+          return ObjectMapperFactory.getWriter()
+              .writerWithDefaultPrettyPrinter()
+              .writeValueAsString(ObjectMapperFactory.get(translator)
+                  .readValue(toString(), Object.class));
         default:
-          return toString();
+          return ObjectMapperFactory.getWriter()
+              .writeValueAsString(ObjectMapperFactory.get(translator)
+                  .readValue(toString(), Object.class));
       }
-    } catch (IOException e) {}
-
-    return sw.toString();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

@@ -26,19 +26,18 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URL;
 
 import org.junit.Test;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.PrettyPrint;
-import com.eclipsesource.json.WriterConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
 public class JsonUnflattenerTest {
+
+  ObjectMapper mapper = new ObjectMapper();
 
   @Test
   public void testUnflattenWithArrayOfNestedObjectsInValByKeepArraysMode()
@@ -260,32 +259,28 @@ public class JsonUnflattenerTest {
         JsonUnflattener.unflatten("[[{\"abc.def\":123}]]"));
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testPrintMode() throws IOException {
     String src = "{\"abc.def\":123}";
     String json =
         new JsonUnflattener(src).withPrintMode(PrintMode.MINIMAL).unflatten();
-    StringWriter sw = new StringWriter();
-    Json.parse(json).writeTo(sw, WriterConfig.MINIMAL);
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toString(), json);
 
     json =
         new JsonUnflattener(src).withPrintMode(PrintMode.REGULAR).unflatten();
-    sw = new StringWriter();
-    Json.parse(json).writeTo(sw, PrettyPrint.singleLine());
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toString(), json);
 
     json = new JsonUnflattener(src).withPrintMode(PrintMode.PRETTY).unflatten();
-    sw = new StringWriter();
-    Json.parse(json).writeTo(sw, WriterConfig.PRETTY_PRINT);
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toPrettyString(), json);
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testNoCache() {
     JsonUnflattener ju = new JsonUnflattener("{\"abc.def\":123}");
     assertNotSame(ju.unflatten(), ju.unflatten());
-    assertEquals("{\"abc\": {\"def\": 123}}",
+    assertEquals("{\"abc\":{\"def\":123}}",
         ju.withPrintMode(PrintMode.REGULAR).unflatten());
   }
 
@@ -312,7 +307,7 @@ public class JsonUnflattenerTest {
 
     JsonUnflattener ju =
         new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB);
-    assertEquals(Json.parse(expectedJson).toString(), ju.unflatten());
+    assertEquals(mapper.readTree(expectedJson).toString(), ju.unflatten());
   }
 
   @Test
@@ -342,7 +337,7 @@ public class JsonUnflattenerTest {
 
     JsonUnflattener ju = new JsonUnflattener(json)
         .withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS);
-    assertEquals(Json.parse(expectedJson).toString(), ju.unflatten());
+    assertEquals(mapper.readTree(expectedJson).toString(), ju.unflatten());
   }
 
 }

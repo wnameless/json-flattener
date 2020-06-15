@@ -18,15 +18,10 @@
 package com.github.wnameless.json.flattener;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
-
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.PrettyPrint;
-import com.eclipsesource.json.WriterConfig;
 
 /**
  * {@link JsonifyLinkedHashMap} is simple a LinkedHashMap but with an override
@@ -50,29 +45,34 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
     this.translator = translator;
   }
 
+  @SuppressWarnings("deprecation")
   public String toString(PrintMode printMode) {
-    StringWriter sw = new StringWriter();
     try {
       switch (printMode) {
         case REGULAR:
-          Json.parse(toString()).writeTo(sw, PrettyPrint.singleLine());
-          break;
+          return ObjectMapperFactory.getWriter()
+              .writeValueAsString(ObjectMapperFactory.get(translator)
+                  .readValue(toString(), Object.class));
         case PRETTY:
-          Json.parse(toString()).writeTo(sw, WriterConfig.PRETTY_PRINT);
-          break;
+          return ObjectMapperFactory.getWriter()
+              .writerWithDefaultPrettyPrinter()
+              .writeValueAsString(ObjectMapperFactory.get(translator)
+                  .readValue(toString(), Object.class));
         default:
-          return toString();
+          return ObjectMapperFactory.getWriter()
+              .writeValueAsString(ObjectMapperFactory.get(translator)
+                  .readValue(toString(), Object.class));
       }
-    } catch (IOException e) {}
-
-    return sw.toString();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append('{');
-    for (Entry<K, V> mem : entrySet()) {
+    for (Map.Entry<K, V> mem : entrySet()) {
       sb.append('"');
       sb.append(mem.getKey());
       sb.append('"');

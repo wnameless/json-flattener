@@ -29,7 +29,6 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Collections;
@@ -38,17 +37,17 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonValue;
-import com.eclipsesource.json.PrettyPrint;
-import com.eclipsesource.json.WriterConfig;
-import com.github.wnameless.json.base.ext.MinimalJsonValue;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.wnameless.json.base.JacksonJsonValue;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 
 public class JsonFlattenerTest {
+
+  ObjectMapper mapper = new ObjectMapper();
 
   @Test
   public void testFlattenAsMap() throws IOException {
@@ -78,10 +77,10 @@ public class JsonFlattenerTest {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
-    JsonValue jsonVal = Json.parse(json);
+    JsonNode jsonVal = new ObjectMapper().readTree(json);
     assertEquals(
         "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
-        JsonFlattener.flatten(new MinimalJsonValue(jsonVal)));
+        JsonFlattener.flatten(new JacksonJsonValue(jsonVal)));
 
     assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         JsonFlattener.flatten("[{\"a\":1},2,{\"c\":[3,4]}]"));
@@ -92,10 +91,10 @@ public class JsonFlattenerTest {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
-    JsonValue jsonVal = Json.parse(json);
+    JsonNode jsonVal = new ObjectMapper().readTree(json);
     assertEquals(
         "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
-        JsonFlattener.flattenAsMap(new MinimalJsonValue(jsonVal)).toString());
+        JsonFlattener.flattenAsMap(new JacksonJsonValue(jsonVal)).toString());
 
     assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         JsonFlattener.flattenAsMap("[{\"a\":1},2,{\"c\":[3,4]}]").toString());
@@ -394,6 +393,7 @@ public class JsonFlattenerTest {
         root.get(0).get(0));
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testPrintMode() throws IOException {
     URL url = Resources.getResource("test.json");
@@ -401,48 +401,36 @@ public class JsonFlattenerTest {
 
     String json =
         new JsonFlattener(src).withPrintMode(PrintMode.MINIMAL).flatten();
-    StringWriter sw = new StringWriter();
-    Json.parse(json).writeTo(sw, WriterConfig.MINIMAL);
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toString(), json);
 
     json = new JsonFlattener(src).withPrintMode(PrintMode.REGULAR).flatten();
-    sw = new StringWriter();
-    Json.parse(json).writeTo(sw, PrettyPrint.singleLine());
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toString(), json);
 
     json = new JsonFlattener(src).withPrintMode(PrintMode.PRETTY).flatten();
-    sw = new StringWriter();
-    Json.parse(json).writeTo(sw, WriterConfig.PRETTY_PRINT);
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toPrettyString(), json);
 
     src = "[[123]]";
     json = new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
         .withPrintMode(PrintMode.MINIMAL).flatten();
-    sw = new StringWriter();
-    Json.parse(json).writeTo(sw, WriterConfig.MINIMAL);
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toString(), json);
 
     json = new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
         .withPrintMode(PrintMode.REGULAR).flatten();
-    sw = new StringWriter();
-    Json.parse(json).writeTo(sw, PrettyPrint.singleLine());
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toString(), json);
 
     json = new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
         .withPrintMode(PrintMode.PRETTY).flatten();
-    sw = new StringWriter();
-    Json.parse(json).writeTo(sw, WriterConfig.PRETTY_PRINT);
-    assertEquals(sw.toString(), json);
+    assertEquals(mapper.readTree(json).toPrettyString(), json);
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testNoCache() {
     JsonFlattener jf = new JsonFlattener("{\"abc\":{\"def\":123}}");
     assertSame(jf.flattenAsMap(), jf.flattenAsMap());
     assertNotSame(jf.flatten(), jf.flatten());
     assertEquals("{\"abc*def\":123}", jf.withSeparator('*').flatten());
-    assertNotEquals(jf.flatten(),
-        jf.withPrintMode(PrintMode.REGULAR).flatten());
+    assertEquals(jf.flatten(), jf.withPrintMode(PrintMode.REGULAR).flatten());
   }
 
   @Test

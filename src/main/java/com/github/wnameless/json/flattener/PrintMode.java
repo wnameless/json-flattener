@@ -35,6 +35,7 @@ public enum PrintMode {
   /**
    * Prints output in one line with necessary indentations.
    */
+  @Deprecated
   REGULAR,
 
   /**

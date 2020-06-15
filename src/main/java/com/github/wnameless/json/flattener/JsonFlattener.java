@@ -34,9 +34,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.eclipsesource.json.Json;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.wnameless.json.base.JacksonJsonValue;
 import com.github.wnameless.json.base.JsonValueBase;
-import com.github.wnameless.json.base.ext.MinimalJsonValue;
 
 /**
  * 
@@ -135,6 +137,8 @@ public final class JsonFlattener {
   private PrintMode printMode = PrintMode.MINIMAL;
   private KeyTransformer keyTrans = null;
 
+  private ObjectMapper mapper = ObjectMapperFactory.get();
+
   /**
    * Creates a JSON flattener.
    * 
@@ -152,7 +156,13 @@ public final class JsonFlattener {
    *          the JSON string
    */
   public JsonFlattener(String json) {
-    source = new MinimalJsonValue(Json.parse(json));
+    JsonNode jsonNode;
+    try {
+      jsonNode = mapper.readTree(json);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    source = new JacksonJsonValue(jsonNode);
   }
 
   /**
@@ -164,7 +174,8 @@ public final class JsonFlattener {
    *           if jsonReader cannot be read
    */
   public JsonFlattener(Reader jsonReader) throws IOException {
-    source = new MinimalJsonValue(Json.parse(jsonReader));
+    JsonNode jsonNode = mapper.readTree(jsonReader);
+    source = new JacksonJsonValue(jsonNode);
   }
 
   /**
