@@ -76,3 +76,7 @@ Version 0.8.0
 
 Version 0.8.1
 + Add JsonFlattener.flattenAsMap(JsonValueBase)
+
+Version 0.9.0
++ Java Module supported
+* Replace minimal-json with Jackson
