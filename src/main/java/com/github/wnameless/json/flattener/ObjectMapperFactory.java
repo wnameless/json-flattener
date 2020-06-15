@@ -46,7 +46,7 @@ class ObjectMapperFactory {
   public static ObjectMapper getWriter() {
     ObjectMapper mapper = new ObjectMapper();
 
-    JsonSerializer<String> js = new JsonSerializer<>() {
+    JsonSerializer<String> js = new JsonSerializer<String>() {
 
       @Override
       public void serialize(String value, JsonGenerator gen,

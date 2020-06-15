@@ -74,11 +74,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<version>2.3.1.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -100,7 +101,7 @@
 						<id>default-compile</id>
 						<configuration>
 							<!-- compile everything to ensure module-info contains right entries -->
-							<release>9</release>
+							<release>11</release>
 						</configuration>
 					</execution>
 					<execution>
