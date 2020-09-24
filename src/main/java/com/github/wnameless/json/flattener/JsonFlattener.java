@@ -136,6 +136,7 @@ public final class JsonFlattener {
   private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
   private KeyTransformer keyTrans = null;
+  private boolean removeIndexBrackets = false;
 
   private ObjectMapper mapper = ObjectMapperFactory.get();
 
@@ -254,6 +255,22 @@ public final class JsonFlattener {
 
     this.leftBracket = leftBracket;
     this.rightBracket = rightBracket;
+    flattenedMap = null;
+    return this;
+  }
+
+  /**
+   * A fluent setter to remove the left and right index brackets within a key in the
+   * flattened JSON. The default is to include left and right index brackets.
+   * Warning: You probably wont be able to unflatten after using
+   *
+   * @param removeIndexBrackets
+   *          boolean
+   * @return this {@link JsonFlattener}
+   */
+  public JsonFlattener removeIndexBrackets(boolean removeIndexBrackets) {
+    isTrue( removeIndexBrackets , "removeIndexBrackets only accepts a true boolean");
+    this.removeIndexBrackets = true;
     flattenedMap = null;
     return this;
   }
@@ -456,9 +473,11 @@ public final class JsonFlattener {
           sb.append(policy.getCharSequenceTranslator().translate(key));
         }
       } else { // JsonValue
-        sb.append(flattenMode.equals(MONGODB) ? separator : leftBracket);
+        if (!removeIndexBrackets)
+          sb.append(flattenMode.equals(MONGODB) ? separator : leftBracket);
         sb.append(iter.getIndex());
-        sb.append(flattenMode.equals(MONGODB) ? "" : rightBracket);
+        if(!removeIndexBrackets)
+          sb.append(flattenMode.equals(MONGODB) ? "" : rightBracket);
       }
     }
 

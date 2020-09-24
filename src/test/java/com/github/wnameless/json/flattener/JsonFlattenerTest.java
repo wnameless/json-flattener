@@ -366,6 +366,24 @@ public class JsonFlattenerTest {
     }
   }
 
+  @Test
+  public void testRemoveIndexBrackets() {
+    String json = "{\"abc\":{\"A.\":[123,\"def\"]}}";
+    assertEquals("{\"abc[\\\"A.\\\"]0\":123,\"abc[\\\"A.\\\"]1\":\"def\"}",
+            new JsonFlattener(json).removeIndexBrackets(true).flatten());
+  }
+
+  @Test
+  public void testRemoveIndexBracketsExceptions() {
+    String json = "{\"abc\":{\"def\":123}}";
+    try {
+      new JsonFlattener(json).removeIndexBrackets(false);
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("removeIndexBrackets only accepts a true boolean", e.getMessage());
+    }
+  }
+
   @SuppressWarnings("unchecked")
   @Test
   public void testRootInMap() {
