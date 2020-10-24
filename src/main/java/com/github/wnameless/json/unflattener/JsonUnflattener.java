@@ -86,7 +86,7 @@ public final class JsonUnflattener {
   public JsonUnflattener(String json) {
     JsonNode jsonNode;
     try {
-      jsonNode = new ObjectMapper().readTree(json);
+      jsonNode = mapper.readTree(json);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -104,7 +104,7 @@ public final class JsonUnflattener {
   public JsonUnflattener(Reader jsonReader) throws IOException {
     JsonNode jsonNode;
     try {
-      jsonNode = new ObjectMapper().readTree(jsonReader);
+      jsonNode = mapper.readTree(jsonReader);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -303,7 +303,7 @@ public final class JsonUnflattener {
   }
 
   private ArrayNode unflattenArray(ArrayNode array) {
-    ArrayNode unflattenArray = new ObjectMapper().createArrayNode();
+    ArrayNode unflattenArray = mapper.createArrayNode();
 
     for (JsonNode value : array) {
       if (value.isArray()) {
@@ -311,7 +311,7 @@ public final class JsonUnflattener {
       } else if (value.isObject()) {
         JsonNode a;
         try {
-          a = new ObjectMapper().readTree(new JsonUnflattener(value.toString())
+          a = mapper.readTree(new JsonUnflattener(value.toString())
               .withSeparator(separator).unflatten());
         } catch (JsonProcessingException e) {
           throw new RuntimeException(e);
@@ -384,7 +384,7 @@ public final class JsonUnflattener {
       ObjectNode jsonObj = (ObjectNode) currentVal;
 
       if (jsonObj.get(objKey) == null) {
-        ObjectNode obj = new ObjectMapper().createObjectNode();
+        ObjectNode obj = mapper.createObjectNode();
         jsonObj.set(objKey, obj);
 
         return obj;
@@ -396,7 +396,7 @@ public final class JsonUnflattener {
 
       if (jsonAry.size() <= aryIdx
           || jsonAry.get(aryIdx).equals(parseJson("null"))) {
-        ObjectNode obj = new ObjectMapper().createObjectNode();
+        ObjectNode obj = mapper.createObjectNode();
         assureJsonArraySize(jsonAry, aryIdx);
         jsonAry.set(aryIdx, obj);
 
@@ -412,7 +412,7 @@ public final class JsonUnflattener {
     JsonNode val = flattened.get(key);
     if (objKey != null) {
       if (val.isArray()) {
-        ArrayNode jsonArray = new ObjectMapper().createArrayNode();
+        ArrayNode jsonArray = mapper.createArrayNode();
         for (JsonNode arrayVal : (ArrayNode) val) {
           jsonArray.add(
               parseJson(newJsonUnflattener(arrayVal.toString()).unflatten()));
@@ -439,11 +439,7 @@ public final class JsonUnflattener {
 
   private void assureJsonArraySize(ArrayNode jsonArray, Integer index) {
     while (index >= jsonArray.size()) {
-      try {
-        jsonArray.add(new ObjectMapper().readTree("null"));
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
+      jsonArray.add(mapper.nullNode());
     }
   }
 
