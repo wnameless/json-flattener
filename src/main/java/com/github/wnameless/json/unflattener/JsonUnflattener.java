@@ -58,6 +58,7 @@ public final class JsonUnflattener {
     return new JsonUnflattener(json).unflatten();
   }
 
+  private final ObjectMapper mapper = new ObjectMapper();
   private final JsonNode root;
 
   private FlattenMode flattenMode = FlattenMode.NORMAL;
@@ -66,8 +67,6 @@ public final class JsonUnflattener {
   private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
   private KeyTransformer keyTrans = null;
-
-  private ObjectMapper mapper = new ObjectMapper();
 
   private JsonNode parseJson(String json) {
     try {
