@@ -32,7 +32,7 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class PeekingIteratorTest {
+public class IndexedPeekIteratorTest {
 
   IndexedPeekIterator<Integer> pIterater;
   IndexedPeekIterator<Integer> emptyIterater;
