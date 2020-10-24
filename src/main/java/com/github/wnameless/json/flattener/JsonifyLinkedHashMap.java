@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * {@link JsonifyLinkedHashMap} is simple a LinkedHashMap but with an override
  * jsonify toString method.
@@ -45,23 +47,15 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
     this.translator = translator;
   }
 
-  @SuppressWarnings("deprecation")
   public String toString(PrintMode printMode) {
+    ObjectMapper mapper = ObjectMapperFactory.get();
     try {
       switch (printMode) {
-        case REGULAR:
-          return ObjectMapperFactory.getWriter()
-              .writeValueAsString(ObjectMapperFactory.get(translator)
-                  .readValue(toString(), Object.class));
         case PRETTY:
-          return ObjectMapperFactory.getWriter()
-              .writerWithDefaultPrettyPrinter()
-              .writeValueAsString(ObjectMapperFactory.get(translator)
-                  .readValue(toString(), Object.class));
+          return mapper.writerWithDefaultPrettyPrinter()
+              .writeValueAsString(mapper.readTree(toString()));
         default:
-          return ObjectMapperFactory.getWriter()
-              .writeValueAsString(ObjectMapperFactory.get(translator)
-                  .readValue(toString(), Object.class));
+          return toString();
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -74,7 +68,7 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
     sb.append('{');
     for (Map.Entry<K, V> mem : entrySet()) {
       sb.append('"');
-      sb.append(mem.getKey());
+      sb.append(translator.translate((String) mem.getKey()));
       sb.append('"');
       sb.append(':');
       if (mem.getValue() instanceof String) {

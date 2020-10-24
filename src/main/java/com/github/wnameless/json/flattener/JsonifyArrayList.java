@@ -22,6 +22,8 @@ import java.util.ArrayList;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * {@link JsonifyArrayList} is simply a ArrayList but with an override jsonify
  * toString method.
@@ -42,23 +44,15 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
     this.translator = translator;
   }
 
-  @SuppressWarnings("deprecation")
   public String toString(PrintMode printMode) {
+    ObjectMapper mapper = ObjectMapperFactory.get();
     try {
       switch (printMode) {
-        case REGULAR:
-          return ObjectMapperFactory.getWriter()
-              .writeValueAsString(ObjectMapperFactory.get(translator)
-                  .readValue(toString(), Object.class));
         case PRETTY:
-          return ObjectMapperFactory.getWriter()
-              .writerWithDefaultPrettyPrinter()
-              .writeValueAsString(ObjectMapperFactory.get(translator)
-                  .readValue(toString(), Object.class));
+          return mapper.writerWithDefaultPrettyPrinter()
+              .writeValueAsString(mapper.readTree(toString()));
         default:
-          return ObjectMapperFactory.getWriter()
-              .writeValueAsString(ObjectMapperFactory.get(translator)
-                  .readValue(toString(), Object.class));
+          return toString();
       }
     } catch (IOException e) {
       throw new RuntimeException(e);

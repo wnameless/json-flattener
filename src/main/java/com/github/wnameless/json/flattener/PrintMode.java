@@ -33,7 +33,7 @@ public enum PrintMode {
   MINIMAL,
 
   /**
-   * Prints output in one line with necessary indentations.
+   * Prints output as minified JSON.
    */
   @Deprecated
   REGULAR,

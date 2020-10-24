@@ -80,3 +80,6 @@ Version 0.8.1
 Version 0.9.0
 + Java Module supported
 * Replace minimal-json with Jackson
+
+Version 0.10.0
+* The Map, which is produced by JsonFlattener.flattenAsMap, is now identical to the JSON string, which is produced by JsonFlattener.flatten, after serialization

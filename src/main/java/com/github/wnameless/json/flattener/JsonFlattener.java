@@ -445,15 +445,13 @@ public final class JsonFlattener {
         if (keyTrans != null) key = keyTrans.transform(key);
         if (hasReservedCharacters(key)) {
           sb.append(leftBracket);
-          sb.append('\\');
           sb.append('"');
           sb.append(policy.getCharSequenceTranslator().translate(key));
-          sb.append('\\');
           sb.append('"');
           sb.append(rightBracket);
         } else {
           if (sb.length() != 0) sb.append(separator);
-          sb.append(policy.getCharSequenceTranslator().translate(key));
+          sb.append(key);
         }
       } else { // JsonValue
         sb.append(flattenMode.equals(MONGODB) ? separator : leftBracket);
