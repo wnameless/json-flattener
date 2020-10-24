@@ -46,7 +46,7 @@ Since v0.9.0, Java Module supported.<br>
 ```
 ```diff
 + Since v0.10.0, The Map produced by JsonFlattener#flattenAsMap after serialization is now identical to the JSON produced by JsonFlattener#flatten.
-+ Before v0.10.0, the serialized flattened Map may be diffenernt at some edge cases(ex: input keys contain separator('.')).
++ Before v0.10.0, the serialized flattened Map may be different at some edge cases(ex: input keys contain separator('.')).
 ```
 
 ## Quick Start
