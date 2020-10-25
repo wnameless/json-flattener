@@ -356,13 +356,13 @@ public final class JsonUnflattener {
   public Map<String, Object> unflattenAsMap() {
     try {
       JsonNode flattenedNode = mapper.readTree(unflatten());
-      if (flattenedNode.isObject()) {
-        return mapper.convertValue(flattenedNode,
+      if (flattenedNode.isArray() || !flattenedNode.isObject()) {
+        ObjectNode objNode = mapper.createObjectNode();
+        objNode.set(ROOT, flattenedNode);
+        return mapper.convertValue(objNode,
             new TypeReference<Map<String, Object>>() {});
       } else {
-        ObjectNode objNode = mapper.createObjectNode();
-        mapper.createObjectNode().set(ROOT, flattenedNode);
-        return mapper.convertValue(objNode,
+        return mapper.convertValue(flattenedNode,
             new TypeReference<Map<String, Object>>() {});
       }
     } catch (JsonProcessingException e) {
