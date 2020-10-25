@@ -128,13 +128,7 @@ public final class JsonUnflattener {
    *          the JSON string
    */
   public JsonUnflattener(String json) {
-    JsonNode jsonNode;
-    try {
-      jsonNode = mapper.readTree(json);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    root = jsonNode;
+    root = parseJson(json);
   }
 
   /**
@@ -362,13 +356,13 @@ public final class JsonUnflattener {
   public Map<String, Object> unflattenAsMap() {
     try {
       JsonNode flattenedNode = mapper.readTree(unflatten());
-      if (flattenedNode.isArray() || !flattenedNode.isObject()) {
-        ObjectNode objNode = mapper.createObjectNode();
-        objNode.set(ROOT, flattenedNode);
-        return mapper.convertValue(objNode,
+      if (flattenedNode.isObject()) {
+        return mapper.convertValue(flattenedNode,
             new TypeReference<Map<String, Object>>() {});
       } else {
-        return mapper.convertValue(flattenedNode,
+        ObjectNode objNode = mapper.createObjectNode();
+        mapper.createObjectNode().set(ROOT, flattenedNode);
+        return mapper.convertValue(objNode,
             new TypeReference<Map<String, Object>>() {});
       }
     } catch (JsonProcessingException e) {
@@ -440,7 +434,7 @@ public final class JsonUnflattener {
       ArrayNode jsonAry = (ArrayNode) currentVal;
 
       if (jsonAry.size() <= aryIdx
-          || jsonAry.get(aryIdx).equals(parseJson("null"))) {
+          || jsonAry.get(aryIdx).equals(mapper.nullNode())) {
         ArrayNode ary = mapper.createArrayNode();
         assureJsonArraySize(jsonAry, aryIdx);
         jsonAry.set(aryIdx, ary);
@@ -469,7 +463,7 @@ public final class JsonUnflattener {
       ArrayNode jsonAry = (ArrayNode) currentVal;
 
       if (jsonAry.size() <= aryIdx
-          || jsonAry.get(aryIdx).equals(parseJson("null"))) {
+          || jsonAry.get(aryIdx).equals(mapper.nullNode())) {
         ObjectNode obj = mapper.createObjectNode();
         assureJsonArraySize(jsonAry, aryIdx);
         jsonAry.set(aryIdx, obj);
