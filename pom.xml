@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.10.1-SNAPSHOT</version>
+	<version>0.11.0-SNAPSHOT</version>
 
 	<name>json-flattener</name>
 	<description>A Java utility used to flatten nested JSON objects and even more to unflatten it back</description>

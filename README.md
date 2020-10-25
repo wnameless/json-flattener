@@ -35,7 +35,7 @@ or a Java Map<br>
 <dependency>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.10.0</version>
+	<version>0.11.0</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>
@@ -76,6 +76,25 @@ System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
 ```
 
+## New Features (since v0.11.0)
+### JsonUnflattener.unflatten(Map)
+```java
+String json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
+Map<String, Object> flattenedMap = JsonFlattener.flattenAsMap(json);
+
+String unflattenedJson = JsonUnflattener.unflatten(flattenedMap);
+```
+### JsonUnflattener.unflattenAsMap
+```java
+String json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
+String flattenedJson = JsonFlattener.flatten(json);
+Map<String, Object> flattenedMap = JsonFlattener.flattenAsMap(json);
+
+Map<String, Object> unflattenedMap;
+unflattenedMap = JsonUnflattener.unflattenAsMap(flattenedJson);
+unflattenedMap = JsonUnflattener.unflattenAsMap(flattenedMap);
+```
+
 ## New Features (since v0.8.1)
 ### JsonFlattener.flattenAsMap(JsonValueBase)
 ```java
@@ -84,7 +103,7 @@ JsonValueBase<?> jsonVal;
 // JacksonJsonValue, which is provided by json-base lib, can wrap Jackson jsonNode to JsonValueBase
 jsonVal = new JacksonJsonValue(jsonNode);
 
-Map<String, Object> flattenJson = JsonFlattener.flattenAsMap(jsonVal);
+Map<String, Object> flattenMap = JsonFlattener.flattenAsMap(jsonVal);
 ```
 
 ## New Features (since v0.8.0)

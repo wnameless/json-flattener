@@ -48,7 +48,7 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
   }
 
   public String toString(PrintMode printMode) {
-    ObjectMapper mapper = ObjectMapperFactory.get();
+    ObjectMapper mapper = new ObjectMapper();
     try {
       switch (printMode) {
         case PRETTY:

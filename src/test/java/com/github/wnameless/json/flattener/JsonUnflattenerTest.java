@@ -28,9 +28,13 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
@@ -40,21 +44,20 @@ public class JsonUnflattenerTest {
 
   ObjectMapper mapper = new ObjectMapper();
 
-  @Test
-  public void testUnflattenWithArrayOfNestedObjectsInValByKeepArraysMode()
-      throws IOException {
-    URL url = Resources.getResource("test6.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+  private Map<String, ?> toMap(String json)
+      throws JsonMappingException, JsonProcessingException {
+    return mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+  }
 
-    String flattendJson = new JsonFlattener(json)
-        .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten();
-    assertEquals("{\"a\":[1,2,3],\"b\":[{\"c.d\":[1,2]}]}", flattendJson);
-    assertEquals("{\"a\":[1,2,3],\"b\":[{\"c\":{\"d\":[1,2]}}]}",
-        JsonUnflattener.unflatten(flattendJson));
+  private Map<String, ?> toRootMap(String json)
+      throws JsonMappingException, JsonProcessingException {
+    return mapper.readValue("{\"" + JsonUnflattener.ROOT + "\":" + json + "}",
+        new TypeReference<Map<String, Object>>() {});
   }
 
   @Test
-  public void testUnflatten() {
+  public void testUnflatten()
+      throws JsonMappingException, JsonProcessingException {
     assertEquals(
         "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}",
         JsonUnflattener.unflatten(
@@ -72,12 +75,102 @@ public class JsonUnflattenerTest {
     assertEquals("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]",
         JsonUnflattener.unflatten(
             JsonFlattener.flatten("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]")));
+
+    // Map
+    assertEquals(
+        "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}",
+        JsonUnflattener.unflatten(toMap(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[1]\":true,\"a.d[0]\":false,\"a.d[2].sss\":777,\"a.d[2].vvv\":888,\"e\":\"f\",\"g\":2.3}")));
+
+    assertEquals("[1,[2,3],4,{\"abc\":5}]", JsonUnflattener.unflatten(toMap(
+        "{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3].abc\":5}")));
+
+    assertEquals("{\" \\\"abc\":{\"def \":123}}", JsonUnflattener.unflatten(
+        toMap(JsonFlattener.flatten("{\" \\\"abc\":{\"def \":123}}"))));
+
+    assertEquals("{\" ].$f\":{\"abc\":{\"def\":[123]}}}", JsonUnflattener
+        .unflatten(toMap("{\"[\\\" ].$f\\\"].abc.def[0]\":123}")));
+
+    assertEquals("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]",
+        JsonUnflattener.unflatten(toMap(
+            JsonFlattener.flatten("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]"))));
   }
 
   @Test
-  public void testUnflattenWithKeyContainsDotAndSquareBracket() {
+  public void testUnflattenAsMap()
+      throws JsonMappingException, JsonProcessingException {
+    assertEquals(toMap(
+        "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}"),
+        JsonUnflattener.unflattenAsMap(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[1]\":true,\"a.d[0]\":false,\"a.d[2].sss\":777,\"a.d[2].vvv\":888,\"e\":\"f\",\"g\":2.3}"));
+
+    assertEquals(toRootMap("[1,[2,3],4,{\"abc\":5}]"),
+        JsonUnflattener.unflattenAsMap(
+            "{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3].abc\":5}"));
+
+    assertEquals(toMap("{\" \\\"abc\":{\"def \":123}}"),
+        JsonUnflattener.unflattenAsMap(
+            JsonFlattener.flatten("{\" \\\"abc\":{\"def \":123}}")));
+
+    assertEquals(toMap("{\" ].$f\":{\"abc\":{\"def\":[123]}}}"),
+        JsonUnflattener.unflattenAsMap("{\"[\\\" ].$f\\\"].abc.def[0]\":123}"));
+
+    assertEquals(toRootMap("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]"),
+        JsonUnflattener.unflattenAsMap(
+            JsonFlattener.flatten("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]")));
+
+    // Map
+    assertEquals(toMap(
+        "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}"),
+        JsonUnflattener.unflattenAsMap(toMap(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[1]\":true,\"a.d[0]\":false,\"a.d[2].sss\":777,\"a.d[2].vvv\":888,\"e\":\"f\",\"g\":2.3}")));
+
+    assertEquals(toRootMap("[1,[2,3],4,{\"abc\":5}]"),
+        JsonUnflattener.unflattenAsMap(toMap(
+            "{\"[1][0]\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3].abc\":5}")));
+
+    assertEquals(toMap("{\" \\\"abc\":{\"def \":123}}"),
+        JsonUnflattener.unflattenAsMap(
+            toMap(JsonFlattener.flatten("{\" \\\"abc\":{\"def \":123}}"))));
+
+    assertEquals(toMap("{\" ].$f\":{\"abc\":{\"def\":[123]}}}"), JsonUnflattener
+        .unflattenAsMap(toMap("{\"[\\\" ].$f\\\"].abc.def[0]\":123}")));
+
+    assertEquals(toRootMap("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]"),
+        JsonUnflattener.unflattenAsMap(toMap(
+            JsonFlattener.flatten("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]"))));
+  }
+
+  @Test
+  public void testUnflattenWithArrayOfNestedObjectsInValByKeepArraysMode()
+      throws IOException {
+    URL url = Resources.getResource("test6.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    String flattendJson = new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten();
+    assertEquals("{\"a\":[1,2,3],\"b\":[{\"c.d\":[1,2]}]}", flattendJson);
+    assertEquals("{\"a\":[1,2,3],\"b\":[{\"c\":{\"d\":[1,2]}}]}",
+        JsonUnflattener.unflatten(flattendJson));
+
+    // Map
+    Map<String, Object> flattendMap = new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.KEEP_ARRAYS).flattenAsMap();
+    assertEquals("{\"a\":[1,2,3],\"b\":[{\"c.d\":[1,2]}]}",
+        flattendMap.toString());
+    assertEquals("{\"a\":[1,2,3],\"b\":[{\"c\":{\"d\":[1,2]}}]}",
+        JsonUnflattener.unflatten(flattendMap));
+  }
+
+  @Test
+  public void testUnflattenWithKeyContainsDotAndSquareBracket()
+      throws JsonMappingException, JsonProcessingException {
     assertEquals("[1,[2,3],4,{\"ab.c.[\":5}]", JsonUnflattener.unflatten(
         "{\"[1][0]\":2,\"[ 0 ]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][ \\\"ab.c.[\\\" ]\":5}"));
+
+    // Map
+    assertEquals("[1,[2,3],4,{\"ab.c.[\":5}]", JsonUnflattener.unflatten(toMap(
+        "{\"[1][0]\":2,\"[ 0 ]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][ \\\"ab.c.[\\\" ]\":5}")));
   }
 
   @Test
@@ -88,20 +181,34 @@ public class JsonUnflattenerTest {
 
     assertEquals("{\"List\":[{\"type\":\"A\"},null,{\"type\":\"B\"}]}",
         JsonUnflattener.unflatten(json));
+
+    // Map
+    assertEquals("{\"List\":[{\"type\":\"A\"},null,{\"type\":\"B\"}]}",
+        JsonUnflattener.unflatten(toMap(json)));
   }
 
   @Test
-  public void testUnflattenWithReversedIndexes() {
+  public void testUnflattenWithReversedIndexes()
+      throws JsonMappingException, JsonProcessingException {
     String json = "{\"[1][1]\":\"B\",\"[0][0]\":\"A\"}";
 
     assertEquals("[[\"A\"],[null,\"B\"]]", JsonUnflattener.unflatten(json));
+
+    // Map
+    assertEquals("[[\"A\"],[null,\"B\"]]",
+        JsonUnflattener.unflatten(toMap(json)));
   }
 
   @Test
-  public void testUnflattenWithInitComplexKey() {
+  public void testUnflattenWithInitComplexKey()
+      throws JsonMappingException, JsonProcessingException {
     String json = "{\"[\\\"b.b\\\"].aaa\":123}";
 
     assertEquals("{\"b.b\":{\"aaa\":123}}", JsonUnflattener.unflatten(json));
+
+    // Map
+    assertEquals("{\"b.b\":{\"aaa\":123}}",
+        JsonUnflattener.unflatten(toMap(json)));
   }
 
   @Test
@@ -144,19 +251,31 @@ public class JsonUnflattenerTest {
 
     assertEquals(json, JsonUnflattener.unflatten(new JsonFlattener(json)
         .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten()));
+
+    // Map
+    assertEquals(json, JsonUnflattener.unflatten(toMap(new JsonFlattener(json)
+        .withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten())));
   }
 
   @Test
-  public void testWithSeparater() {
+  public void testWithSeparater()
+      throws JsonMappingException, JsonProcessingException {
     String json = "{\"abc\":{\"def\":123}}";
     assertEquals(json,
         new JsonUnflattener(
             new JsonFlattener(json).withSeparator('*').flatten())
                 .withSeparator('*').unflatten());
+
+    // Map
+    assertEquals(json,
+        new JsonUnflattener(
+            toMap(new JsonFlattener(json).withSeparator('*').flatten()))
+                .withSeparator('*').unflatten());
   }
 
   @Test
-  public void testWithSeparaterExceptions() {
+  public void testWithSeparaterExceptions()
+      throws JsonMappingException, JsonProcessingException {
     String json = "{\"abc\":{\"def\":123}}";
     try {
       new JsonUnflattener(json).withSeparator('"');
@@ -182,10 +301,37 @@ public class JsonUnflattenerTest {
     } catch (IllegalArgumentException e) {
       assertEquals("Separator(]) is already used in brackets", e.getMessage());
     }
+
+    // Map
+    try {
+      new JsonUnflattener(toMap(json)).withSeparator('"');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Separator contains illegal chracter(\")", e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withSeparator(' ');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Separator contains illegal chracter( )", e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withSeparator('[');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Separator([) is already used in brackets", e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withSeparator(']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Separator(]) is already used in brackets", e.getMessage());
+    }
   }
 
   @Test
-  public void testWithLeftAndRightBrackets() {
+  public void testWithLeftAndRightBrackets()
+      throws JsonMappingException, JsonProcessingException {
     String json = "{\"abc[\\\"A.\\\"][0]\":123}";
     assertEquals("{\"abc\":{\"A.\":[123]}}", new JsonUnflattener(json)
         .withLeftAndRightBrackets('[', ']').unflatten());
@@ -193,10 +339,20 @@ public class JsonUnflattenerTest {
     json = "{\"abc{\\\"A.\\\"}{0}\":123}";
     assertEquals("{\"abc\":{\"A.\":[123]}}", new JsonUnflattener(json)
         .withLeftAndRightBrackets('{', '}').unflatten());
+
+    // Map
+    json = "{\"abc[\\\"A.\\\"][0]\":123}";
+    assertEquals("{\"abc\":{\"A.\":[123]}}", new JsonUnflattener(toMap(json))
+        .withLeftAndRightBrackets('[', ']').unflatten());
+
+    json = "{\"abc{\\\"A.\\\"}{0}\":123}";
+    assertEquals("{\"abc\":{\"A.\":[123]}}", new JsonUnflattener(toMap(json))
+        .withLeftAndRightBrackets('{', '}').unflatten());
   }
 
   @Test
-  public void testWithLeftAndRightBracketsExceptions() {
+  public void testWithLeftAndRightBracketsExceptions()
+      throws JsonMappingException, JsonProcessingException {
     String json = "{\"abc\":{\"def\":123}}";
     try {
       new JsonUnflattener(json).withLeftAndRightBrackets('#', '#');
@@ -244,10 +400,59 @@ public class JsonUnflattenerTest {
       assertEquals("Right bracket contains illegal chracter(.)",
           e.getMessage());
     }
+
+    // Map
+    try {
+      new JsonUnflattener(toMap(json)).withLeftAndRightBrackets('#', '#');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Both brackets cannot be the same", e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withLeftAndRightBrackets('"', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Left bracket contains illegal chracter(\")",
+          e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withLeftAndRightBrackets(' ', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Left bracket contains illegal chracter( )", e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withLeftAndRightBrackets('.', ']');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Left bracket contains illegal chracter(.)", e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withLeftAndRightBrackets('[', '"');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Right bracket contains illegal chracter(\")",
+          e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withLeftAndRightBrackets('[', ' ');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Right bracket contains illegal chracter( )",
+          e.getMessage());
+    }
+    try {
+      new JsonUnflattener(toMap(json)).withLeftAndRightBrackets('[', '.');
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertEquals("Right bracket contains illegal chracter(.)",
+          e.getMessage());
+    }
   }
 
   @Test
-  public void testWithNonObject() {
+  public void testWithNonObject()
+      throws JsonMappingException, JsonProcessingException {
     assertEquals("123", JsonUnflattener.unflatten("123"));
     assertEquals("\"abc\"", JsonUnflattener.unflatten("\"abc\""));
     assertEquals("true", JsonUnflattener.unflatten("true"));
@@ -276,13 +481,19 @@ public class JsonUnflattenerTest {
     assertEquals(mapper.readTree(json).toPrettyString(), json);
   }
 
-  @SuppressWarnings("deprecation")
   @Test
-  public void testNoCache() {
+  public void testNoCache()
+      throws JsonMappingException, JsonProcessingException {
     JsonUnflattener ju = new JsonUnflattener("{\"abc.def\":123}");
     assertNotSame(ju.unflatten(), ju.unflatten());
     assertEquals("{\"abc\":{\"def\":123}}",
-        ju.withPrintMode(PrintMode.REGULAR).unflatten());
+        ju.withPrintMode(PrintMode.MINIMAL).unflatten());
+
+    // Map
+    ju = new JsonUnflattener(toMap("{\"abc.def\":123}"));
+    assertNotSame(ju.unflatten(), ju.unflatten());
+    assertEquals("{\"abc\":{\"def\":123}}",
+        ju.withPrintMode(PrintMode.MINIMAL).unflatten());
   }
 
   @Test
@@ -296,8 +507,15 @@ public class JsonUnflattenerTest {
   public void testInitByReader() throws IOException {
     StringReader sr = new StringReader("{\"abc.def\":123}");
 
-    assertEquals(new JsonUnflattener(sr),
-        new JsonUnflattener("{\"abc.def\":123}"));
+    assertEquals(new JsonUnflattener("{\"abc.def\":123}"),
+        new JsonUnflattener(sr));
+  }
+
+  @Test
+  public void testInitByMap()
+      throws JsonMappingException, JsonProcessingException {
+    assertEquals(new JsonUnflattener("{\"abc.def\":123}"),
+        new JsonUnflattener(toMap("{\"abc.def\":123}")));
   }
 
   @Test
@@ -311,10 +529,15 @@ public class JsonUnflattenerTest {
     JsonUnflattener ju =
         new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB);
     assertEquals(mapper.readTree(expectedJson).toString(), ju.unflatten());
+
+    // Map
+    ju = new JsonUnflattener(toMap(json)).withFlattenMode(FlattenMode.MONGODB);
+    assertEquals(mapper.readTree(expectedJson).toString(), ju.unflatten());
   }
 
   @Test
-  public void testWithKeyTransformer() {
+  public void testWithKeyTransformer()
+      throws JsonMappingException, JsonProcessingException {
     String json = "{\"abc.de_f\":123}";
     JsonUnflattener ju =
         new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB)
@@ -326,6 +549,18 @@ public class JsonUnflattenerTest {
               }
 
             });
+    assertEquals("{\"abc\":{\"de.f\":123}}", ju.unflatten());
+
+    // Map
+    ju = new JsonUnflattener(toMap(json)).withFlattenMode(FlattenMode.MONGODB)
+        .withKeyTransformer(new KeyTransformer() {
+
+          @Override
+          public String transform(String key) {
+            return key.replace('_', '.');
+          }
+
+        });
     assertEquals("{\"abc\":{\"de.f\":123}}", ju.unflatten());
   }
 
@@ -339,6 +574,11 @@ public class JsonUnflattenerTest {
     String json = Resources.toString(urlKBA, Charsets.UTF_8);
 
     JsonUnflattener ju = new JsonUnflattener(json)
+        .withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS);
+    assertEquals(mapper.readTree(expectedJson).toString(), ju.unflatten());
+
+    // Map
+    ju = new JsonUnflattener(toMap(json))
         .withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS);
     assertEquals(mapper.readTree(expectedJson).toString(), ju.unflatten());
   }

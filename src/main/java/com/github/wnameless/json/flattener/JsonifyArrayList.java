@@ -45,7 +45,7 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
   }
 
   public String toString(PrintMode printMode) {
-    ObjectMapper mapper = ObjectMapperFactory.get();
+    ObjectMapper mapper = new ObjectMapper();
     try {
       switch (printMode) {
         case PRETTY:

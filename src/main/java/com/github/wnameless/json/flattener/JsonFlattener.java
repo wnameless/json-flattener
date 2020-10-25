@@ -124,10 +124,11 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
+  private final ObjectMapper mapper = new ObjectMapper();
+  private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
   private final JsonValueBase<?> source;
 
   private JsonifyLinkedHashMap<String, Object> flattenedMap;
-  private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
 
   private FlattenMode flattenMode = FlattenMode.NORMAL;
   private CharSequenceTranslatorFactory policy = StringEscapePolicy.DEFAULT;
@@ -136,8 +137,6 @@ public final class JsonFlattener {
   private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
   private KeyTransformer keyTrans = null;
-
-  private ObjectMapper mapper = ObjectMapperFactory.get();
 
   /**
    * Creates a JSON flattener.

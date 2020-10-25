@@ -25,10 +25,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -48,6 +50,15 @@ import com.github.wnameless.json.flattener.PrintMode;
 public final class JsonUnflattener {
 
   /**
+   * {@link ROOT} is the default key of the Map returned by
+   * {@link #unflattenAsMap}. When {@link JsonUnflattener} processes a JSON
+   * string which is not a JSON object or array, the final outcome may not suit
+   * in a Java Map. At that moment, {@link JsonUnflattener} will put the result
+   * in the Map with {@link ROOT} as its key.
+   */
+  public static final String ROOT = "root";
+
+  /**
    * Returns a JSON string of nested objects by the given flattened JSON string.
    * 
    * @param json
@@ -56,6 +67,40 @@ public final class JsonUnflattener {
    */
   public static String unflatten(String json) {
     return new JsonUnflattener(json).unflatten();
+  }
+
+  /**
+   * Returns a JSON string of nested objects by the given flattened Map.
+   * 
+   * @param flattenedMap
+   *          a flattened Map
+   * @return a JSON string of nested objects
+   */
+  public static String unflatten(Map<String, ?> flattenedMap) {
+    return new JsonUnflattener(flattenedMap).unflatten();
+  }
+
+  /**
+   * Returns a Java Map of nested objects by the given flattened JSON string.
+   * 
+   * @param json
+   *          a flattened JSON string
+   * @return a Java Map of nested objects
+   */
+  public static Map<String, Object> unflattenAsMap(String json) {
+    return new JsonUnflattener(json).unflattenAsMap();
+  }
+
+  /**
+   * Returns a Java Map of nested objects by the given flattened Map.
+   * 
+   * @param flattenedMap
+   *          a flattened Map
+   * @return a Java Map of nested objects
+   */
+  public static Map<String, Object> unflattenAsMap(
+      Map<String, ?> flattenedMap) {
+    return new JsonUnflattener(flattenedMap).unflattenAsMap();
   }
 
   private final ObjectMapper mapper = new ObjectMapper();
@@ -107,6 +152,17 @@ public final class JsonUnflattener {
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
+    root = jsonNode;
+  }
+
+  /**
+   * Creates a JSON unflattener.
+   * 
+   * @param flattenedMap
+   *          a flattened Map
+   */
+  public JsonUnflattener(Map<String, ?> flattenedMap) {
+    JsonNode jsonNode = mapper.valueToTree(flattenedMap);
     root = jsonNode;
   }
 
@@ -222,11 +278,8 @@ public final class JsonUnflattener {
     return this;
   }
 
-  @SuppressWarnings("deprecation")
   private String writeByConfig(JsonNode jsonNode) {
     switch (printMode) {
-      case REGULAR:
-        return jsonNode.toString();
       case PRETTY:
         return jsonNode.toPrettyString();
       default:
@@ -299,6 +352,28 @@ public final class JsonUnflattener {
 
     sw.append(writeByConfig(unflattened));
     return sw.toString();
+  }
+
+  /**
+   * Returns a Java Map of nested objects by the given flattened JSON string.
+   * 
+   * @return a Java Map of nested objects
+   */
+  public Map<String, Object> unflattenAsMap() {
+    try {
+      JsonNode flattenedNode = mapper.readTree(unflatten());
+      if (flattenedNode.isArray() || !flattenedNode.isObject()) {
+        ObjectNode objNode = mapper.createObjectNode();
+        objNode.set(ROOT, flattenedNode);
+        return mapper.convertValue(objNode,
+            new TypeReference<Map<String, Object>>() {});
+      } else {
+        return mapper.convertValue(flattenedNode,
+            new TypeReference<Map<String, Object>>() {});
+      }
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private ArrayNode unflattenArray(ArrayNode array) {
