@@ -395,7 +395,6 @@ public class JsonFlattenerTest {
         root.get(0).get(0));
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testPrintMode() throws IOException {
     URL url = Resources.getResource("test.json");
@@ -403,9 +402,6 @@ public class JsonFlattenerTest {
 
     String json =
         new JsonFlattener(src).withPrintMode(PrintMode.MINIMAL).flatten();
-    assertEquals(mapper.readTree(json).toString(), json);
-
-    json = new JsonFlattener(src).withPrintMode(PrintMode.REGULAR).flatten();
     assertEquals(mapper.readTree(json).toString(), json);
 
     json = new JsonFlattener(src).withPrintMode(PrintMode.PRETTY).flatten();
@@ -417,22 +413,17 @@ public class JsonFlattenerTest {
     assertEquals(mapper.readTree(json).toString(), json);
 
     json = new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
-        .withPrintMode(PrintMode.REGULAR).flatten();
-    assertEquals(mapper.readTree(json).toString(), json);
-
-    json = new JsonFlattener(src).withFlattenMode(FlattenMode.KEEP_ARRAYS)
         .withPrintMode(PrintMode.PRETTY).flatten();
     assertEquals(mapper.readTree(json).toPrettyString(), json);
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testNoCache() {
     JsonFlattener jf = new JsonFlattener("{\"abc\":{\"def\":123}}");
     assertSame(jf.flattenAsMap(), jf.flattenAsMap());
     assertNotSame(jf.flatten(), jf.flatten());
     assertEquals("{\"abc*def\":123}", jf.withSeparator('*').flatten());
-    assertEquals(jf.flatten(), jf.withPrintMode(PrintMode.REGULAR).flatten());
+    assertEquals(jf.flatten(), jf.withPrintMode(PrintMode.MINIMAL).flatten());
   }
 
   @Test

@@ -469,16 +469,11 @@ public class JsonUnflattenerTest {
         JsonUnflattener.unflatten("[[{\"abc.def\":123}]]"));
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testPrintMode() throws IOException {
     String src = "{\"abc.def\":123}";
     String json =
         new JsonUnflattener(src).withPrintMode(PrintMode.MINIMAL).unflatten();
-    assertEquals(mapper.readTree(json).toString(), json);
-
-    json =
-        new JsonUnflattener(src).withPrintMode(PrintMode.REGULAR).unflatten();
     assertEquals(mapper.readTree(json).toString(), json);
 
     json = new JsonUnflattener(src).withPrintMode(PrintMode.PRETTY).unflatten();

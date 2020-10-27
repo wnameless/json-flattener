@@ -205,10 +205,11 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withSeparator(char separator) {
-    isTrue(!String.valueOf(separator).matches("[\"\\s]"),
-        "Separator contains illegal character(%s)", String.valueOf(separator));
+    String separatorStr = String.valueOf(separator);
+    isTrue(!separatorStr.matches("[\"\\s]"),
+        "Separator contains illegal character(%s)", separatorStr);
     isTrue(!leftBracket.equals(separator) && !rightBracket.equals(separator),
-        "Separator(%s) is already used in brackets", String.valueOf(separator));
+        "Separator(%s) is already used in brackets", separatorStr);
 
     this.separator = separator;
     return this;
@@ -232,12 +233,12 @@ public final class JsonUnflattener {
   public JsonUnflattener withLeftAndRightBrackets(char leftBracket,
       char rightBracket) {
     isTrue(leftBracket != rightBracket, "Both brackets cannot be the same");
-    isTrue(!Character.toString(leftBracket).matches(illegalBracketsRegex()),
-        "Left bracket contains illegal character(%s)",
-        Character.toString(leftBracket));
-    isTrue(!Character.toString(rightBracket).matches(illegalBracketsRegex()),
-        "Right bracket contains illegal character(%s)",
-        Character.toString(rightBracket));
+    String leftBracketStr = String.valueOf(leftBracket);
+    String rightBracketStr = String.valueOf(rightBracket);
+    isTrue(!leftBracketStr.matches(illegalBracketsRegex()),
+        "Left bracket contains illegal character(%s)", leftBracketStr);
+    isTrue(!rightBracketStr.matches(illegalBracketsRegex()),
+        "Right bracket contains illegal character(%s)", rightBracketStr);
 
     this.leftBracket = leftBracket;
     this.rightBracket = rightBracket;
