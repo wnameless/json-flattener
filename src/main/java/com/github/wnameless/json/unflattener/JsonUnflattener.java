@@ -205,12 +205,10 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withSeparator(char separator) {
-    isTrue(!Character.toString(separator).matches("[\"\\s]"),
-        "Separator contains illegal character(%s)",
-        Character.toString(separator));
+    isTrue(!String.valueOf(separator).matches("[\"\\s]"),
+        "Separator contains illegal character(%s)", String.valueOf(separator));
     isTrue(!leftBracket.equals(separator) && !rightBracket.equals(separator),
-        "Separator(%s) is already used in brackets",
-        Character.toString(separator));
+        "Separator(%s) is already used in brackets", String.valueOf(separator));
 
     this.separator = separator;
     return this;
