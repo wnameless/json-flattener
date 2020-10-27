@@ -138,6 +138,17 @@ public final class JsonFlattener {
   private PrintMode printMode = PrintMode.MINIMAL;
   private KeyTransformer keyTrans = null;
 
+  private JsonFlattener newJsonFlattener(JsonValueBase<?> jsonVal) {
+    JsonFlattener jf = new JsonFlattener(jsonVal);
+    jf.withFlattenMode(flattenMode);
+    jf.withStringEscapePolicy(policy);
+    jf.withSeparator(separator);
+    jf.withLeftAndRightBrackets(leftBracket, rightBracket);
+    jf.withPrintMode(printMode);
+    if (keyTrans != null) jf.withKeyTransformer(keyTrans);
+    return jf;
+  }
+
   /**
    * Creates a JSON flattener.
    * 
@@ -471,17 +482,6 @@ public final class JsonFlattener {
     JsonifyLinkedHashMap<K, V> map = new JsonifyLinkedHashMap<>();
     map.setTranslator(policy.getCharSequenceTranslator());
     return map;
-  }
-
-  private JsonFlattener newJsonFlattener(JsonValueBase<?> jsonVal) {
-    JsonFlattener jf = new JsonFlattener(jsonVal);
-    jf.withFlattenMode(flattenMode);
-    jf.withStringEscapePolicy(policy);
-    jf.withSeparator(separator);
-    jf.withLeftAndRightBrackets(leftBracket, rightBracket);
-    jf.withPrintMode(printMode);
-    if (keyTrans != null) jf.withKeyTransformer(keyTrans);
-    return jf;
   }
 
   @Override

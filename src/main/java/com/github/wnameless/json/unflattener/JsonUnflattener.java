@@ -113,6 +113,16 @@ public final class JsonUnflattener {
   private PrintMode printMode = PrintMode.MINIMAL;
   private KeyTransformer keyTrans = null;
 
+  private JsonUnflattener newJsonUnflattener(JsonNode jsonNode) {
+    JsonUnflattener ju = new JsonUnflattener(jsonNode);
+    ju.withFlattenMode(flattenMode);
+    ju.withSeparator(separator);
+    ju.withLeftAndRightBrackets(leftBracket, rightBracket);
+    ju.withPrintMode(printMode);
+    if (keyTrans != null) ju.withKeyTransformer(keyTrans);
+    return ju;
+  }
+
   private JsonNode parseJson(String json) {
     try {
       return mapper.readTree(json);
@@ -489,16 +499,6 @@ public final class JsonUnflattener {
       assureJsonArraySize((ArrayNode) currentVal, aryIdx);
       ((ArrayNode) currentVal).set(aryIdx, val);
     }
-  }
-
-  private JsonUnflattener newJsonUnflattener(JsonNode jsonNode) {
-    JsonUnflattener ju = new JsonUnflattener(jsonNode);
-    ju.withFlattenMode(flattenMode);
-    ju.withSeparator(separator);
-    ju.withLeftAndRightBrackets(leftBracket, rightBracket);
-    ju.withPrintMode(printMode);
-    if (keyTrans != null) ju.withKeyTransformer(keyTrans);
-    return ju;
   }
 
   private void assureJsonArraySize(ArrayNode jsonArray, Integer index) {
