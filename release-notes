@@ -87,3 +87,6 @@ Version 0.10.0
 Version 0.11.0
 + Add #unflatten(Map) to JsonUnflattener
 + Add #unflattenAsMap to JsonUnflattener
+
+Version 0.11.1
+* Fix some typo in Exception messages
