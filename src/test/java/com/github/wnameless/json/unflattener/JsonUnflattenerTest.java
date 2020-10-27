@@ -15,7 +15,7 @@
  * the License.
  *
  */
-package com.github.wnameless.json.flattener;
+package com.github.wnameless.json.unflattener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,7 +36,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.wnameless.json.unflattener.JsonUnflattener;
+import com.github.wnameless.json.flattener.FlattenMode;
+import com.github.wnameless.json.flattener.JsonFlattener;
+import com.github.wnameless.json.flattener.KeyTransformer;
+import com.github.wnameless.json.flattener.PrintMode;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 

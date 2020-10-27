@@ -155,6 +155,10 @@ public final class JsonUnflattener {
     root = jsonNode;
   }
 
+  private JsonUnflattener(JsonNode jsonNode) {
+    root = jsonNode;
+  }
+
   private String arrayIndex() {
     return Pattern.quote(leftBracket.toString()) + "\\s*\\d+\\s*"
         + Pattern.quote(rightBracket.toString());
@@ -371,14 +375,13 @@ public final class JsonUnflattener {
       if (value.isArray()) {
         unflattenArray.add(unflattenArray((ArrayNode) value));
       } else if (value.isObject()) {
-        JsonNode a;
+        JsonNode obj;
         try {
-          a = mapper.readTree(new JsonUnflattener(value.toString())
-              .withSeparator(separator).unflatten());
+          obj = mapper.readTree(newJsonUnflattener(value).unflatten());
         } catch (JsonProcessingException e) {
           throw new RuntimeException(e);
         }
-        unflattenArray.add(a);
+        unflattenArray.add(obj);
       } else {
         unflattenArray.add(value);
       }
@@ -476,8 +479,7 @@ public final class JsonUnflattener {
       if (val.isArray()) {
         ArrayNode jsonArray = mapper.createArrayNode();
         for (JsonNode arrayVal : (ArrayNode) val) {
-          jsonArray.add(
-              parseJson(newJsonUnflattener(arrayVal.toString()).unflatten()));
+          jsonArray.add(parseJson(newJsonUnflattener(arrayVal).unflatten()));
         }
         ((ObjectNode) currentVal).set(objKey, jsonArray);
       } else {
@@ -489,8 +491,8 @@ public final class JsonUnflattener {
     }
   }
 
-  private JsonUnflattener newJsonUnflattener(String json) {
-    JsonUnflattener jf = new JsonUnflattener(json);
+  private JsonUnflattener newJsonUnflattener(JsonNode jsonNode) {
+    JsonUnflattener jf = new JsonUnflattener(jsonNode);
     if (flattenMode != null) jf.withFlattenMode(flattenMode);
     if (keyTrans != null) jf.withKeyTransformer(keyTrans);
     if (leftBracket != null && rightBracket != null)
