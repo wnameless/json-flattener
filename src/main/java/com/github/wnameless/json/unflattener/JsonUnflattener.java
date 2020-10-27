@@ -492,13 +492,13 @@ public final class JsonUnflattener {
   }
 
   private JsonUnflattener newJsonUnflattener(JsonNode jsonNode) {
-    JsonUnflattener jf = new JsonUnflattener(jsonNode);
-    if (flattenMode != null) jf.withFlattenMode(flattenMode);
-    if (keyTrans != null) jf.withKeyTransformer(keyTrans);
-    if (leftBracket != null && rightBracket != null)
-      jf.withLeftAndRightBrackets(leftBracket, rightBracket);
-    if (separator != null) jf.withSeparator(separator);
-    return jf;
+    JsonUnflattener ju = new JsonUnflattener(jsonNode);
+    ju.withFlattenMode(flattenMode);
+    ju.withSeparator(separator);
+    ju.withLeftAndRightBrackets(leftBracket, rightBracket);
+    ju.withPrintMode(printMode);
+    if (keyTrans != null) ju.withKeyTransformer(keyTrans);
+    return ju;
   }
 
   private void assureJsonArraySize(ArrayNode jsonArray, Integer index) {

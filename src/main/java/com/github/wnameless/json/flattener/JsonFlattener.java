@@ -405,7 +405,7 @@ public final class JsonFlattener {
           return array;
         } else if (val.isObject()) {
           if (val.asObject().iterator().hasNext()) {
-            return newJsonFlattener(val.toString()).flattenAsMap();
+            return newJsonFlattener(val).flattenAsMap();
           } else {
             return newJsonifyLinkedHashMap();
           }
@@ -473,10 +473,15 @@ public final class JsonFlattener {
     return map;
   }
 
-  private JsonFlattener newJsonFlattener(String json) {
-    return new JsonFlattener(json).withFlattenMode(flattenMode)
-        .withSeparator(separator).withStringEscapePolicy(policy)
-        .withPrintMode(printMode);
+  private JsonFlattener newJsonFlattener(JsonValueBase<?> jsonVal) {
+    JsonFlattener jf = new JsonFlattener(jsonVal);
+    jf.withFlattenMode(flattenMode);
+    jf.withStringEscapePolicy(policy);
+    jf.withSeparator(separator);
+    jf.withLeftAndRightBrackets(leftBracket, rightBracket);
+    jf.withPrintMode(printMode);
+    if (keyTrans != null) jf.withKeyTransformer(keyTrans);
+    return jf;
   }
 
   @Override
