@@ -152,7 +152,7 @@ public final class JsonFlattener {
    * Creates a JSON flattener.
    * 
    * @param json
-   *          the JSON string
+   *          a JSON string
    */
   public JsonFlattener(String json) {
     JsonNode jsonNode;
@@ -168,9 +168,9 @@ public final class JsonFlattener {
    * Creates a JSON flattener.
    * 
    * @param jsonReader
-   *          the JSON reader
+   *          a JSON reader
    * @throws IOException
-   *           if jsonReader cannot be read
+   *           if the jsonReader cannot be read
    */
   public JsonFlattener(Reader jsonReader) throws IOException {
     JsonNode jsonNode = mapper.readTree(jsonReader);

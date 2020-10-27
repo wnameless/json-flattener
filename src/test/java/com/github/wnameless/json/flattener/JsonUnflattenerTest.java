@@ -56,6 +56,13 @@ public class JsonUnflattenerTest {
   }
 
   @Test
+  public void testConstructorException() {
+    assertThrows(RuntimeException.class, () -> {
+      new JsonUnflattener("abc[123]}");
+    });
+  }
+
+  @Test
   public void testUnflatten()
       throws JsonMappingException, JsonProcessingException {
     assertEquals(
@@ -274,7 +281,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithSeparaterExceptions()
+  public void testWithSeparaterException()
       throws JsonMappingException, JsonProcessingException {
     String json = "{\"abc\":{\"def\":123}}";
     try {
@@ -351,7 +358,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithLeftAndRightBracketsExceptions()
+  public void testWithLeftAndRightBracketsException()
       throws JsonMappingException, JsonProcessingException {
     String json = "{\"abc\":{\"def\":123}}";
     try {

@@ -125,7 +125,7 @@ public final class JsonUnflattener {
    * Creates a JSON unflattener.
    * 
    * @param json
-   *          the JSON string
+   *          a JSON string
    */
   public JsonUnflattener(String json) {
     root = parseJson(json);
@@ -135,17 +135,12 @@ public final class JsonUnflattener {
    * Creates a JSON unflattener.
    * 
    * @param jsonReader
-   *          the JSON reader
+   *          a JSON reader
    * @throws IOException
-   *           if jsonReader cannot be read
+   *           if the jsonReader cannot be read
    */
   public JsonUnflattener(Reader jsonReader) throws IOException {
-    JsonNode jsonNode;
-    try {
-      jsonNode = mapper.readTree(jsonReader);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+    JsonNode jsonNode = mapper.readTree(jsonReader);
     root = jsonNode;
   }
 

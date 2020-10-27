@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -50,13 +51,10 @@ public class JsonFlattenerTest {
   ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  public void testFlattenAsMap() throws IOException {
-    URL url = Resources.getResource("test2.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
-
-    assertEquals(
-        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
-        JsonFlattener.flattenAsMap(json).toString());
+  public void testConstructorException() {
+    assertThrows(RuntimeException.class, () -> {
+      new JsonFlattener("abc[123]}");
+    });
   }
 
   @Test
@@ -70,6 +68,16 @@ public class JsonFlattenerTest {
 
     assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         JsonFlattener.flatten("[{\"a\":1},2,{\"c\":[3,4]}]"));
+  }
+
+  @Test
+  public void testFlattenAsMap() throws IOException {
+    URL url = Resources.getResource("test2.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    assertEquals(
+        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
+        JsonFlattener.flattenAsMap(json).toString());
   }
 
   @Test
@@ -280,7 +288,7 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testWithSeparatorExceptions() {
+  public void testWithSeparatorException() {
     String json = "{\"abc\":{\"def\":123}}";
     try {
       new JsonFlattener(json).withSeparator('"');
@@ -316,7 +324,7 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testWithLeftAndRightBracketsExceptions() {
+  public void testWithLeftAndRightBracketsException() {
     String json = "{\"abc\":{\"def\":123}}";
     try {
       new JsonFlattener(json).withLeftAndRightBrackets('#', '#');
