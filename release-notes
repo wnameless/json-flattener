@@ -91,3 +91,4 @@ Version 0.11.0
 Version 0.11.1
 * Fix some typo in Exception messages
 - Remove PrintMode.REGULAR
+* Improve performance of JsonFlattener & JsonUnflattener
