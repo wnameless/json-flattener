@@ -5,7 +5,7 @@
 	<version>0.11.2-SNAPSHOT</version>
 
 	<name>json-flattener</name>
-	<description>A Java utility used to flatten nested JSON objects and even more to unflatten it back</description>
+	<description>A Java utility is used to flatten nested JSON objects and even more to unflatten it back</description>
 	<url>https://github.com/wnameless/json-flattener</url>
 
 	<licenses>
