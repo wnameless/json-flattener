@@ -3,7 +3,7 @@
 
 json-flattener
 =============
-A Java utility used to FLATTEN nested JSON objects and even more to UNFLATTEN it back.
+A Java utility is used to FLATTEN nested JSON objects and even more to UNFLATTEN it back.
 
 ## Purpose
 Converts a nested JSON
