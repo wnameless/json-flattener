@@ -17,12 +17,9 @@
  */
 package com.github.wnameless.json.flattener;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * {@link JsonifyArrayList} is simply a ArrayList but with an override jsonify
@@ -45,17 +42,11 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
   }
 
   public String toString(PrintMode printMode) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      switch (printMode) {
-        case PRETTY:
-          return mapper.writerWithDefaultPrettyPrinter()
-              .writeValueAsString(mapper.readTree(toString()));
-        default:
-          return toString();
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    switch (printMode) {
+      case PRETTY:
+        return PrintMode.prettyPrint(toString());
+      default:
+        return toString();
     }
   }
 

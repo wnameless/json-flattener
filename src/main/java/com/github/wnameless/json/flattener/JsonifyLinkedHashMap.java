@@ -17,13 +17,10 @@
  */
 package com.github.wnameless.json.flattener;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * {@link JsonifyLinkedHashMap} is simple a LinkedHashMap but with an override
@@ -48,17 +45,11 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
   }
 
   public String toString(PrintMode printMode) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      switch (printMode) {
-        case PRETTY:
-          return mapper.writerWithDefaultPrettyPrinter()
-              .writeValueAsString(mapper.readTree(toString()));
-        default:
-          return toString();
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    switch (printMode) {
+      case PRETTY:
+        return PrintMode.prettyPrint(toString());
+      default:
+        return toString();
     }
   }
 

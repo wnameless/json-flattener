@@ -567,7 +567,9 @@ public class JsonFlattenerTest {
     };
 
     JsonFlattener jf = new JsonFlattener(new JacksonJsonCore(mapper), json);
-    assertEquals(json, jf.flatten());
+    jf.withPrintMode(PrintMode.PRETTY);
+    assertEquals(mapper.writerWithDefaultPrettyPrinter()
+        .writeValueAsString(mapper.readTree(json)), jf.flatten());
   }
 
 }

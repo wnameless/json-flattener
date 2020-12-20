@@ -608,7 +608,9 @@ public class JsonUnflattenerTest {
     };
 
     JsonUnflattener ju = new JsonUnflattener(new JacksonJsonCore(mapper), json);
-    assertEquals(json, ju.unflatten());
+    ju.withPrintMode(PrintMode.PRETTY);
+    assertEquals(mapper.writerWithDefaultPrettyPrinter()
+        .writeValueAsString(mapper.readTree(json)), ju.unflatten());
   }
 
 }

@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JsonArrayCore;
 import com.github.wnameless.json.base.JsonCore;
@@ -298,13 +296,7 @@ public final class JsonUnflattener {
   private String writeByConfig(JsonValueCore<?> jsonNode) {
     switch (printMode) {
       case PRETTY:
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-          return mapper.writerWithDefaultPrettyPrinter()
-              .writeValueAsString(jsonNode.toJson());
-        } catch (JsonProcessingException e) {
-          throw new RuntimeException(e);
-        }
+        return PrintMode.prettyPrint(jsonNode.toJson());
       default:
         return jsonNode.toJson();
     }
