@@ -57,6 +57,7 @@ public enum PrintMode {
           prettyPrintBuilder.append(jsonChar);
           break;
         case ' ':
+        case '\t':
           if (inQuote) {
             prettyPrintBuilder.append(jsonChar);
           }
