@@ -34,10 +34,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.wnameless.json.base.JacksonJsonValue;
+import com.github.wnameless.json.base.JacksonJsonCore;
+import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonValueBase;
 
 /**
@@ -124,7 +122,7 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final JsonCore<?> jsonCore;
   private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
   private final JsonValueBase<?> source;
 
@@ -156,7 +154,13 @@ public final class JsonFlattener {
    *          a {@link JsonValueBase}
    */
   public JsonFlattener(JsonValueBase<?> json) {
+    jsonCore = new JacksonJsonCore();
     source = notNull(json);
+  }
+
+  public JsonFlattener(JsonCore<?> jsonCore, JsonValueBase<?> json) {
+    this.jsonCore = notNull(jsonCore);
+    source = jsonCore.parse(json.toJson());
   }
 
   /**
@@ -166,13 +170,13 @@ public final class JsonFlattener {
    *          a JSON string
    */
   public JsonFlattener(String json) {
-    JsonNode jsonNode;
-    try {
-      jsonNode = mapper.readTree(json);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    source = new JacksonJsonValue(jsonNode);
+    jsonCore = new JacksonJsonCore();
+    source = jsonCore.parse(json);
+  }
+
+  public JsonFlattener(JsonCore<?> jsonCore, String json) {
+    this.jsonCore = notNull(jsonCore);
+    source = jsonCore.parse(json);
   }
 
   /**
@@ -184,8 +188,14 @@ public final class JsonFlattener {
    *           if the jsonReader cannot be read
    */
   public JsonFlattener(Reader jsonReader) throws IOException {
-    JsonNode jsonNode = mapper.readTree(jsonReader);
-    source = new JacksonJsonValue(jsonNode);
+    jsonCore = new JacksonJsonCore();
+    source = jsonCore.parse(jsonReader);
+  }
+
+  public JsonFlattener(JsonCore<?> jsonCore, Reader jsonReader)
+      throws IOException {
+    this.jsonCore = notNull(jsonCore);
+    source = jsonCore.parse(jsonReader);
   }
 
   /**

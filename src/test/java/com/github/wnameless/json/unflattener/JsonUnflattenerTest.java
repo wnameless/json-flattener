@@ -34,8 +34,10 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.github.wnameless.json.flattener.KeyTransformer;
@@ -590,6 +592,23 @@ public class JsonUnflattenerTest {
     ju = new JsonUnflattener(toMap(json))
         .withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS);
     assertEquals(mapper.readTree(expectedJson).toString(), ju.unflatten());
+  }
+
+  @Test
+  public void testWithLongDecimal() throws IOException {
+    URL url = Resources.getResource("test_long_decimal.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    ObjectMapper mapper = new ObjectMapper() {
+      private static final long serialVersionUID = 1L;
+      {
+        configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
+        configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true);
+      }
+    };
+
+    JsonUnflattener ju = new JsonUnflattener(new JacksonJsonCore(mapper), json);
+    assertEquals(json, ju.unflatten());
   }
 
 }

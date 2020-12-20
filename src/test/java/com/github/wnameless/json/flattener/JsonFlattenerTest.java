@@ -38,8 +38,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JacksonJsonValue;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
@@ -549,6 +551,23 @@ public class JsonFlattenerTest {
     String flattened = jf.flatten();
 
     assertEquals(expectedJson, flattened);
+  }
+
+  @Test
+  public void testWithLongDecimal() throws IOException {
+    URL url = Resources.getResource("test_long_decimal.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    ObjectMapper mapper = new ObjectMapper() {
+      private static final long serialVersionUID = 1L;
+      {
+        configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
+        configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true);
+      }
+    };
+
+    JsonFlattener jf = new JsonFlattener(new JacksonJsonCore(mapper), json);
+    assertEquals(json, jf.flatten());
   }
 
 }
