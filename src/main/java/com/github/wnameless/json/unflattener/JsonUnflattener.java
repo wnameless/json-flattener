@@ -33,6 +33,7 @@ import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JsonArrayCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonObjectCore;
+import com.github.wnameless.json.base.JsonPrinter;
 import com.github.wnameless.json.base.JsonValueCore;
 import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.KeyTransformer;
@@ -296,7 +297,7 @@ public final class JsonUnflattener {
   private String writeByConfig(JsonValueCore<?> jsonNode) {
     switch (printMode) {
       case PRETTY:
-        return PrintMode.prettyPrint(jsonNode.toJson());
+        return JsonPrinter.prettyPrint(jsonNode.toJson());
       default:
         return jsonNode.toJson();
     }
@@ -320,7 +321,7 @@ public final class JsonUnflattener {
 
     JsonObjectCore<?> flattened = root.asObject();
     JsonValueCore<?> unflattened =
-        flattened.isEmpty() ? jsonCore.createJsonObject().asValue() : null;
+        flattened.isEmpty() ? jsonCore.parse("{}").asValue() : null;
 
     Iterator<String> names = flattened.names();
     while (names.hasNext()) {
@@ -353,12 +354,10 @@ public final class JsonUnflattener {
         if (objKey == null && aryIdx == null) {
           if (isJsonArray(keyPart)) {
             aryIdx = extractIndex(keyPart);
-            if (currentVal == null)
-              currentVal = jsonCore.createJsonArray().asValue();
+            if (currentVal == null) currentVal = jsonCore.parse("[]").asValue();
           } else { // JSON object
             objKey = extractKey(keyPart);
-            if (currentVal == null)
-              currentVal = jsonCore.createJsonObject().asValue();
+            if (currentVal == null) currentVal = jsonCore.parse("{}").asValue();
           }
         }
 
@@ -380,7 +379,7 @@ public final class JsonUnflattener {
   public Map<String, Object> unflattenAsMap() {
     JsonValueCore<?> flattenedNode = jsonCore.parse(unflatten());
     if (flattenedNode.isArray() || !flattenedNode.isObject()) {
-      JsonObjectCore<?> objNode = jsonCore.createJsonObject();
+      JsonObjectCore<?> objNode = jsonCore.parse("{}").asObject();
       objNode.set(ROOT, flattenedNode);
       return jsonCore.convertToMap(objNode);
     } else {
@@ -389,7 +388,7 @@ public final class JsonUnflattener {
   }
 
   private JsonArrayCore<?> unflattenArray(JsonArrayCore<?> array) {
-    JsonArrayCore<?> unflattenArray = jsonCore.createJsonArray();
+    JsonArrayCore<?> unflattenArray = jsonCore.parse("[]").asArray();
 
     for (JsonValueCore<?> value : array) {
       if (value.isArray()) {
@@ -436,7 +435,7 @@ public final class JsonUnflattener {
       JsonObjectCore<?> jsonObj = currentVal.asObject();
 
       if (jsonObj.get(objKey) == null) {
-        JsonArrayCore<?> ary = jsonCore.createJsonArray();
+        JsonArrayCore<?> ary = jsonCore.parse("[]").asArray();
         jsonObj.set(objKey, ary);
 
         return ary;
@@ -447,7 +446,7 @@ public final class JsonUnflattener {
       JsonArrayCore<?> jsonAry = currentVal.asArray();
 
       if (jsonAry.size() <= aryIdx || jsonAry.get(aryIdx).isNull()) {
-        JsonArrayCore<?> ary = jsonCore.createJsonArray();
+        JsonArrayCore<?> ary = jsonCore.parse("[]").asArray();
         assureJsonArraySize(jsonAry, aryIdx);
         jsonAry.set(aryIdx, ary);
 
@@ -464,7 +463,7 @@ public final class JsonUnflattener {
       JsonObjectCore<?> jsonObj = currentVal.asObject();
 
       if (jsonObj.get(objKey) == null) {
-        JsonObjectCore<?> obj = jsonCore.createJsonObject();
+        JsonObjectCore<?> obj = jsonCore.parse("{}").asObject();
         jsonObj.set(objKey, obj);
 
         return obj;
@@ -475,7 +474,7 @@ public final class JsonUnflattener {
       JsonArrayCore<?> jsonAry = currentVal.asArray();
 
       if (jsonAry.size() <= aryIdx || jsonAry.get(aryIdx).isNull()) {
-        JsonObjectCore<?> obj = jsonCore.createJsonObject();
+        JsonObjectCore<?> obj = jsonCore.parse("{}").asObject();
         assureJsonArraySize(jsonAry, aryIdx);
         jsonAry.set(aryIdx, obj);
 
@@ -491,7 +490,7 @@ public final class JsonUnflattener {
     JsonValueCore<?> val = flattened.get(key);
     if (objKey != null) {
       if (val.isArray()) {
-        JsonArrayCore<?> jsonArray = jsonCore.createJsonArray();
+        JsonArrayCore<?> jsonArray = jsonCore.parse("[]").asArray();
         for (JsonValueCore<?> arrayVal : val.asArray()) {
           jsonArray.add(parseJson(newJsonUnflattener(arrayVal).unflatten()));
         }
@@ -507,7 +506,7 @@ public final class JsonUnflattener {
 
   private void assureJsonArraySize(JsonArrayCore<?> jsonArray, Integer index) {
     while (index >= jsonArray.size()) {
-      jsonArray.add(jsonCore.createJsonNull());
+      jsonArray.add(jsonCore.parse("null"));
     }
   }
 

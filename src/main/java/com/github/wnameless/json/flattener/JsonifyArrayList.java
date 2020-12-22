@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
 
+import com.github.wnameless.json.base.JsonPrinter;
+
 /**
  * {@link JsonifyArrayList} is simply a ArrayList but with an override jsonify
  * toString method.
@@ -44,7 +46,7 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
   public String toString(PrintMode printMode) {
     switch (printMode) {
       case PRETTY:
-        return PrintMode.prettyPrint(toString());
+        return JsonPrinter.prettyPrint(toString());
       default:
         return toString();
     }

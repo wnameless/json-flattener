@@ -22,6 +22,8 @@ import java.util.Map;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
 
+import com.github.wnameless.json.base.JsonPrinter;
+
 /**
  * {@link JsonifyLinkedHashMap} is simple a LinkedHashMap but with an override
  * jsonify toString method.
@@ -47,7 +49,7 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
   public String toString(PrintMode printMode) {
     switch (printMode) {
       case PRETTY:
-        return PrintMode.prettyPrint(toString());
+        return JsonPrinter.prettyPrint(toString());
       default:
         return toString();
     }
