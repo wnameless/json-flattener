@@ -34,6 +34,7 @@ import com.github.wnameless.json.base.JsonArrayCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonObjectCore;
 import com.github.wnameless.json.base.JsonPrinter;
+import com.github.wnameless.json.base.JsonValueBase;
 import com.github.wnameless.json.base.JsonValueCore;
 import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.KeyTransformer;
@@ -113,8 +114,8 @@ public final class JsonUnflattener {
   private PrintMode printMode = PrintMode.MINIMAL;
   private KeyTransformer keyTrans = null;
 
-  private JsonUnflattener newJsonUnflattener(JsonValueCore<?> jsonNode) {
-    JsonUnflattener ju = new JsonUnflattener(jsonNode);
+  private JsonUnflattener newJsonUnflattener(JsonValueCore<?> jsonValue) {
+    JsonUnflattener ju = new JsonUnflattener(jsonValue);
     ju.withFlattenMode(flattenMode);
     ju.withSeparator(separator);
     ju.withLeftAndRightBrackets(leftBracket, rightBracket);
@@ -294,12 +295,12 @@ public final class JsonUnflattener {
     return this;
   }
 
-  private String writeByConfig(JsonValueCore<?> jsonNode) {
+  private String writeByConfig(JsonValueBase<?> jsonValue) {
     switch (printMode) {
       case PRETTY:
-        return JsonPrinter.prettyPrint(jsonNode.toJson());
+        return JsonPrinter.prettyPrint(jsonValue.toJson());
       default:
-        return jsonNode.toJson();
+        return jsonValue.toJson();
     }
   }
 
@@ -377,13 +378,13 @@ public final class JsonUnflattener {
    * @return a Java Map of nested objects
    */
   public Map<String, Object> unflattenAsMap() {
-    JsonValueCore<?> flattenedNode = jsonCore.parse(unflatten());
-    if (flattenedNode.isArray() || !flattenedNode.isObject()) {
-      JsonObjectCore<?> objNode = jsonCore.parse("{}").asObject();
-      objNode.set(ROOT, flattenedNode);
-      return jsonCore.convertToMap(objNode);
+    JsonValueCore<?> flattenedValue = jsonCore.parse(unflatten());
+    if (flattenedValue.isArray() || !flattenedValue.isObject()) {
+      JsonObjectCore<?> jsonObj = jsonCore.parse("{}").asObject();
+      jsonObj.set(ROOT, flattenedValue);
+      return jsonCore.convertToMap(jsonObj);
     } else {
-      return jsonCore.convertToMap(flattenedNode);
+      return jsonCore.convertToMap(flattenedValue);
     }
   }
 
