@@ -25,7 +25,6 @@ import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
@@ -415,7 +414,7 @@ public final class JsonFlattener {
   private Object jsonVal2Obj(JsonValueBase<?> val) {
     if (val.isBoolean()) return val.asBoolean();
     if (val.isString()) return val.asString();
-    if (val.isNumber()) return new BigDecimal(val.toString());
+    if (val.isNumber()) return val.asNumber();
     switch (flattenMode) {
       case KEEP_ARRAYS:
         if (val.isArray()) {

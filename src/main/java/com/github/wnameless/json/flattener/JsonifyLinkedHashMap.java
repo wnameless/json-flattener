@@ -17,6 +17,7 @@
  */
 package com.github.wnameless.json.flattener;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -41,6 +42,12 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
 
   private CharSequenceTranslator translator =
       StringEscapePolicy.DEFAULT.getCharSequenceTranslator();
+
+  public JsonifyLinkedHashMap() {}
+
+  public JsonifyLinkedHashMap(Map<K, V> map) {
+    super(map);
+  }
 
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
@@ -68,6 +75,10 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
         sb.append('"');
         sb.append(translator.translate((String) mem.getValue()));
         sb.append('"');
+      } else if (mem.getValue() instanceof Collection) {
+        sb.append(new JsonifyArrayList<>((Collection<?>) mem.getValue()));
+      } else if (mem.getValue() instanceof Map) {
+        sb.append(new JsonifyLinkedHashMap<>((Map<?, ?>) mem.getValue()));
       } else {
         sb.append(mem.getValue());
       }

@@ -18,6 +18,8 @@
 package com.github.wnameless.json.flattener;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 import org.apache.commons.text.translate.CharSequenceTranslator;
 
@@ -38,6 +40,12 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
 
   private CharSequenceTranslator translator =
       StringEscapePolicy.DEFAULT.getCharSequenceTranslator();
+
+  public JsonifyArrayList() {}
+
+  public JsonifyArrayList(Collection<E> coll) {
+    super(coll);
+  }
 
   public void setTranslator(CharSequenceTranslator translator) {
     this.translator = translator;
@@ -61,6 +69,10 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
         sb.append('"');
         sb.append(translator.translate((String) e));
         sb.append('"');
+      } else if (e instanceof Collection) {
+        sb.append(new JsonifyArrayList<>((Collection<?>) e));
+      } else if (e instanceof Map) {
+        sb.append(new JsonifyLinkedHashMap<>((Map<?, ?>) e));
       } else {
         sb.append(e);
       }

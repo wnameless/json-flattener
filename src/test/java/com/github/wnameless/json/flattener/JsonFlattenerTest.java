@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -384,8 +383,7 @@ public class JsonFlattenerTest {
     assertEquals("null", JsonFlattener.flatten("null"));
     assertEquals(null, JsonFlattener.flattenAsMap("null").get("root"));
     assertEquals("123", JsonFlattener.flatten("123"));
-    assertEquals(new BigDecimal("123"),
-        JsonFlattener.flattenAsMap("123").get("root"));
+    assertEquals(123, JsonFlattener.flattenAsMap("123").get("root"));
     assertEquals("\"abc\"", JsonFlattener.flatten("\"abc\""));
     assertEquals("abc", JsonFlattener.flattenAsMap("\"abc\"").get("root"));
     assertEquals("true", JsonFlattener.flatten("true"));
@@ -401,8 +399,7 @@ public class JsonFlattenerTest {
             "[[{\"abc\":{\"def\":123}}]]")
                 .withFlattenMode(FlattenMode.KEEP_ARRAYS).flattenAsMap()
                 .get("root");
-    assertEquals(ImmutableMap.of("abc.def", new BigDecimal(123)),
-        root.get(0).get(0));
+    assertEquals(ImmutableMap.of("abc.def", 123), root.get(0).get(0));
   }
 
   @Test

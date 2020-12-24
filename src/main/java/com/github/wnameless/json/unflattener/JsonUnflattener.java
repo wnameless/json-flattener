@@ -37,6 +37,7 @@ import com.github.wnameless.json.base.JsonPrinter;
 import com.github.wnameless.json.base.JsonValueBase;
 import com.github.wnameless.json.base.JsonValueCore;
 import com.github.wnameless.json.flattener.FlattenMode;
+import com.github.wnameless.json.flattener.JsonifyLinkedHashMap;
 import com.github.wnameless.json.flattener.KeyTransformer;
 import com.github.wnameless.json.flattener.PrintMode;
 
@@ -176,12 +177,12 @@ public final class JsonUnflattener {
    */
   public JsonUnflattener(Map<String, ?> flattenedMap) {
     jsonCore = new JacksonJsonCore();
-    root = jsonCore.parse(flattenedMap);
+    root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());
   }
 
   public JsonUnflattener(JsonCore<?> jsonCore, Map<String, ?> flattenedMap) {
     this.jsonCore = notNull(jsonCore);
-    root = jsonCore.parse(flattenedMap);
+    root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());
   }
 
   private String arrayIndex() {
@@ -382,9 +383,9 @@ public final class JsonUnflattener {
     if (flattenedValue.isArray() || !flattenedValue.isObject()) {
       JsonObjectCore<?> jsonObj = jsonCore.parse("{}").asObject();
       jsonObj.set(ROOT, flattenedValue);
-      return jsonCore.convertToMap(jsonObj);
+      return jsonObj.toMap();
     } else {
-      return jsonCore.convertToMap(flattenedValue);
+      return flattenedValue.asObject().toMap();
     }
   }
 
