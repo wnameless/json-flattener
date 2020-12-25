@@ -92,3 +92,6 @@ Version 0.11.1
 * Fix some typo in Exception messages
 - Remove PrintMode.REGULAR
 * Improve performance of JsonFlattener & JsonUnflattener
+
+Version 0.12.0
++ Apply JsonCore in json-base-v2.0.0

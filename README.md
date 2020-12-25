@@ -35,7 +35,7 @@ or a Java Map<br>
 <dependency>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.11.1</version>
+	<version>0.12.0</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>
@@ -74,6 +74,25 @@ String nestedJsonWithDotKey = JsonUnflattener.unflatten(
         "{\"[1][0];\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.[\\\"]\":5}");
 System.out.println(nestedJsonWithDotKey);
 // Output: [1,[2,3],4,{"ab.c.[":5}]
+```
+## New Features (since v0.12.0)
+### JsonCore - customized JSON libarary supported
+```java
+JsonFlattener jf;
+JsonUnflattener ju;
+
+ObjectMapper mapper = new ObjectMapper() {
+  {
+    configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
+    configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true);
+  }
+};
+jf = new JsonFlattener(new JacksonJsonCore(mapper), json);
+ju = new JsonUnflattener(new JacksonJsonCore(mapper), json);
+
+Gson gson = new GsonBuilder().serializeNulls().create();
+jf = new JsonFlattener(new GsonJsonCore(gson), json);
+ju = new JsonUnflattener(new GsonJsonCore(gson), json);
 ```
 
 ## New Features (since v0.11.0)
