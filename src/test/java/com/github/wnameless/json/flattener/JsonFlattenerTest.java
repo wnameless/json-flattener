@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -551,7 +552,7 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testWithLongDecimal() throws IOException {
+  public void testWithJsonCore() throws IOException {
     URL url = Resources.getResource("test_long_decimal.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
@@ -564,6 +565,17 @@ public class JsonFlattenerTest {
     };
 
     JsonFlattener jf = new JsonFlattener(new JacksonJsonCore(mapper), json);
+    jf.withPrintMode(PrintMode.PRETTY);
+    assertEquals(mapper.writerWithDefaultPrettyPrinter()
+        .writeValueAsString(mapper.readTree(json)), jf.flatten());
+
+    jf = new JsonFlattener(new JacksonJsonCore(mapper), new StringReader(json));
+    jf.withPrintMode(PrintMode.PRETTY);
+    assertEquals(mapper.writerWithDefaultPrettyPrinter()
+        .writeValueAsString(mapper.readTree(json)), jf.flatten());
+
+    jf = new JsonFlattener(new JacksonJsonCore(mapper),
+        new JacksonJsonCore(mapper).parse(json));
     jf.withPrintMode(PrintMode.PRETTY);
     assertEquals(mapper.writerWithDefaultPrettyPrinter()
         .writeValueAsString(mapper.readTree(json)), jf.flatten());

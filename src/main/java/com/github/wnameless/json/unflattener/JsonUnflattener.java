@@ -135,7 +135,7 @@ public final class JsonUnflattener {
   }
 
   /**
-   * Creates a JSON unflattener.
+   * Creates a JSON unflattener by given JSON string.
    * 
    * @param json
    *          a JSON string
@@ -145,13 +145,21 @@ public final class JsonUnflattener {
     root = parseJson(json);
   }
 
+  /**
+   * Creates a JSON unflattener by given {@link JsonCore} and JSON string.
+   * 
+   * @param jsonCore
+   *          a {@link JsonCore}
+   * @param json
+   *          a JSON string
+   */
   public JsonUnflattener(JsonCore<?> jsonCore, String json) {
     this.jsonCore = notNull(jsonCore);
     root = parseJson(json);
   }
 
   /**
-   * Creates a JSON unflattener.
+   * Creates a JSON unflattener by given JSON string reader.
    * 
    * @param jsonReader
    *          a JSON reader
@@ -163,6 +171,17 @@ public final class JsonUnflattener {
     root = jsonCore.parse(jsonReader);
   }
 
+  /**
+   * Creates a JSON unflattener by given {@link JsonCore} and JSON string
+   * reader.
+   * 
+   * @param jsonCore
+   *          a {@link JsonCore}
+   * @param jsonReader
+   *          a JSON reader
+   * @throws IOException
+   *           if the jsonReader cannot be read
+   */
   public JsonUnflattener(JsonCore<?> jsonCore, Reader jsonReader)
       throws IOException {
     this.jsonCore = notNull(jsonCore);
@@ -170,16 +189,25 @@ public final class JsonUnflattener {
   }
 
   /**
-   * Creates a JSON unflattener.
+   * Creates a JSON unflattener by given flattened {@link Map}.
    * 
    * @param flattenedMap
-   *          a flattened Map
+   *          a flattened {@link Map}
    */
   public JsonUnflattener(Map<String, ?> flattenedMap) {
     jsonCore = new JacksonJsonCore();
     root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());
   }
 
+  /**
+   * Creates a JSON unflattener by given {@link JsonCore} and flattened
+   * {@link Map}.
+   * 
+   * @param jsonCore
+   *          a {@link JsonCore}
+   * @param flattenedMap
+   *          a flattened {@link Map}
+   */
   public JsonUnflattener(JsonCore<?> jsonCore, Map<String, ?> flattenedMap) {
     this.jsonCore = notNull(jsonCore);
     root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());

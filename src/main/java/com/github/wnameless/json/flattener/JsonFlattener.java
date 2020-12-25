@@ -147,7 +147,7 @@ public final class JsonFlattener {
   }
 
   /**
-   * Creates a JSON flattener.
+   * Creates a JSON flattener by given {@link JsonValueBase}.
    * 
    * @param json
    *          a {@link JsonValueBase}
@@ -157,13 +157,22 @@ public final class JsonFlattener {
     source = notNull(json);
   }
 
+  /**
+   * Creates a JSON flattener by given {@link JsonCore} and
+   * {@link JsonValueBase}.
+   * 
+   * @param jsonCore
+   *          a {@link JsonCore}
+   * @param json
+   *          a JSON string
+   */
   public JsonFlattener(JsonCore<?> jsonCore, JsonValueBase<?> json) {
     this.jsonCore = notNull(jsonCore);
     source = jsonCore.parse(json.toJson());
   }
 
   /**
-   * Creates a JSON flattener.
+   * Creates a JSON flattener by given JSON string.
    * 
    * @param json
    *          a JSON string
@@ -173,13 +182,21 @@ public final class JsonFlattener {
     source = jsonCore.parse(json);
   }
 
+  /**
+   * Creates a JSON flattener by given {@link JsonCore} and JSON string.
+   * 
+   * @param jsonCore
+   *          a {@link JsonCore}
+   * @param json
+   *          a JSON string
+   */
   public JsonFlattener(JsonCore<?> jsonCore, String json) {
     this.jsonCore = notNull(jsonCore);
     source = jsonCore.parse(json);
   }
 
   /**
-   * Creates a JSON flattener.
+   * Creates a JSON flattener by given JSON string reader.
    * 
    * @param jsonReader
    *          a JSON reader
@@ -191,6 +208,16 @@ public final class JsonFlattener {
     source = jsonCore.parse(jsonReader);
   }
 
+  /**
+   * Creates a JSON flattener by given {@link JsonCore} and JSON string reader.
+   * 
+   * @param jsonCore
+   *          a {@link JsonCore}
+   * @param jsonReader
+   *          a JSON string
+   * @throws IOException
+   *           if the jsonReader cannot be read
+   */
   public JsonFlattener(JsonCore<?> jsonCore, Reader jsonReader)
       throws IOException {
     this.jsonCore = notNull(jsonCore);

@@ -595,7 +595,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithLongDecimal() throws IOException {
+  public void testWithJsonCore() throws IOException {
     URL url = Resources.getResource("test_long_decimal.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
@@ -608,6 +608,18 @@ public class JsonUnflattenerTest {
     };
 
     JsonUnflattener ju = new JsonUnflattener(new JacksonJsonCore(mapper), json);
+    ju.withPrintMode(PrintMode.PRETTY);
+    assertEquals(mapper.writerWithDefaultPrettyPrinter()
+        .writeValueAsString(mapper.readTree(json)), ju.unflatten());
+
+    ju = new JsonUnflattener(new JacksonJsonCore(mapper),
+        new StringReader(json));
+    ju.withPrintMode(PrintMode.PRETTY);
+    assertEquals(mapper.writerWithDefaultPrettyPrinter()
+        .writeValueAsString(mapper.readTree(json)), ju.unflatten());
+
+    ju = new JsonUnflattener(new JacksonJsonCore(mapper),
+        mapper.readValue(json, new TypeReference<Map<String, Object>>() {}));
     ju.withPrintMode(PrintMode.PRETTY);
     assertEquals(mapper.writerWithDefaultPrettyPrinter()
         .writeValueAsString(mapper.readTree(json)), ju.unflatten());
