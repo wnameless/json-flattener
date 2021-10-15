@@ -35,7 +35,7 @@ or a Java Map<br>
 <dependency>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.12.0</version>
+	<version>0.12.1</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>

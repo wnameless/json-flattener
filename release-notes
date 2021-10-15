@@ -95,3 +95,6 @@ Version 0.11.1
 
 Version 0.12.0
 + Apply JsonCore in json-base-v2.0.0
+
+Version 0.12.1
+* Minor improve performance

@@ -434,7 +434,7 @@ public final class JsonFlattener {
       Object value = jsonVal2Obj(val);
       // Check NOT empty JSON object
       if (!(ROOT.equals(key) && emptyMap().equals(value)))
-        flattenedMap.put(key, jsonVal2Obj(val));
+        flattenedMap.put(key, value);
     }
   }
 
