@@ -19,7 +19,7 @@ package com.github.wnameless.json.flattener;
 
 import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
 import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.EMPTY_MAP;
 import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -433,8 +433,9 @@ public final class JsonFlattener {
       String key = computeKey();
       Object value = jsonVal2Obj(val);
       // Check NOT empty JSON object
-      if (!(ROOT.equals(key) && emptyMap().equals(value)))
+      if (!ROOT.equals(key) || !EMPTY_MAP.equals(value)) {
         flattenedMap.put(key, value);
+      }
     }
   }
 
@@ -442,6 +443,7 @@ public final class JsonFlattener {
     if (val.isBoolean()) return val.asBoolean();
     if (val.isString()) return val.asString();
     if (val.isNumber()) return val.asNumber();
+
     switch (flattenMode) {
       case KEEP_ARRAYS:
         if (val.isArray()) {
