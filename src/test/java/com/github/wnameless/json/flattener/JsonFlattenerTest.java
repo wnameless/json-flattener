@@ -473,6 +473,26 @@ public class JsonFlattenerTest {
   }
 
   @Test
+  public void testWithUnflattableMode() throws IOException {
+    URL url = Resources.getResource("test7.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+    assertEquals(
+        "{\"agent_ephemeral_id\":\"123\"}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.UNFLATTENABLE)
+            .withSeparator('_').flatten());
+  }
+  
+  @Test
+  public void testWithUnflattableModeWithArray() throws IOException {
+    URL url = Resources.getResource("test8.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+    assertEquals(
+        "{\"agent_ephemeral_id_0\":\"123\",\"agent_ephemeral_id_1\":\"456\"}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.UNFLATTENABLE)
+            .withSeparator('_').flatten());
+  }
+  
+  @Test
   public void testWithRootKeyInSourceObject() {
     String json = "{\"" + JsonFlattener.ROOT + "\":null, \"ss\":[123]}";
     assertEquals("{\"" + JsonFlattener.ROOT + "\":null,\"ss[0]\":123}",

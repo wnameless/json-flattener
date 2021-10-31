@@ -45,6 +45,11 @@ public enum FlattenMode {
    * Flattens every objects except arrays which contain only primitive
    * types(strings, numbers, booleans, and null).
    */
-  KEEP_PRIMITIVE_ARRAYS;
+  KEEP_PRIMITIVE_ARRAYS,
+  
+  /**
+   * Flattens every objects and dont worry about unflattening it
+   */
+  UNFLATTENABLE;
 
 }
