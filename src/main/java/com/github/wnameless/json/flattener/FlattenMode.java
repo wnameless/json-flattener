@@ -50,6 +50,6 @@ public enum FlattenMode {
   /**
    * Flattens every objects and dont worry about unflattening it
    */
-  UNFLATTENABLE;
+  FLATTEN_ONLY;
 
 }

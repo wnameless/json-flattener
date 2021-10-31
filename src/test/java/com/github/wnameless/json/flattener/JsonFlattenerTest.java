@@ -478,7 +478,7 @@ public class JsonFlattenerTest {
     String json = Resources.toString(url, Charsets.UTF_8);
     assertEquals(
         "{\"agent_ephemeral_id\":\"123\"}",
-        new JsonFlattener(json).withFlattenMode(FlattenMode.UNFLATTENABLE)
+        new JsonFlattener(json).withFlattenMode(FlattenMode.FLATTEN_ONLY)
             .withSeparator('_').flatten());
   }
   
@@ -488,7 +488,7 @@ public class JsonFlattenerTest {
     String json = Resources.toString(url, Charsets.UTF_8);
     assertEquals(
         "{\"agent_ephemeral_id_0\":\"123\",\"agent_ephemeral_id_1\":\"456\"}",
-        new JsonFlattener(json).withFlattenMode(FlattenMode.UNFLATTENABLE)
+        new JsonFlattener(json).withFlattenMode(FlattenMode.FLATTEN_ONLY)
             .withSeparator('_').flatten());
   }
   

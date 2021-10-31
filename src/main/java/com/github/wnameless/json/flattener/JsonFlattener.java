@@ -18,7 +18,7 @@
 package com.github.wnameless.json.flattener;
 
 import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
-import static com.github.wnameless.json.flattener.FlattenMode.UNFLATTENABLE;
+import static com.github.wnameless.json.flattener.FlattenMode.FLATTEN_ONLY;
 import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
 import static java.util.Collections.EMPTY_MAP;
 import static org.apache.commons.lang3.Validate.isTrue;
@@ -479,8 +479,8 @@ public final class JsonFlattener {
     return StringUtils.containsAny(key, separator, leftBracket, rightBracket);
   }
 
-  private boolean flattenModeRequiresBrackets() {
-	  return flattenMode.equals(MONGODB) || flattenMode.equals(UNFLATTENABLE) ;
+  private boolean flattenModeDontRequireBrackets() {
+	  return flattenMode.equals(MONGODB) || flattenMode.equals(FLATTEN_ONLY) ;
   }
   
   private String computeKey() {
@@ -495,7 +495,7 @@ public final class JsonFlattener {
             ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent())
                 .getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
-        if (hasReservedCharacters(key) && !flattenMode.equals(UNFLATTENABLE)) {
+        if (hasReservedCharacters(key) && !flattenMode.equals(FLATTEN_ONLY)) {
           sb.append(leftBracket);
           sb.append('"');
           sb.append(policy.getCharSequenceTranslator().translate(key));
@@ -506,9 +506,9 @@ public final class JsonFlattener {
           sb.append(key);
         }
       } else { // JsonValue
-        sb.append(flattenModeRequiresBrackets() ? separator : leftBracket);
+        sb.append(flattenModeDontRequireBrackets() ? separator : leftBracket);
         sb.append(iter.getIndex());
-        sb.append(flattenModeRequiresBrackets() ? "" : rightBracket);
+        sb.append(flattenModeDontRequireBrackets() ? "" : rightBracket);
       }
     }
     return sb.toString();
