@@ -1,5 +1,14 @@
-{
-  "agent": {
-    "ephemeral_id": ["123", "456"]
+[
+  {
+    "field1" : "value",
+    "agent": {
+      "ephemeral_id": "123"
+    }
+  },
+  {
+    "field1" : "value",
+    "agent": {
+      "ephemeral_id": "123"
+    }
   }
-}
+]

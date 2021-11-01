@@ -50,6 +50,10 @@ public enum FlattenMode {
   /**
    * Flattens every objects and dont worry about unflattening it
    */
-  FLATTEN_ONLY;
+  FLATTEN_ONLY,
 
+  /**
+   * Flattens every objects except arrays.
+   */
+  FLATTEN_ONLY_KEEP_ARRAYS;
 }

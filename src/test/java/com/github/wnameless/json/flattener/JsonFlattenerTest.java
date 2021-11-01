@@ -473,25 +473,40 @@ public class JsonFlattenerTest {
   }
 
   @Test
-  public void testWithUnflattableMode() throws IOException {
+  public void testWithFlattableOnlyMode() throws IOException {
     URL url = Resources.getResource("test7.json");
     String json = Resources.toString(url, Charsets.UTF_8);
-    assertEquals(
-        "{\"agent_ephemeral_id\":\"123\"}",
-        new JsonFlattener(json).withFlattenMode(FlattenMode.FLATTEN_ONLY)
-            .withSeparator('_').flatten());
+    assertEquals("{\"agent_ephemeral_id\":\"123\"}",
+	  new JsonFlattener(json).withFlattenMode(FlattenMode.FLATTEN_ONLY).withSeparator('_').flatten());
   }
-  
+
   @Test
-  public void testWithUnflattableModeWithArray() throws IOException {
+  public void testWithFlattableOnlyModeWithArray() throws IOException {
     URL url = Resources.getResource("test8.json");
     String json = Resources.toString(url, Charsets.UTF_8);
     assertEquals(
-        "{\"agent_ephemeral_id_0\":\"123\",\"agent_ephemeral_id_1\":\"456\"}",
-        new JsonFlattener(json).withFlattenMode(FlattenMode.FLATTEN_ONLY)
-            .withSeparator('_').flatten());
+      "{\"_0_field1\":\"value\",\"_0_agent_ephemeral_id\":\"123\",\"_1_field1\":\"value\",\"_1_agent_ephemeral_id\":\"123\"}",
+      new JsonFlattener(json).withFlattenMode(FlattenMode.FLATTEN_ONLY).withSeparator('_').flatten());
   }
-  
+
+  @Test
+  public void testWithFlattableOnlyAndKeepArrayMode() throws IOException {
+    URL url = Resources.getResource("test7.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+    assertEquals("{\"agent_ephemeral_id\":\"123\"}", new JsonFlattener(json)
+      .withFlattenMode(FlattenMode.FLATTEN_ONLY_KEEP_ARRAYS).withSeparator('_').flatten());
+  }
+
+  @Test
+  public void testWithFlattableOnlyAndKeepArrayModeWithArray() throws IOException {
+    URL url = Resources.getResource("test8.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+    assertEquals(
+      "[{\"field1\":\"value\",\"agent_ephemeral_id\":\"123\"},{\"field1\":\"value\",\"agent_ephemeral_id\":\"123\"}]",
+      new JsonFlattener(json).withFlattenMode(FlattenMode.FLATTEN_ONLY_KEEP_ARRAYS).withSeparator('_')
+        .flatten());
+  }
+
   @Test
   public void testWithRootKeyInSourceObject() {
     String json = "{\"" + JsonFlattener.ROOT + "\":null, \"ss\":[123]}";

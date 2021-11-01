@@ -19,6 +19,7 @@ package com.github.wnameless.json.flattener;
 
 import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
 import static com.github.wnameless.json.flattener.FlattenMode.FLATTEN_ONLY;
+import static com.github.wnameless.json.flattener.FlattenMode.FLATTEN_ONLY_KEEP_ARRAYS;
 import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
 import static java.util.Collections.EMPTY_MAP;
 import static org.apache.commons.lang3.Validate.isTrue;
@@ -421,6 +422,7 @@ public final class JsonFlattener {
           }
           break;
         case KEEP_ARRAYS:
+		case FLATTEN_ONLY_KEEP_ARRAYS:
           JsonifyArrayList<Object> array = newJsonifyArrayList();
           for (JsonValueBase<?> value : val.asArray()) {
             array.add(jsonVal2Obj(value));
@@ -447,6 +449,7 @@ public final class JsonFlattener {
 
     switch (flattenMode) {
       case KEEP_ARRAYS:
+      case FLATTEN_ONLY_KEEP_ARRAYS:
         if (val.isArray()) {
           JsonifyArrayList<Object> array = newJsonifyArrayList();
           for (JsonValueBase<?> value : val.asArray()) {
@@ -479,10 +482,14 @@ public final class JsonFlattener {
     return StringUtils.containsAny(key, separator, leftBracket, rightBracket);
   }
 
-  private boolean flattenModeDontRequireBrackets() {
-	  return flattenMode.equals(MONGODB) || flattenMode.equals(FLATTEN_ONLY) ;
+  private boolean flattenOnly() {
+    return flattenMode.equals(FLATTEN_ONLY) || flattenMode.equals(FLATTEN_ONLY_KEEP_ARRAYS);
   }
-  
+
+  private boolean dontRequireArrays() {
+    return flattenMode.equals(MONGODB) || flattenMode.equals(FLATTEN_ONLY);
+  }
+	
   private String computeKey() {
     if (elementIters.isEmpty()) return ROOT;
 
@@ -495,7 +502,7 @@ public final class JsonFlattener {
             ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent())
                 .getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
-        if (hasReservedCharacters(key) && !flattenMode.equals(FLATTEN_ONLY)) {
+        if (hasReservedCharacters(key) && !flattenOnly()) {
           sb.append(leftBracket);
           sb.append('"');
           sb.append(policy.getCharSequenceTranslator().translate(key));
@@ -506,9 +513,9 @@ public final class JsonFlattener {
           sb.append(key);
         }
       } else { // JsonValue
-        sb.append(flattenModeDontRequireBrackets() ? separator : leftBracket);
+        sb.append(dontRequireArrays() ? separator : leftBracket);
         sb.append(iter.getIndex());
-        sb.append(flattenModeDontRequireBrackets() ? "" : rightBracket);
+        sb.append(dontRequireArrays() ? "" : rightBracket);
       }
     }
     return sb.toString();
