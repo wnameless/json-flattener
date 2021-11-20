@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonValueBase;
+import com.github.wnameless.json.unflattener.JsonUnflattener;
 
 /**
  * 
@@ -134,6 +135,7 @@ public final class JsonFlattener {
   private Character rightBracket = ']';
   private PrintMode printMode = PrintMode.MINIMAL;
   private KeyTransformer keyTrans = null;
+  private boolean ignoreReservedCharacters = false;
 
   private JsonFlattener newJsonFlattener(JsonValueBase<?> jsonVal) {
     JsonFlattener jf = new JsonFlattener(jsonVal);
@@ -143,6 +145,7 @@ public final class JsonFlattener {
     jf.withLeftAndRightBrackets(leftBracket, rightBracket);
     jf.withPrintMode(printMode);
     if (keyTrans != null) jf.withKeyTransformer(keyTrans);
+    if (ignoreReservedCharacters) jf.ignoreReservedCharacters();
     return jf;
   }
 
@@ -331,6 +334,26 @@ public final class JsonFlattener {
   }
 
   /**
+   * After this option is enable, all reserved characters used in keys will stop
+   * to be checked and escaped. <br>
+   * <br>
+   * Example:<br>
+   * <br>
+   * Input JSON: {"matrix":{"agent.smith":"1999"}}<br>
+   * Flatten with option disable: {"matrix[\"agent.smith\"]":"1999"}<br>
+   * Flatten with option enable: {"matrix.agent.smith":"1999"}<br>
+   * <br>
+   * {@link JsonUnflattener} may cause unpredictable results with the JSON
+   * produced by a {@link JsonFlattener} with this option enable.
+   * 
+   * @return this {@link JsonFlattener}
+   */
+  public JsonFlattener ignoreReservedCharacters() {
+    ignoreReservedCharacters = true;
+    return this;
+  }
+
+  /**
    * Returns a flattened JSON string.
    * 
    * @return a flattened JSON string
@@ -490,7 +513,7 @@ public final class JsonFlattener {
             ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent())
                 .getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
-        if (hasReservedCharacters(key)) {
+        if (!ignoreReservedCharacters && hasReservedCharacters(key)) {
           sb.append(leftBracket);
           sb.append('"');
           sb.append(policy.getCharSequenceTranslator().translate(key));

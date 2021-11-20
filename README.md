@@ -35,7 +35,7 @@ or a Java Map<br>
 <dependency>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.12.1</version>
+	<version>0.13.0</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>
@@ -75,6 +75,27 @@ String nestedJsonWithDotKey = JsonUnflattener.unflatten(
 System.out.println(nestedJsonWithDotKey);
 // [1,[2,3],4,{"ab.c.[":5}]
 ```
+
+## New Features (since v0.13.0)
+### IgnoreReservedCharacters - reserved characters in keys can be ignored
+```java
+String json = "{\"matrix\":{\"agent.smith\":\"1999\"}}";
+
+System.out.println(JsonFlattener.flatten(json));
+// {"matrix[\"agent.smith\"]":"1999"}
+
+System.out.println(new JsonFlattener(json).ignoreReservedCharacters().flatten());
+// {"matrix.agent.smith":"1999"}
+// The escape of reserved character('.') has been ignored
+
+new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten();
+// Throws IllegalArgumentException
+
+System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).ignoreReservedCharacters().flatten());
+// {"matrix.agent.smith":"1999"}
+// The check of reserved character('.') has been ignored
+```
+
 ## New Features (since v0.12.0)
 ### JsonCore - customized JSON libarary supported
 ```java

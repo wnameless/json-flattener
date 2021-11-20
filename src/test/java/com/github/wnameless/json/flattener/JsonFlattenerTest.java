@@ -581,4 +581,36 @@ public class JsonFlattenerTest {
         .writeValueAsString(mapper.readTree(json)), jf.flatten());
   }
 
+  @Test
+  public void testWithIgnoreReservedCharacters() {
+    String json = "{\"matrix\":{\"agent.smith\":\"1999\"}}";
+
+    assertEquals("{\"matrix[\\\"agent.smith\\\"]\":\"1999\"}",
+        JsonFlattener.flatten(json));
+    assertEquals("{\"matrix.agent.smith\":\"1999\"}",
+        new JsonFlattener(json).ignoreReservedCharacters().flatten());
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten();
+    });
+    assertEquals("{\"matrix.agent.smith\":\"1999\"}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB)
+            .ignoreReservedCharacters().flatten());
+
+    String jsonArray = "[\n" + "  {\n" + "    \"matrix\" : \"reloaded\",\n"
+        + "    \"agent\": {\n" + "      \"smith_no\": \"1\"\n" + "    }\n"
+        + "  },\n" + "  {\n" + "    \"matrix\" : \"reloaded\",\n"
+        + "    \"agent\": {\n" + "      \"smith_no\": \"2\"\n" + "    }\n"
+        + "  }\n" + "]";
+
+    assertEquals(
+        "{\"_0_matrix\":\"reloaded\",\"_0_agent_smith_no\":\"1\",\"_1_matrix\":\"reloaded\",\"_1_agent_smith_no\":\"2\"}",
+        new JsonFlattener(jsonArray).withFlattenMode(FlattenMode.MONGODB)
+            .withSeparator('_').ignoreReservedCharacters().flatten());
+    assertEquals(
+        "[{\"matrix\":\"reloaded\",\"agent_smith_no\":\"1\"},{\"matrix\":\"reloaded\",\"agent_smith_no\":\"2\"}]",
+        new JsonFlattener(jsonArray).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withSeparator('_').ignoreReservedCharacters().flatten());
+  }
+
 }
