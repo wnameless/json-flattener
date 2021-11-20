@@ -597,11 +597,9 @@ public class JsonFlattenerTest {
         new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB)
             .ignoreReservedCharacters().flatten());
 
-    String jsonArray = "[\n" + "  {\n" + "    \"matrix\" : \"reloaded\",\n"
-        + "    \"agent\": {\n" + "      \"smith_no\": \"1\"\n" + "    }\n"
-        + "  },\n" + "  {\n" + "    \"matrix\" : \"reloaded\",\n"
-        + "    \"agent\": {\n" + "      \"smith_no\": \"2\"\n" + "    }\n"
-        + "  }\n" + "]";
+    String jsonArray =
+        "[{\"matrix\":\"reloaded\",\"agent\":{\"smith_no\":\"1\"}},"
+            + "{\"matrix\":\"reloaded\",\"agent\":{\"smith_no\":\"2\"}}]";
 
     assertEquals(
         "{\"_0_matrix\":\"reloaded\",\"_0_agent_smith_no\":\"1\",\"_1_matrix\":\"reloaded\",\"_1_agent_smith_no\":\"2\"}",
