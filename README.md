@@ -3,7 +3,7 @@
 
 json-flattener
 =============
-A Java utility is used to FLATTEN nested JSON objects and even more to UNFLATTEN it back.
+A Java utility is designed to FLATTEN nested JSON objects and even more to UNFLATTEN them back.
 
 ## Purpose
 Converts a nested JSON
@@ -35,7 +35,7 @@ or a Java Map<br>
 <dependency>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.13.0</version>
+	<version>0.14.0</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>
@@ -74,6 +74,31 @@ String nestedJsonWithDotKey = JsonUnflattener.unflatten(
         "{\"[1][0];\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.[\\\"]\":5}");
 System.out.println(nestedJsonWithDotKey);
 // [1,[2,3],4,{"ab.c.[":5}]
+```
+
+## New Features (since v0.14.0)
+### JsonFlattenerFactory - produce any JsonFlattener with preconfigured settings
+```java
+// Inside Spring configuration class
+@Bean
+public JsonFlattenerFactory jsonFlattenerFactory() {
+  // Changes the default PrintMode from MINIMAL to PRETTY
+  Consumer<JsonFlattener> configurer = jf -> jf.withPrintMode(PrintMode.PRETTY);
+  // Alters the default JsonCore from Jackson to GSON
+  JsonCore<?> jsonCore = new GsonJsonCore();
+
+  return new JsonFlattenerFactory(configurer, jsonCore);
+}
+
+// In any other Spring environment class
+@Autowired
+JsonFlattenerFactory jsonFlattenerFactory;
+
+public void usageExamples(String json) {
+  JsonFlattener jf1 = jsonFlattenerFactory.build(json);
+  JsonFlattener jf2 = jsonFlattenerFactory.build(new GsonJsonCore().parse(json));
+  JsonFlattener jf3 = jsonFlattenerFactory.build(new StringReader(json));
+}
 ```
 
 ## New Features (since v0.13.0)

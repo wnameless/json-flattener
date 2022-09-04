@@ -101,3 +101,6 @@ Version 0.12.1
 
 Version 0.13.0
 + Add #ignoreReservedCharacters
+
+Version 0.14.0
++ Add JsonFlattenerFactory
