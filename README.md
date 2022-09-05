@@ -105,7 +105,7 @@ public void usageExamples(String json) {
 ```java
 // Inside Spring configuration class
 @Bean
-public JsonUnFlattenerFactory jsonUnflattenerFactory() {
+public JsonUnflattenerFactory jsonUnflattenerFactory() {
   // Sets the FlattenMode to MONGODB
   Consumer<JsonUnflattener> configurer = ju -> ju.withFlattenMode(FlattenMode.MONGODB);
   // Alters the default JsonCore from Jackson to GSON
@@ -116,12 +116,12 @@ public JsonUnFlattenerFactory jsonUnflattenerFactory() {
 
 // In any other Spring environment class
 @Autowired
-JsonUnFlattenerFactory jsonUnflattenerFactory;
+JsonUnflattenerFactory jsonUnflattenerFactory;
 
 public void usageExamples(String json) {
-  JsonUnFlattener ju1 = jsonUnflattenerFactory.build(json);
-  JsonUnFlattener ju2 = jsonUnflattenerFactory.build(new StringReader(json));
-  JsonUnFlattener ju3 = jsonUnflattenerFactory.build((Map<String, ?>) new ObjectMapper().readValue(json, Map.class));
+  JsonUnflattener ju1 = jsonUnflattenerFactory.build(json);
+  JsonUnflattener ju2 = jsonUnflattenerFactory.build(new StringReader(json));
+  JsonUnflattener ju3 = jsonUnflattenerFactory.build((Map<String, ?>) new ObjectMapper().readValue(json, Map.class));
 }
 ```
 
