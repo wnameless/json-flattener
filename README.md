@@ -101,6 +101,30 @@ public void usageExamples(String json) {
 }
 ```
 
+### JsonUnflattenerFactory - produces any JsonUnflattener with preconfigured settings
+```java
+// Inside Spring configuration class
+@Bean
+public JsonUnFlattenerFactory jsonUnflattenerFactory() {
+  // Sets the FlattenMode to MONGODB
+  Consumer<JsonUnflattener> configurer = ju -> ju.withFlattenMode(FlattenMode.MONGODB);
+  // Alters the default JsonCore from Jackson to GSON
+  JsonCore<?> jsonCore = new GsonJsonCore();
+
+  return new JsonUnflattenerFactory(configurer, jsonCore);
+}
+
+// In any other Spring environment class
+@Autowired
+JsonUnFlattenerFactory jsonUnFlattenerFactory;
+
+public void usageExamples(String json) {
+  JsonUnFlattener ju1 = jsonUnFlattenerFactory.build(json);
+  JsonUnFlattener ju2 = jsonUnFlattenerFactory.build(new GsonJsonCore().parse(json));
+  JsonUnFlattener ju3 = jsonUnFlattenerFactory.build(new StringReader(json));
+}
+```
+
 ## New Features (since v0.13.0)
 ### IgnoreReservedCharacters - reserved characters in keys can be ignored
 ```java
@@ -149,6 +173,7 @@ Map<String, Object> flattenedMap = JsonFlattener.flattenAsMap(json);
 
 String unflattenedJson = JsonUnflattener.unflatten(flattenedMap);
 ```
+
 ### JsonUnflattener.unflattenAsMap
 ```java
 String json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
@@ -331,6 +356,7 @@ Map<String, Object> map = new JsonFlattener("[[123]]").withFlattenMode(FlattenMo
 System.out.println(map.get("root"));
 // [[123]]
 ```
+
 ### StringEscapePolicy
 ```java
 String json = "{\"abc\":{\"def\":\"太極\\t\"}}";
@@ -343,6 +369,7 @@ System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePo
 System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePolicy.ALL_UNICODES).flatten());
 // {"abc.def":"\u592A\u6975\t"}
 ```
+
 ### Separator
 ```java
 // JsonFlattener - separator can be changed from dot(.) to an arbitrary character
@@ -355,6 +382,7 @@ json = "{\"abc*def\":123}";
 System.out.println(new JsonUnflattener(json).withSeparator('*').unflatten());
 // {"abc":{"def":123}}
 ```
+
 ### PrintMode
 ```java
 String json = "{\"abc\":{\"def\":123}}";
