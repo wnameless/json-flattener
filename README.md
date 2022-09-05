@@ -77,7 +77,7 @@ System.out.println(nestedJsonWithDotKey);
 ```
 
 ## New Features (since v0.14.0)
-### JsonFlattenerFactory - produce any JsonFlattener with preconfigured settings
+### JsonFlattenerFactory - produces any JsonFlattener with preconfigured settings
 ```java
 // Inside Spring configuration class
 @Bean
@@ -190,9 +190,6 @@ jsonVal = new GsonJsonValue(jsonElement);
 
 // JacksonJsonValue, which is provided by json-base lib, can wrap Jackson jsonNode to JsonValueBase
 jsonVal = new JacksonJsonValue(jsonNode);
-
-// MinimalJsonValue, which is provided by json-base lib, can wrap MinimalJson jsonValue to JsonValueBase
-jsonVal = new MinimalJsonValue(jsonValue);
 
 // You can also implement the JsonValueBase interface for any JSON lib you are using
 jsonVal = new CostumeJsonValue(yourJsonVal);
@@ -367,10 +364,6 @@ String json = "{\"abc\":{\"def\":123}}";
 System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.MINIMAL).flatten());
 // {"abc.def":123}
 
-// PrintMode.REGULAR
-System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.REGULAR).flatten());
-// { "abc.def": 123 }
-
 // PrintMode.PRETTY
 System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.PRETTY).flatten());
 // {
@@ -382,10 +375,6 @@ System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.PRETTY).flatt
 json = "{\"abc.def\":123}";
 System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.MINIMAL).unflatten());
 // {"abc":{"def":123}}
-
-// PrintMode.REGULAR
-System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.REGULAR).unflatten());
-// {"abc": {"def": 123}}
 
 // PrintMode.PRETTY
 System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.PRETTY).unflatten());
