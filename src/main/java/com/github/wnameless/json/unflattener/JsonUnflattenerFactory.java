@@ -15,114 +15,117 @@
  * the License.
  *
  */
-package com.github.wnameless.json.flattener;
+package com.github.wnameless.json.unflattener;
 
 import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import com.github.wnameless.json.base.JsonCore;
-import com.github.wnameless.json.base.JsonValueBase;
 
 /**
  * 
- * {@link JsonFlattenerFactory} preserves the configuration of a
- * {@link JsonFlattener}, in doing so, any input JSON data can be used to create
- * a {@link JsonFlattener} object with the same configuration.
- *
- * @author Wei-Ming Wu
+ * {@link JsonUnflattenerFactory} preserves the configuration of a
+ * {@link JsonUnflattener}, in doing so, any input JSON data can be used to
+ * create a {@link JsonUnflattener} object with the same configuration.
  * 
+ * @author Wei-Ming Wu
+ *
  */
-public final class JsonFlattenerFactory {
+public final class JsonUnflattenerFactory {
 
-  private final Consumer<JsonFlattener> configurer;
+  private final Consumer<JsonUnflattener> configurer;
   private final Optional<JsonCore<?>> jsonCore;
 
   /**
-   * Returns a {@link JsonFlattenerFactory}.
+   * Returns a {@link JsonUnflattenerFactory}.
    * 
    * @param configurer
    *          a functional interface used to set up the configuration of a
-   *          {@link JsonFlattener}.
+   *          {@link JsonUnflattener}.
    */
-  public JsonFlattenerFactory(Consumer<JsonFlattener> configurer) {
+  public JsonUnflattenerFactory(Consumer<JsonUnflattener> configurer) {
     this.configurer = notNull(configurer);
     this.jsonCore = Optional.empty();
   }
 
   /**
-   * Returns a {@link JsonFlattenerFactory}.
+   * Returns a {@link JsonUnflattenerFactory}.
    * 
    * @param configurer
    *          a functional interface used to set up the configuration of a
-   *          {@link JsonFlattener}.
+   *          {@link JsonUnflattener}.
    * @param jsonCore
    *          a {@link JsonCore}
    */
-  public JsonFlattenerFactory(Consumer<JsonFlattener> configurer,
+  public JsonUnflattenerFactory(Consumer<JsonUnflattener> configurer,
       JsonCore<?> jsonCore) {
     this.configurer = notNull(configurer);
     this.jsonCore = Optional.of(jsonCore);
   }
 
   /**
-   * Creates a {@link JsonFlattener} by given JSON string and configures it with
-   * the configurer and jsonCore within this {@link JsonFlattenerFactory}.
+   * Creates a {@link JsonUnflattener} by given JSON string and configures it
+   * with the configurer and jsonCore within this
+   * {@link JsonUnflattenerFactory}.
    * 
    * @param json
    *          the JSON string
-   * @return a {@link JsonFlattener}
+   * @return a {@link JsonUnflattener}
    */
-  public JsonFlattener build(String json) {
-    JsonFlattener jf;
+  public JsonUnflattener build(String json) {
+    JsonUnflattener jf;
     if (jsonCore.isPresent()) {
-      jf = new JsonFlattener(jsonCore.get(), json);
+      jf = new JsonUnflattener(jsonCore.get(), json);
     } else {
-      jf = new JsonFlattener(json);
+      jf = new JsonUnflattener(json);
     }
+
     configurer.accept(jf);
     return jf;
   }
 
   /**
-   * Creates a {@link JsonFlattener} by given {@link JsonValueBase} and
+   * Creates a {@link JsonUnflattener} by given flattened {@link Map} and
    * configures it with the configurer and jsonCore within this
-   * {@link JsonFlattenerFactory}.
+   * {@link JsonUnflattenerFactory}.
    * 
-   * @param json
-   *          the {@link JsonValueBase}
-   * @return a {@link JsonFlattener}
+   * @param flattenedMap
+   *          a flattened {@link Map}
+   * @return a {@link JsonUnflattener}
    */
-  public JsonFlattener build(JsonValueBase<?> json) {
-    JsonFlattener jf;
+  public JsonUnflattener build(Map<String, ?> flattenedMap) {
+    JsonUnflattener jf;
     if (jsonCore.isPresent()) {
-      jf = new JsonFlattener(jsonCore.get(), json);
+      jf = new JsonUnflattener(jsonCore.get(), flattenedMap);
     } else {
-      jf = new JsonFlattener(json);
+      jf = new JsonUnflattener(flattenedMap);
     }
     configurer.accept(jf);
     return jf;
   }
 
   /**
-   * Creates a {@link JsonFlattener} by given JSON reader and configures it with
-   * the configurer and jsonCore within this {@link JsonFlattenerFactory}.
+   * Creates a {@link JsonUnflattener} by given JSON reader and configures it
+   * with the configurer and jsonCore within this
+   * {@link JsonUnflattenerFactory}.
    * 
    * @param jsonReader
    *          a JSON reader
-   * @return a {@link JsonFlattener}
+   * @return a {@link JsonUnflattener}
    * @throws IOException
    *           if the jsonReader cannot be read
    */
-  public JsonFlattener build(Reader jsonReader) throws IOException {
-    JsonFlattener jf;
+  public JsonUnflattener build(Reader jsonReader) throws IOException {
+    JsonUnflattener jf;
     if (jsonCore.isPresent()) {
-      jf = new JsonFlattener(jsonCore.get(), jsonReader);
+      jf = new JsonUnflattener(jsonCore.get(), jsonReader);
     } else {
-      jf = new JsonFlattener(jsonReader);
+      jf = new JsonUnflattener(jsonReader);
     }
     configurer.accept(jf);
     return jf;
@@ -139,15 +142,15 @@ public final class JsonFlattenerFactory {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof JsonFlattenerFactory)) return false;
-    JsonFlattenerFactory other = (JsonFlattenerFactory) o;
+    if (!(o instanceof JsonUnflattenerFactory)) return false;
+    JsonUnflattenerFactory other = (JsonUnflattenerFactory) o;
     return configurer.equals(other.configurer)
         && jsonCore.equals(other.jsonCore);
   }
 
   @Override
   public String toString() {
-    return "JsonFlattenerFactory{configurer=" + configurer + ", jsonCore="
+    return "JsonUnflattenerFactory{configurer=" + configurer + ", jsonCore="
         + jsonCore + "}";
   }
 
