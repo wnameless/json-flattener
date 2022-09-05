@@ -96,8 +96,8 @@ JsonFlattenerFactory jsonFlattenerFactory;
 
 public void usageExamples(String json) {
   JsonFlattener jf1 = jsonFlattenerFactory.build(json);
-  JsonFlattener jf2 = jsonFlattenerFactory.build(new GsonJsonCore().parse(json));
-  JsonFlattener jf3 = jsonFlattenerFactory.build(new StringReader(json));
+  JsonFlattener jf2 = jsonFlattenerFactory.build(new StringReader(json));
+  JsonFlattener jf3 = jsonFlattenerFactory.build(new GsonJsonCore().parse(json));
 }
 ```
 
@@ -116,12 +116,12 @@ public JsonUnFlattenerFactory jsonUnflattenerFactory() {
 
 // In any other Spring environment class
 @Autowired
-JsonUnFlattenerFactory jsonUnFlattenerFactory;
+JsonUnFlattenerFactory jsonUnflattenerFactory;
 
 public void usageExamples(String json) {
-  JsonUnFlattener ju1 = jsonUnFlattenerFactory.build(json);
-  JsonUnFlattener ju2 = jsonUnFlattenerFactory.build(new GsonJsonCore().parse(json));
-  JsonUnFlattener ju3 = jsonUnFlattenerFactory.build(new StringReader(json));
+  JsonUnFlattener ju1 = jsonUnflattenerFactory.build(json);
+  JsonUnFlattener ju2 = jsonUnflattenerFactory.build(new StringReader(json));
+  JsonUnFlattener ju3 = jsonUnflattenerFactory.build((Map<String, ?>) new ObjectMapper().readValue(json, Map.class));
 }
 ```
 
