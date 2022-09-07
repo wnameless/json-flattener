@@ -3,7 +3,7 @@
 
 json-flattener
 =============
-A Java utility is used to FLATTEN nested JSON objects and even more to UNFLATTEN it back.
+A Java utility is designed to FLATTEN nested JSON objects and even more to UNFLATTEN them back.
 
 ## Purpose
 Converts a nested JSON
@@ -35,7 +35,7 @@ or a Java Map<br>
 <dependency>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.13.0</version>
+	<version>0.14.0</version>
 </dependency>
 ```
 Since v0.5.0, Java 8 required.<br>
@@ -74,6 +74,55 @@ String nestedJsonWithDotKey = JsonUnflattener.unflatten(
         "{\"[1][0];\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.[\\\"]\":5}");
 System.out.println(nestedJsonWithDotKey);
 // [1,[2,3],4,{"ab.c.[":5}]
+```
+
+## New Features (since v0.14.0)
+### JsonFlattenerFactory - produces any JsonFlattener with preconfigured settings
+```java
+// Inside Spring configuration class
+@Bean
+public JsonFlattenerFactory jsonFlattenerFactory() {
+  // Changes the default PrintMode from MINIMAL to PRETTY
+  Consumer<JsonFlattener> configurer = jf -> jf.withPrintMode(PrintMode.PRETTY);
+  // Alters the default JsonCore from Jackson to GSON
+  JsonCore<?> jsonCore = new GsonJsonCore();
+
+  return new JsonFlattenerFactory(configurer, jsonCore);
+}
+
+// In any other Spring environment class
+@Autowired
+JsonFlattenerFactory jsonFlattenerFactory;
+
+public void usageExamples(String json) {
+  JsonFlattener jf1 = jsonFlattenerFactory.build(json);
+  JsonFlattener jf2 = jsonFlattenerFactory.build(new StringReader(json));
+  JsonFlattener jf3 = jsonFlattenerFactory.build(new GsonJsonCore().parse(json));
+}
+```
+
+### JsonUnflattenerFactory - produces any JsonUnflattener with preconfigured settings
+```java
+// Inside Spring configuration class
+@Bean
+public JsonUnflattenerFactory jsonUnflattenerFactory() {
+  // Sets the FlattenMode to MONGODB
+  Consumer<JsonUnflattener> configurer = ju -> ju.withFlattenMode(FlattenMode.MONGODB);
+  // Alters the default JsonCore from Jackson to GSON
+  JsonCore<?> jsonCore = new GsonJsonCore();
+
+  return new JsonUnflattenerFactory(configurer, jsonCore);
+}
+
+// In any other Spring environment class
+@Autowired
+JsonUnflattenerFactory jsonUnflattenerFactory;
+
+public void usageExamples(String json) {
+  JsonUnflattener ju1 = jsonUnflattenerFactory.build(json);
+  JsonUnflattener ju2 = jsonUnflattenerFactory.build(new StringReader(json));
+  JsonUnflattener ju3 = jsonUnflattenerFactory.build((Map<String, ?>) new ObjectMapper().readValue(json, Map.class));
+}
 ```
 
 ## New Features (since v0.13.0)
@@ -124,6 +173,7 @@ Map<String, Object> flattenedMap = JsonFlattener.flattenAsMap(json);
 
 String unflattenedJson = JsonUnflattener.unflatten(flattenedMap);
 ```
+
 ### JsonUnflattener.unflattenAsMap
 ```java
 String json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
@@ -165,9 +215,6 @@ jsonVal = new GsonJsonValue(jsonElement);
 
 // JacksonJsonValue, which is provided by json-base lib, can wrap Jackson jsonNode to JsonValueBase
 jsonVal = new JacksonJsonValue(jsonNode);
-
-// MinimalJsonValue, which is provided by json-base lib, can wrap MinimalJson jsonValue to JsonValueBase
-jsonVal = new MinimalJsonValue(jsonValue);
 
 // You can also implement the JsonValueBase interface for any JSON lib you are using
 jsonVal = new CostumeJsonValue(yourJsonVal);
@@ -309,6 +356,7 @@ Map<String, Object> map = new JsonFlattener("[[123]]").withFlattenMode(FlattenMo
 System.out.println(map.get("root"));
 // [[123]]
 ```
+
 ### StringEscapePolicy
 ```java
 String json = "{\"abc\":{\"def\":\"太極\\t\"}}";
@@ -321,6 +369,7 @@ System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePo
 System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePolicy.ALL_UNICODES).flatten());
 // {"abc.def":"\u592A\u6975\t"}
 ```
+
 ### Separator
 ```java
 // JsonFlattener - separator can be changed from dot(.) to an arbitrary character
@@ -333,6 +382,7 @@ json = "{\"abc*def\":123}";
 System.out.println(new JsonUnflattener(json).withSeparator('*').unflatten());
 // {"abc":{"def":123}}
 ```
+
 ### PrintMode
 ```java
 String json = "{\"abc\":{\"def\":123}}";
@@ -341,10 +391,6 @@ String json = "{\"abc\":{\"def\":123}}";
 // PrintMode.MINIMAL(default)
 System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.MINIMAL).flatten());
 // {"abc.def":123}
-
-// PrintMode.REGULAR
-System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.REGULAR).flatten());
-// { "abc.def": 123 }
 
 // PrintMode.PRETTY
 System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.PRETTY).flatten());
@@ -357,10 +403,6 @@ System.out.println(new JsonFlattener(json).withPrintMode(PrintMode.PRETTY).flatt
 json = "{\"abc.def\":123}";
 System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.MINIMAL).unflatten());
 // {"abc":{"def":123}}
-
-// PrintMode.REGULAR
-System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.REGULAR).unflatten());
-// {"abc": {"def": 123}}
 
 // PrintMode.PRETTY
 System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.PRETTY).unflatten());
