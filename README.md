@@ -53,26 +53,54 @@ Since v0.9.0, Java Module supported.<br>
 ## Quick Start
 ```java
 String json = "{ \"a\" : { \"b\" : 1, \"c\": null, \"d\": [false, true] }, \"e\": \"f\", \"g\":2.3 }";
+// { "a":
+//   { "b": 1,
+//     "c": null,
+//     "d": [false, true]
+//   },
+//   "e": "f",
+//   "g": 2.3
+// }
+```
+
+Flatten to Java Map
+```java
 Map<String, Object> flattenJson = JsonFlattener.flattenAsMap(json);
 
 System.out.println(flattenJson);
 // {a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
+```
 
+Flatten to JSON string
+```java
 String jsonStr = JsonFlattener.flatten(json);
+
 System.out.println(jsonStr);
 // {"a.b":1,"a.c":null,"a.d[0]":false,"a.d[1]":true,"e":"f","g":2.3}
+```
 
+Unflatten to JSON string
+```java
 String nestedJson = JsonUnflattener.unflatten(jsonStr);
+
 System.out.println(nestedJson);
 // {"a":{"b":1,"c":null,"d":[false,true]},"e":"f","g":2.3}
+```
 
-// Support JSON keys which contain dots or square brackets
+Flatten with reserved characters
+```java
+// Supports JSON keys which contain dots or square brackets
 String flattendJsonWithDotKey = JsonFlattener.flatten("[{\"a.a.[\":1},2,{\"c\":[3,4]}]");
+
 System.out.println(flattendJsonWithDotKey);
 // {"[0][\"a.a.[\"]":12,"[1]":2,"[2].c[0]":3,"[2].c[1]":4}
+```
 
+Unflatten with reserved characters
+```java
 String nestedJsonWithDotKey = JsonUnflattener.unflatten(
         "{\"[1][0];\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.[\\\"]\":5}");
+	
 System.out.println(nestedJsonWithDotKey);
 // [1,[2,3],4,{"ab.c.[":5}]
 ```
