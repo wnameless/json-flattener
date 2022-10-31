@@ -27,57 +27,98 @@ into a flattened JSON
   "g": 2.3
 }
 ```
-or a Java Map<br>
-&nbsp;&nbsp;{a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
+or a Java Map
+```java
+// {a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
+```
 
-## Maven Repo
+# Maven Repo
 ```xml
 <dependency>
 	<groupId>com.github.wnameless.json</groupId>
 	<artifactId>json-flattener</artifactId>
-	<version>0.14.0</version>
+	<version>${newestVersion}</version>
+	<!-- Newest version shows in the maven-central badge above -->
 </dependency>
 ```
-Since v0.5.0, Java 8 required.<br>
-Since v0.6.0, StringEscapePolicy.DEFAULT, which escapes all special characters but slash('/') and Unicode, becomes the default setting.<br>
-Since v0.9.0, Java Module supported.<br>
-```diff
-- Since v0.7.0, group ID is changed from [com.github.wnameless] to [com.github.wnameless.json].
-```
-```diff
-+ Since v0.10.0, The Map produced by JsonFlattener#flattenAsMap after serialization is now identical to the JSON produced by JsonFlattener#flatten.
-+ Before v0.10.0, the serialized flattened Map may be different at some edge cases(ex: input keys contain separator('.')).
-```
 
-## Quick Start
+# Quick Start
 ```java
 String json = "{ \"a\" : { \"b\" : 1, \"c\": null, \"d\": [false, true] }, \"e\": \"f\", \"g\":2.3 }";
+
+// { "a":
+//   { "b": 1,
+//     "c": null,
+//     "d": [false, true]
+//   },
+//   "e": "f",
+//   "g": 2.3
+// }
+```
+
+Flatten to Java Map
+```java
 Map<String, Object> flattenJson = JsonFlattener.flattenAsMap(json);
 
 System.out.println(flattenJson);
 // {a.b=1, a.c=null, a.d[0]=false, a.d[1]=true, e=f, g=2.3}
+```
 
+Flatten to JSON string
+```java
 String jsonStr = JsonFlattener.flatten(json);
+
 System.out.println(jsonStr);
 // {"a.b":1,"a.c":null,"a.d[0]":false,"a.d[1]":true,"e":"f","g":2.3}
+```
 
+Unflatten from JSON string
+```java
 String nestedJson = JsonUnflattener.unflatten(jsonStr);
+
 System.out.println(nestedJson);
 // {"a":{"b":1,"c":null,"d":[false,true]},"e":"f","g":2.3}
+```
 
-// Support JSON keys which contain dots or square brackets
+Flatten or Unflatten with reserved characters
+```java
+// Supports JSON keys which contain dots or square brackets
 String flattendJsonWithDotKey = JsonFlattener.flatten("[{\"a.a.[\":1},2,{\"c\":[3,4]}]");
+
 System.out.println(flattendJsonWithDotKey);
 // {"[0][\"a.a.[\"]":12,"[1]":2,"[2].c[0]":3,"[2].c[1]":4}
 
 String nestedJsonWithDotKey = JsonUnflattener.unflatten(
         "{\"[1][0];\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.[\\\"]\":5}");
+	
 System.out.println(nestedJsonWithDotKey);
 // [1,[2,3],4,{"ab.c.[":5}]
 ```
 
-## New Features (since v0.14.0)
-### JsonFlattenerFactory - produces any JsonFlattener with preconfigured settings
+# Feature List<a id='top'></a>
+| Name | Description | Since |
+| --- | --- | --- |
+| [JsonFlattenerFactory](#14.0.1) | produces any JsonFlattener with preconfigured settings | v0.14.0 |
+| [JsonUnflattenerFactory](#14.0.2) | produces any JsonUnflattener with preconfigured settings | v0.14.0 |
+| [IgnoreReservedCharacters](#13.0.1) | reserved characters in keys can be ignored | v0.13.0 |
+| [JsonCore](#12.0.1) | customized JSON libarary(Jackson, GSON, etc.) supported | v0.12.0 |
+| [JsonUnflattener.unflatten(Map)](#11.0.1) | new API for Java Map unflattening | v0.11.0 |
+| [JsonUnflattener.unflattenAsMap](#11.0.2) | new API for JSON unflattening | v0.11.0 |
+| [JsonFlattener.flattenAsMap(JsonValueBase)](#8.1.1) | new API for JSON flattening | v0.8.1 |
+| [FlattenMode.KEEP_PRIMITIVE_ARRAYS](#8.0.1) | new FlattenMode to keep all primitive JSON arrrays | v0.8.0 |
+| [JsonValueBase](#7.0.1)| comes from json-base lib, is introduced to improve performance | v0.7.0 |
+| [StringEscapePolicy](#6.0.1) | ALL, ALL_BUT_SLASH, ALL_BUT_UNICODE, ALL_BUT_SLASH_AND_UNICODE, DEFAULT | v0.6.0 |
+| [CharSequenceTranslatorFactory](#5.0.1) | customized StringEscapePolicy | v0.5.0 |
+| [FlattenMode.MONGODB](#4.0.1) | dot notation | v0.4.0 |
+| [KeyTransformer](#4.0.2) | manipulates keys before flattening  | v0.4.0 |
+| [LeftAndRightBrackets](#3.0.1) | customized brackets | v0.3.0 |
+| [Reader](#3.0.2) | input JSON as Java Reader | v0.3.0 |
+| [FlattenMode](#2.0.1) | NORMAL, KEEP_ARRAYS | v0.2.0 |
+| [StringEscapePolicy](#2.0.2) | NORMAL, ALL_UNICODES | v0.2.0 |
+| [Separator](#2.0.3) | customized separator | v0.2.0 |
+| [PrintMode](#2.0.4) | MINIMAL, PRETTY | v0.2.0 |
+
+### [:top:](#top) JsonFlattenerFactory<a id='14.0.1'></a> - produces any JsonFlattener with preconfigured settings
 ```java
 // Inside Spring configuration class
 @Bean
@@ -101,7 +142,7 @@ public void usageExamples(String json) {
 }
 ```
 
-### JsonUnflattenerFactory - produces any JsonUnflattener with preconfigured settings
+### [:top:](#top) JsonUnflattenerFactory<a id='14.0.2'></a> - produces any JsonUnflattener with preconfigured settings
 ```java
 // Inside Spring configuration class
 @Bean
@@ -125,8 +166,7 @@ public void usageExamples(String json) {
 }
 ```
 
-## New Features (since v0.13.0)
-### IgnoreReservedCharacters - reserved characters in keys can be ignored
+### [:top:](#top) IgnoreReservedCharacters<a id='13.0.1'></a> - reserved characters in keys can be ignored
 ```java
 String json = "{\"matrix\":{\"agent.smith\":\"1999\"}}";
 
@@ -145,8 +185,7 @@ System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).
 // The check of reserved character('.') has been ignored
 ```
 
-## New Features (since v0.12.0)
-### JsonCore - customized JSON libarary supported
+### [:top:](#top) JsonCore<a id='12.0.1'></a> - customized JSON libarary supported
 ```java
 JsonFlattener jf;
 JsonUnflattener ju;
@@ -165,8 +204,7 @@ jf = new JsonFlattener(new GsonJsonCore(gson), json);
 ju = new JsonUnflattener(new GsonJsonCore(gson), json);
 ```
 
-## New Features (since v0.11.0)
-### JsonUnflattener.unflatten(Map)
+### [:top:](#top) JsonUnflattener.unflatten(Map)<a id='11.0.1'></a> - new API for Java Map unflattening
 ```java
 String json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
 Map<String, Object> flattenedMap = JsonFlattener.flattenAsMap(json);
@@ -174,7 +212,7 @@ Map<String, Object> flattenedMap = JsonFlattener.flattenAsMap(json);
 String unflattenedJson = JsonUnflattener.unflatten(flattenedMap);
 ```
 
-### JsonUnflattener.unflattenAsMap
+### [:top:](#top) JsonUnflattener.unflattenAsMap<a id='11.0.2'></a> - new API for JSON unflattening
 ```java
 String json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
 String flattenedJson = JsonFlattener.flatten(json);
@@ -185,8 +223,7 @@ unflattenedMap = JsonUnflattener.unflattenAsMap(flattenedJson);
 unflattenedMap = JsonUnflattener.unflattenAsMap(flattenedMap);
 ```
 
-## New Features (since v0.8.1)
-### JsonFlattener.flattenAsMap(JsonValueBase)
+### [:top:](#top) JsonFlattener.flattenAsMap(JsonValueBase)<a id='8.1.1'></a> - new API for JSON flattening
 ```java
 JsonValueBase<?> jsonVal;
 
@@ -196,8 +233,7 @@ jsonVal = new JacksonJsonValue(jsonNode);
 Map<String, Object> flattenMap = JsonFlattener.flattenAsMap(jsonVal);
 ```
 
-## New Features (since v0.8.0)
-### FlattenMode.KEEP_PRIMITIVE_ARRAYS
+### [:top:](#top) FlattenMode.KEEP_PRIMITIVE_ARRAYS<a id='8.0.1'></a> - new FlattenMode to keep all primitive JSON arrrays
 ```java
 String json = "{\"ary\":[true,[1, 2, 3],false]}";
 System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS).flatten());
@@ -205,8 +241,7 @@ System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIM
 ```
 This mode only keeps arrays which contain only primitive types(strings, numbers, booleans, and null).
 
-## New Features (since v0.7.0)
-### JsonValueBase, which comes from json-base lib, is introduced to improve performance
+### [:top:](#top) JsonValueBase<a id='7.0.1'></a> - comes from json-base lib, is introduced to improve performance
 ```java
 JsonValueBase<?> jsonVal;
 
@@ -222,8 +257,7 @@ jsonVal = new CostumeJsonValue(yourJsonVal);
 new JsonFlattener(jsonVal);
 ```
 
-## New Features (since v0.6.0)
-### More options in StringEscapePolicy enum
+### [:top:](#top) StringEscapePolicy<a id='6.0.1'></a> - ALL, ALL_BUT_SLASH, ALL_BUT_UNICODE, ALL_BUT_SLASH_AND_UNICODE, DEFAULT
 ```java
 StringEscapePolicy.ALL //                       Escapes all JSON special characters and Unicode
 StringEscapePolicy.ALL_BUT_SLASH //             Escapes all JSON special characters and Unicode but slash('/')
@@ -232,8 +266,7 @@ StringEscapePolicy.ALL_BUT_SLASH_AND_UNICODE // Escapes all JSON special charact
 StringEscapePolicy.DEFAULT //                   Escapes all JSON special characters but slash('/') and Unicode
 ```
 
-## New Features (since v0.5.0)
-### CharSequenceTranslatorFactory
+### [:top:](#top) CharSequenceTranslatorFactory<a id='5.0.1'></a> - customized StringEscapePolicy
 ```java
 public class MyStringEscapePolicy implements CharSequenceTranslatorFactory { ... }
 ```
@@ -261,8 +294,7 @@ new JsonFlattener(YOUR_JSON)
         });
 ```
 
-## New Features (since v0.4.0)
-### FlattenMode.MONGODB (dot notation)
+### [:top:](#top) FlattenMode.MONGODB<a id='4.0.1'></a> - dot notation
 ```java
 String json = "{\"abc\":{\"def\":[123]}}";
 System.out.println(new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten());
@@ -282,7 +314,7 @@ System.out.println(new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB
 // {"abc":{"def":[123]}}
 ```
 
-### KeyTransformer
+### [:top:](#top) KeyTransformer<a id='4.0.2'></a> - manipulates keys before flattening 
 ```java
 String json = "{\"abc\":{\"de.f\":123}}";
 JsonFlattener jf = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB);
@@ -314,8 +346,7 @@ System.out.println(ju.unflatten());
 // {"abc":{"de.f":123}}
 ```
 
-## New Features (since v0.3.0)
-### LeftAndRightBrackets
+### [:top:](#top) LeftAndRightBrackets<a id='3.0.1'></a> - customized brackets
 ```java
 // JsonFlattener - Brackets can be changed from square brackets([]) to any 2 arbitrary characters
 String json = "{\"abc\":{\"def\":[123]}}";
@@ -328,7 +359,7 @@ System.out.println(new JsonUnflattener(json).withLeftAndRightBrackets('(', ')').
 // {"abc":{"def":[123]}}
 ```
 
-### Reader
+### [:top:](#top) Reader<a id='3.0.2'></a> - input JSON as Java Reader
 ```java
 InputStream inputStream = new FileInputStream("simple.json");
 Reader reader = new InputStreamReader(inputStream);
@@ -338,8 +369,7 @@ JsonFlattener jf = new JsonFlattener(reader);
 JsonUnflattener ju = new JsonUnflattener(reader);
 ```
 
-## New Features (since v0.2.0)
-### FlattenMode
+### [:top:](#top) FlattenMode<a id='2.0.1'></a> - NORMAL, KEEP_ARRAYS
 ```java
 String json = "{\"abc\":{\"def\":[1,2,{\"g\":{\"h\":[3]}}]}}";
 
@@ -357,7 +387,7 @@ System.out.println(map.get("root"));
 // [[123]]
 ```
 
-### StringEscapePolicy
+### [:top:](#top) StringEscapePolicy<a id='2.0.2'></a> - NORMAL, ALL_UNICODES
 ```java
 String json = "{\"abc\":{\"def\":\"太極\\t\"}}";
 
@@ -370,7 +400,7 @@ System.out.println(new JsonFlattener(json).withStringEscapePolicy(StringEscapePo
 // {"abc.def":"\u592A\u6975\t"}
 ```
 
-### Separator
+### [:top:](#top) Separator<a id='2.0.3'></a> - customized separator
 ```java
 // JsonFlattener - separator can be changed from dot(.) to an arbitrary character
 String json = "{\"abc\":{\"def\":123}}";
@@ -383,7 +413,7 @@ System.out.println(new JsonUnflattener(json).withSeparator('*').unflatten());
 // {"abc":{"def":123}}
 ```
 
-### PrintMode
+### [:top:](#top) PrintMode<a id='2.0.4'></a> - MINIMAL, PRETTY
 ```java
 String json = "{\"abc\":{\"def\":123}}";
 
@@ -411,4 +441,18 @@ System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.PRETTY).unf
 //     "def": 123
 //   }
 // }
+```
+
+## MISC
+| Note| Since |
+| --- | --- |
+| Java 8 required. | v0.5.0 |
+| StringEscapePolicy.DEFAULT, which escapes all special characters but slash('/') and Unicode, becomes the default setting. | v0.6.0 |
+| Java Module supported. | v0.9.0 |
+```diff
+- Since v0.7.0, group ID is changed from [com.github.wnameless] to [com.github.wnameless.json].
+```
+```diff
++ Since v0.10.0, The Map produced by JsonFlattener#flattenAsMap after serialization is now identical to the JSON produced by JsonFlattener#flatten.
++ Before v0.10.0, the serialized flattened Map may be different at some edge cases(ex: input keys contain separator('.')).
 ```
