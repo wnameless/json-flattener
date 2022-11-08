@@ -448,11 +448,6 @@ System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.PRETTY).unf
 | --- | --- |
 | Java 8 required. | v0.5.0 |
 | StringEscapePolicy.DEFAULT, which escapes all special characters but slash('/') and Unicode, becomes the default setting. | v0.6.0 |
+| Group ID is changed from [com.github.wnameless] to [com.github.wnameless.json]. | v0.7.0 |
 | Java Module supported. | v0.9.0 |
-```diff
-- Since v0.7.0, group ID is changed from [com.github.wnameless] to [com.github.wnameless.json].
-```
-```diff
-+ Since v0.10.0, The Map produced by JsonFlattener#flattenAsMap after serialization is now identical to the JSON produced by JsonFlattener#flatten.
-+ Before v0.10.0, the serialized flattened Map may be different at some edge cases(ex: input keys contain separator('.')).
-```
+| The Map produced by JsonFlattener#flattenAsMap after serialization is now identical to the JSON produced by JsonFlattener#flatten. Before v0.10.0, the serialized flattened Map may be different at some edge cases(ex: input keys contain separator('.')). | v0.10.0 |
