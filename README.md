@@ -86,7 +86,7 @@ Flatten or Unflatten with reserved characters
 String flattendJsonWithDotKey = JsonFlattener.flatten("[{\"a.a.[\":1},2,{\"c\":[3,4]}]");
 
 System.out.println(flattendJsonWithDotKey);
-// {"[0][\"a.a.[\"]":12,"[1]":2,"[2].c[0]":3,"[2].c[1]":4}
+// {"[0][\"a.a.[\"]":1,"[1]":2,"[2].c[0]":3,"[2].c[1]":4}
 
 String nestedJsonWithDotKey = JsonUnflattener.unflatten(
         "{\"[1][0];\":2,\"[0]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][\\\"ab.c.[\\\"]\":5}");
