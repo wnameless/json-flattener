@@ -113,4 +113,3 @@ Version 0.15.0
 * Upgrade json-base lib
 * Fix PrintMode.PRETTY bug by upgrading json-base lib
 * Fix backslash escape bug
-
