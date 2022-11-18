@@ -516,7 +516,7 @@ public final class JsonFlattener {
         if (!ignoreReservedCharacters && hasReservedCharacters(key)) {
           sb.append(leftBracket);
           sb.append('"');
-          sb.append(policy.getCharSequenceTranslator().translate(key));
+          sb.append(key);
           sb.append('"');
           sb.append(rightBracket);
         } else {

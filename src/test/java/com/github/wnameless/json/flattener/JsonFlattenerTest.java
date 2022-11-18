@@ -426,6 +426,40 @@ public class JsonFlattenerTest {
   }
 
   @Test
+  public void testPrintModeWithEscapedDoubleQoutesAndBackslash()
+      throws IOException {
+    URL url = Resources.getResource("test_print_mode_unflatten_minimal.json");
+    String input = Resources.toString(url, Charsets.UTF_8);
+    JsonFlattener jf = new JsonFlattener(input);
+    jf.withPrintMode(PrintMode.MINIMAL);
+    String flattendJsonWithDotKey = jf.flatten();
+
+    url = Resources.getResource("test_print_mode_flatten_minimal.json");
+    String output = Resources.toString(url, Charsets.UTF_8);
+    assertEquals(output, flattendJsonWithDotKey);
+
+    jf.withPrintMode(PrintMode.PRETTY);
+    flattendJsonWithDotKey = jf.flatten();
+
+    url = Resources.getResource("test_print_mode_flatten_pretty.json");
+    output = Resources.toString(url, Charsets.UTF_8);
+    assertEquals(output, flattendJsonWithDotKey);
+
+    JsonUnflattener ju = new JsonUnflattener(flattendJsonWithDotKey);
+    ju.withPrintMode(PrintMode.MINIMAL);
+    String nestedJsonWithDotKey = ju.unflatten();
+
+    assertEquals(input, nestedJsonWithDotKey);
+
+    ju.withPrintMode(PrintMode.PRETTY);
+    nestedJsonWithDotKey = ju.unflatten();
+
+    url = Resources.getResource("test_print_mode_unflatten_pretty.json");
+    output = Resources.toString(url, Charsets.UTF_8);
+    assertEquals(output, nestedJsonWithDotKey);
+  }
+
+  @Test
   public void testNoCache() {
     JsonFlattener jf = new JsonFlattener("{\"abc\":{\"def\":123}}");
     assertSame(jf.flattenAsMap(), jf.flattenAsMap());
