@@ -108,3 +108,7 @@ Version 0.14.0
 
 Version 0.14.2
 * Fix Maven dependency security issues
+
+Version 0.15.0
+* Upgrade json-base lib
+* Fix PrintMode.PRETTY bug by upgrading json-base lib
