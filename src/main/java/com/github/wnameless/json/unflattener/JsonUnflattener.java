@@ -121,7 +121,7 @@ public final class JsonUnflattener {
     ju.withSeparator(separator);
     ju.withLeftAndRightBrackets(leftBracket, rightBracket);
     ju.withPrintMode(printMode);
-    if (keyTrans != null) ju.withKeyTransformer(keyTrans);
+    ju.withKeyTransformer(keyTrans);
     return ju;
   }
 
@@ -320,7 +320,7 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withKeyTransformer(KeyTransformer keyTrans) {
-    this.keyTrans = notNull(keyTrans);
+    this.keyTrans = keyTrans;
     return this;
   }
 

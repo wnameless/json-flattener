@@ -119,3 +119,4 @@ Version 0.15.1
 
 Version 0.16.0
 + Jakarta and org.json are supported by upgrading json-base lib to v2.3.0
+* Increase JUnit code coverage to 100%

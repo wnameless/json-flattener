@@ -151,6 +151,9 @@ public class JsonUnflattenerTest {
     assertEquals(toRootMap("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]"),
         JsonUnflattener.unflattenAsMap(toMap(
             JsonFlattener.flatten("[{\"abc\\t\":\" \\\" \\r \\t \1234 \"}]"))));
+
+    // Single value
+    assertEquals(toRootMap("123"), JsonUnflattener.unflattenAsMap("123"));
   }
 
   @Test

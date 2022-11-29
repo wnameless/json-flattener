@@ -144,7 +144,7 @@ public final class JsonFlattener {
     jf.withSeparator(separator);
     jf.withLeftAndRightBrackets(leftBracket, rightBracket);
     jf.withPrintMode(printMode);
-    if (keyTrans != null) jf.withKeyTransformer(keyTrans);
+    jf.withKeyTransformer(keyTrans);
     if (ignoreReservedCharacters) jf.ignoreReservedCharacters();
     return jf;
   }
@@ -328,7 +328,7 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withKeyTransformer(KeyTransformer keyTrans) {
-    this.keyTrans = notNull(keyTrans);
+    this.keyTrans = keyTrans;
     flattenedMap = null;
     return this;
   }
