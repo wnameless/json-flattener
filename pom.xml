@@ -80,20 +80,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>2.7.5</version>
+            <version>3.0.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
-            </plugin>
-        </plugins>
-    </reporting>
 
     <build>
         <plugins>
@@ -120,10 +110,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M7</version>
                 <configuration>
-                    <excludes>
-                        <exclude>**/JsonFlattenerFactoryTest.java</exclude>
-                        <exclude>**/JsonUnflattenerFactoryTest.java</exclude>
-                    </excludes>
+                    <useModulePath>false</useModulePath> <!-- tests use classpath -->
                 </configuration>
             </plugin>
             <plugin>
