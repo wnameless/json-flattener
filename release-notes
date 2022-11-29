@@ -116,3 +116,6 @@ Version 0.15.0
 
 Version 0.15.1
 * Upgrade json-base lib to prevent potential bug
+
+Version 0.16.0
++ Jakarta and org.json are supported by upgrading json-base lib to v2.3.0

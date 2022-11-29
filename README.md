@@ -98,6 +98,7 @@ System.out.println(nestedJsonWithDotKey);
 # Feature List<a id='top'></a>
 | Name | Description | Since |
 | --- | --- | --- |
+| Jackson, Gson, org.json, Jakarta | Upgrading [json-base](https://github.com/wnameless/json-base) to support 4 major JSON implementations | v0.16.0 |
 | [JsonFlattenerFactory](#14.0.1) | produces any JsonFlattener with preconfigured settings | v0.14.0 |
 | [JsonUnflattenerFactory](#14.0.2) | produces any JsonUnflattener with preconfigured settings | v0.14.0 |
 | [IgnoreReservedCharacters](#13.0.1) | reserved characters in keys can be ignored | v0.13.0 |
