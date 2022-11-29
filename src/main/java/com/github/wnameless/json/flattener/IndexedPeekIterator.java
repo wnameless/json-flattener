@@ -126,8 +126,13 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
    * @return element
    */
   public E peek() {
-    if (!hasPeek && hasNext()) peeking();
-    if (!hasPeek) throw new NoSuchElementException();
+    if (!hasPeek) {
+      if (hasNext()) {
+        peeking();
+      } else {
+        throw new NoSuchElementException();
+      }
+    }
 
     return peek;
   }

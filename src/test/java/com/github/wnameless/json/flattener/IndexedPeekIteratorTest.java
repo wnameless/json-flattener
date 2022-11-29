@@ -46,6 +46,13 @@ public class IndexedPeekIteratorTest {
   }
 
   @Test
+  public void testConstructorException() {
+    assertThrows(NullPointerException.class, () -> {
+      new IndexedPeekIterator<Integer>(null);
+    });
+  }
+
+  @Test
   public void testIterface() {
     assertTrue(pIterater instanceof Iterator);
   }
@@ -83,8 +90,10 @@ public class IndexedPeekIteratorTest {
   @Test
   public void testPeek() {
     assertEquals(Integer.valueOf(1), pIterater.peek());
+    assertEquals(Integer.valueOf(1), pIterater.peek());
     pIterater.next();
     assertEquals(Integer.valueOf(2), pIterater.peek());
+
   }
 
   @Test
