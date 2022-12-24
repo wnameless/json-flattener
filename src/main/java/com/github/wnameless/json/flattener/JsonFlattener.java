@@ -2,16 +2,14 @@
  * 
  * Copyright 2015 Wei-Ming Wu
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  *
  */
@@ -22,7 +20,6 @@ import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexed
 import static java.util.Collections.EMPTY_MAP;
 import static org.apache.commons.lang3.Validate.isTrue;
 import static org.apache.commons.lang3.Validate.notNull;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayDeque;
@@ -30,9 +27,7 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonValueBase;
@@ -40,19 +35,17 @@ import com.github.wnameless.json.unflattener.JsonUnflattener;
 
 /**
  * 
- * {@link JsonFlattener} flattens any JSON nested objects or arrays into a
- * flattened JSON string or a Map{@literal <Stirng, Object>}. The String key
- * will represents the corresponding position of value in the original nested
- * objects or arrays and the Object value are either String, Boolean, Long,
- * Double or null. <br>
+ * {@link JsonFlattener} flattens any JSON nested objects or arrays into a flattened JSON string or
+ * a Map{@literal <Stirng, Object>}. The String key will represents the corresponding position of
+ * value in the original nested objects or arrays and the Object value are either String, Boolean,
+ * Long, Double or null. <br>
  * <br>
  * For example:<br>
  * A nested JSON<br>
  * { "a" : { "b" : 1, "c": null, "d": [false, true] }, "e": "f", "g":2.3 }<br>
  * <br>
  * can be turned into a flattened JSON <br>
- * { "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": "f", "g":2.3 }
- * <br>
+ * { "a.b": 1, "a.c": null, "a.d[0]": false, "a.d[1]": true, "e": "f", "g":2.3 } <br>
  * <br>
  * or into a Map<br>
  * {<br>
@@ -70,19 +63,17 @@ import com.github.wnameless.json.unflattener.JsonUnflattener;
 public final class JsonFlattener {
 
   /**
-   * {@link ROOT} is the default key of the Map returned by
-   * {@link #flattenAsMap}. When {@link JsonFlattener} processes a JSON string
-   * which is not a JSON object or array, the final outcome may not suit in a
-   * Java Map. At that moment, {@link JsonFlattener} will put the result in the
-   * Map with {@link ROOT} as its key.
+   * {@link ROOT} is the default key of the Map returned by {@link #flattenAsMap}. When
+   * {@link JsonFlattener} processes a JSON string which is not a JSON object or array, the final
+   * outcome may not suit in a Java Map. At that moment, {@link JsonFlattener} will put the result
+   * in the Map with {@link ROOT} as its key.
    */
   public static final String ROOT = "root";
 
   /**
    * Returns a flattened JSON string.
    * 
-   * @param jsonVal
-   *          a JSON data which wraps by {@link JsonValueBase}
+   * @param jsonVal a JSON data which wraps by {@link JsonValueBase}
    * @return a flattened JSON string
    */
   public static String flatten(JsonValueBase<?> jsonVal) {
@@ -92,8 +83,7 @@ public final class JsonFlattener {
   /**
    * Returns a flattened JSON string.
    * 
-   * @param json
-   *          the JSON string
+   * @param json the JSON string
    * @return a flattened JSON string
    */
   public static String flatten(String json) {
@@ -103,8 +93,7 @@ public final class JsonFlattener {
   /**
    * Returns a flattened JSON as Map.
    * 
-   * @param jsonVal
-   *          a JSON data which wraps by {@link JsonValueBase}
+   * @param jsonVal a JSON data which wraps by {@link JsonValueBase}
    * @return a flattened JSON as Map
    */
   public static Map<String, Object> flattenAsMap(JsonValueBase<?> jsonVal) {
@@ -114,8 +103,7 @@ public final class JsonFlattener {
   /**
    * Returns a flattened JSON as Map.
    * 
-   * @param json
-   *          the JSON string
+   * @param json the JSON string
    * @return a flattened JSON as Map
    */
   public static Map<String, Object> flattenAsMap(String json) {
@@ -152,8 +140,7 @@ public final class JsonFlattener {
   /**
    * Creates a JSON flattener by given {@link JsonValueBase}.
    * 
-   * @param json
-   *          a {@link JsonValueBase}
+   * @param json a {@link JsonValueBase}
    */
   public JsonFlattener(JsonValueBase<?> json) {
     jsonCore = new JacksonJsonCore();
@@ -161,13 +148,10 @@ public final class JsonFlattener {
   }
 
   /**
-   * Creates a JSON flattener by given {@link JsonCore} and
-   * {@link JsonValueBase}.
+   * Creates a JSON flattener by given {@link JsonCore} and {@link JsonValueBase}.
    * 
-   * @param jsonCore
-   *          a {@link JsonCore}
-   * @param json
-   *          a JSON string
+   * @param jsonCore a {@link JsonCore}
+   * @param json a JSON string
    */
   public JsonFlattener(JsonCore<?> jsonCore, JsonValueBase<?> json) {
     this.jsonCore = notNull(jsonCore);
@@ -177,8 +161,7 @@ public final class JsonFlattener {
   /**
    * Creates a JSON flattener by given JSON string.
    * 
-   * @param json
-   *          a JSON string
+   * @param json a JSON string
    */
   public JsonFlattener(String json) {
     jsonCore = new JacksonJsonCore();
@@ -188,10 +171,8 @@ public final class JsonFlattener {
   /**
    * Creates a JSON flattener by given {@link JsonCore} and JSON string.
    * 
-   * @param jsonCore
-   *          a {@link JsonCore}
-   * @param json
-   *          a JSON string
+   * @param jsonCore a {@link JsonCore}
+   * @param json a JSON string
    */
   public JsonFlattener(JsonCore<?> jsonCore, String json) {
     this.jsonCore = notNull(jsonCore);
@@ -201,10 +182,8 @@ public final class JsonFlattener {
   /**
    * Creates a JSON flattener by given JSON string reader.
    * 
-   * @param jsonReader
-   *          a JSON reader
-   * @throws IOException
-   *           if the jsonReader cannot be read
+   * @param jsonReader a JSON reader
+   * @throws IOException if the jsonReader cannot be read
    */
   public JsonFlattener(Reader jsonReader) throws IOException {
     jsonCore = new JacksonJsonCore();
@@ -214,15 +193,11 @@ public final class JsonFlattener {
   /**
    * Creates a JSON flattener by given {@link JsonCore} and JSON string reader.
    * 
-   * @param jsonCore
-   *          a {@link JsonCore}
-   * @param jsonReader
-   *          a JSON string
-   * @throws IOException
-   *           if the jsonReader cannot be read
+   * @param jsonCore a {@link JsonCore}
+   * @param jsonReader a JSON string
+   * @throws IOException if the jsonReader cannot be read
    */
-  public JsonFlattener(JsonCore<?> jsonCore, Reader jsonReader)
-      throws IOException {
+  public JsonFlattener(JsonCore<?> jsonCore, Reader jsonReader) throws IOException {
     this.jsonCore = notNull(jsonCore);
     source = jsonCore.parse(jsonReader);
   }
@@ -230,8 +205,7 @@ public final class JsonFlattener {
   /**
    * A fluent setter to setup a mode of the {@link JsonFlattener}.
    * 
-   * @param flattenMode
-   *          a {@link FlattenMode}
+   * @param flattenMode a {@link FlattenMode}
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
@@ -243,30 +217,26 @@ public final class JsonFlattener {
   /**
    * A fluent setter to setup the JSON string escape policy.
    * 
-   * @param policy
-   *          any {@link CharSequenceTranslatorFactory} or a
-   *          {@link StringEscapePolicy}
+   * @param policy any {@link CharSequenceTranslatorFactory} or a {@link StringEscapePolicy}
    * @return this {@link JsonFlattener}
    */
-  public JsonFlattener withStringEscapePolicy(
-      CharSequenceTranslatorFactory policy) {
+  public JsonFlattener withStringEscapePolicy(CharSequenceTranslatorFactory policy) {
     this.policy = notNull(policy);
     flattenedMap = null;
     return this;
   }
 
   /**
-   * A fluent setter to setup the separator within a key in the flattened JSON.
-   * The default separator is a dot(.).
+   * A fluent setter to setup the separator within a key in the flattened JSON. The default
+   * separator is a dot(.).
    * 
-   * @param separator
-   *          any character
+   * @param separator any character
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withSeparator(char separator) {
     String separatorStr = String.valueOf(separator);
-    isTrue(!separatorStr.matches("[\"\\s]"),
-        "Separator contains illegal character(%s)", separatorStr);
+    isTrue(!separatorStr.matches("[\"\\s]"), "Separator contains illegal character(%s)",
+        separatorStr);
     isTrue(!leftBracket.equals(separator) && !rightBracket.equals(separator),
         "Separator(%s) is already used in brackets", separatorStr);
 
@@ -280,18 +250,14 @@ public final class JsonFlattener {
   }
 
   /**
-   * A fluent setter to setup the left and right brackets within a key in the
-   * flattened JSON. The default left and right brackets are left square
-   * bracket([) and right square bracket(]).
+   * A fluent setter to setup the left and right brackets within a key in the flattened JSON. The
+   * default left and right brackets are left square bracket([) and right square bracket(]).
    * 
-   * @param leftBracket
-   *          any character
-   * @param rightBracket
-   *          any character
+   * @param leftBracket any character
+   * @param rightBracket any character
    * @return this {@link JsonFlattener}
    */
-  public JsonFlattener withLeftAndRightBrackets(char leftBracket,
-      char rightBracket) {
+  public JsonFlattener withLeftAndRightBrackets(char leftBracket, char rightBracket) {
     isTrue(leftBracket != rightBracket, "Both brackets cannot be the same");
     String leftBracketStr = String.valueOf(leftBracket);
     String rightBracketStr = String.valueOf(rightBracket);
@@ -307,11 +273,10 @@ public final class JsonFlattener {
   }
 
   /**
-   * A fluent setter to setup a print mode of the {@link JsonFlattener}. The
-   * default print mode is minimal.
+   * A fluent setter to setup a print mode of the {@link JsonFlattener}. The default print mode is
+   * minimal.
    * 
-   * @param printMode
-   *          a {@link PrintMode}
+   * @param printMode a {@link PrintMode}
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withPrintMode(PrintMode printMode) {
@@ -320,11 +285,9 @@ public final class JsonFlattener {
   }
 
   /**
-   * A fluent setter to setup a {@link KeyTransformer} of the
-   * {@link JsonFlattener}.
+   * A fluent setter to setup a {@link KeyTransformer} of the {@link JsonFlattener}.
    * 
-   * @param keyTrans
-   *          a {@link KeyTransformer}
+   * @param keyTrans a {@link KeyTransformer}
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withKeyTransformer(KeyTransformer keyTrans) {
@@ -334,8 +297,8 @@ public final class JsonFlattener {
   }
 
   /**
-   * After this option is enable, all reserved characters used in keys will stop
-   * to be checked and escaped. <br>
+   * After this option is enable, all reserved characters used in keys will stop to be checked and
+   * escaped. <br>
    * <br>
    * Example:<br>
    * <br>
@@ -343,8 +306,8 @@ public final class JsonFlattener {
    * Flatten with option disable: {"matrix[\"agent.smith\"]":"1999"}<br>
    * Flatten with option enable: {"matrix.agent.smith":"1999"}<br>
    * <br>
-   * {@link JsonUnflattener} may cause unpredictable results with the JSON
-   * produced by a {@link JsonFlattener} with this option enable.
+   * {@link JsonUnflattener} may cause unpredictable results with the JSON produced by a
+   * {@link JsonFlattener} with this option enable.
    * 
    * @return this {@link JsonFlattener}
    */
@@ -377,8 +340,7 @@ public final class JsonFlattener {
     } else if (obj instanceof CharSequence) {
       StringBuilder sb = new StringBuilder();
       sb.append('"');
-      sb.append(
-          policy.getCharSequenceTranslator().translate((CharSequence) obj));
+      sb.append(policy.getCharSequenceTranslator().translate((CharSequence) obj));
       sb.append('"');
       return sb.toString();
     } else if (obj instanceof JsonifyArrayList) {
@@ -495,8 +457,8 @@ public final class JsonFlattener {
 
   private boolean hasReservedCharacters(String key) {
     if (flattenMode.equals(MONGODB) && StringUtils.containsAny(key, separator))
-      throw new IllegalArgumentException("Key cannot contain separator("
-          + separator + ") in FlattenMode." + MONGODB);
+      throw new IllegalArgumentException(
+          "Key cannot contain separator(" + separator + ") in FlattenMode." + MONGODB);
 
     return StringUtils.containsAny(key, separator, leftBracket, rightBracket);
   }
@@ -509,9 +471,7 @@ public final class JsonFlattener {
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Entry) {
         @SuppressWarnings("unchecked")
-        String key =
-            ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent())
-                .getKey();
+        String key = ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent()).getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
         if (!ignoreReservedCharacters && hasReservedCharacters(key)) {
           sb.append(leftBracket);

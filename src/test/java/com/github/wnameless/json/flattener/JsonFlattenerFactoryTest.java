@@ -2,16 +2,14 @@
  *
  * Copyright 2022 Wei-Ming Wu
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  *
  */
@@ -55,14 +53,16 @@ public class JsonFlattenerFactoryTest {
     String json = Resources.toString(url, Charsets.UTF_8);
 
     JsonFlattener jf = jsonFlattenerFactory.build(json);
-    assertEquals(JsonPrinter.prettyPrint(
-        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+    assertEquals(
+        JsonPrinter.prettyPrint(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
         jf.flatten());
 
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer);
     jf = jsonFlattenerFactory.build(json);
-    assertEquals(JsonPrinter.prettyPrint(
-        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+    assertEquals(
+        JsonPrinter.prettyPrint(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
         jf.flatten());
   }
 
@@ -72,14 +72,16 @@ public class JsonFlattenerFactoryTest {
     String json = Resources.toString(url, Charsets.UTF_8);
 
     JsonFlattener jf = jsonFlattenerFactory.build(jsonCore.parse(json));
-    assertEquals(JsonPrinter.prettyPrint(
-        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+    assertEquals(
+        JsonPrinter.prettyPrint(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
         jf.flatten());
 
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer);
     jf = jsonFlattenerFactory.build(jsonCore.parse(json));
-    assertEquals(JsonPrinter.prettyPrint(
-        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+    assertEquals(
+        JsonPrinter.prettyPrint(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
         jf.flatten());
   }
 
@@ -89,14 +91,16 @@ public class JsonFlattenerFactoryTest {
     String json = Resources.toString(url, Charsets.UTF_8);
 
     JsonFlattener jf = jsonFlattenerFactory.build(new StringReader(json));
-    assertEquals(JsonPrinter.prettyPrint(
-        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+    assertEquals(
+        JsonPrinter.prettyPrint(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
         jf.flatten());
 
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer);
     jf = jsonFlattenerFactory.build(new StringReader(json));
-    assertEquals(JsonPrinter.prettyPrint(
-        "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+    assertEquals(
+        JsonPrinter.prettyPrint(
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
         jf.flatten());
   }
 
@@ -117,8 +121,7 @@ public class JsonFlattenerFactoryTest {
   public void testEquals() {
     assertEquals(jsonFlattenerFactory, jsonFlattenerFactory);
 
-    JsonFlattenerFactory otherJsonFlattenerFactory =
-        new JsonFlattenerFactory(configurer, jsonCore);
+    JsonFlattenerFactory otherJsonFlattenerFactory = new JsonFlattenerFactory(configurer, jsonCore);
     assertEquals(jsonFlattenerFactory, otherJsonFlattenerFactory);
 
     otherJsonFlattenerFactory = new JsonFlattenerFactory(configurer);
@@ -139,17 +142,13 @@ public class JsonFlattenerFactoryTest {
   public void testToString() {
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer);
 
-    assertEquals(
-        "JsonFlattenerFactory{configurer=" + configurer.toString()
-            + ", jsonCore=" + Optional.empty() + "}",
-        jsonFlattenerFactory.toString());
+    assertEquals("JsonFlattenerFactory{configurer=" + configurer.toString() + ", jsonCore="
+        + Optional.empty() + "}", jsonFlattenerFactory.toString());
 
     jsonCore = new GsonJsonCore();
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer, jsonCore);
-    assertEquals(
-        "JsonFlattenerFactory{configurer=" + configurer.toString()
-            + ", jsonCore=" + Optional.of(jsonCore) + "}",
-        jsonFlattenerFactory.toString());
+    assertEquals("JsonFlattenerFactory{configurer=" + configurer.toString() + ", jsonCore="
+        + Optional.of(jsonCore) + "}", jsonFlattenerFactory.toString());
   }
 
 }

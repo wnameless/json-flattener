@@ -2,16 +2,14 @@
  *
  * Copyright 2015 Wei-Ming Wu
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  *
  */
@@ -23,13 +21,11 @@ import java.util.NoSuchElementException;
 
 /**
  * 
- * {@link IndexedPeekIterator} is an Iterator which provides user a
- * {@link #peek()} method to peek an element advanced, a {@link #getIndex()}
- * method to get the index of last returned element and a {@link #getCurrent()}
- * method to get the last returned element itself.
+ * {@link IndexedPeekIterator} is an Iterator which provides user a {@link #peek()} method to peek
+ * an element advanced, a {@link #getIndex()} method to get the index of last returned element and a
+ * {@link #getCurrent()} method to get the last returned element itself.
  * 
- * @param <E>
- *          the type of elements
+ * @param <E> the type of elements
  * 
  * @author Wei-Ming Wu
  * 
@@ -39,14 +35,11 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
   /**
    * Creates an {@link IndexedPeekIterator} by given Iterable.
    * 
-   * @param <T>
-   *          the type of elements
-   * @param iter
-   *          any Iterable
+   * @param <T> the type of elements
+   * @param iter any Iterable
    * @return an {@link IndexedPeekIterator}
    */
-  public static <T> IndexedPeekIterator<T> newIndexedPeekIterator(
-      Iterable<T> iter) {
+  public static <T> IndexedPeekIterator<T> newIndexedPeekIterator(Iterable<T> iter) {
     return new IndexedPeekIterator<T>(iter.iterator());
   }
 
@@ -59,8 +52,7 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
   /**
    * Creates an {@link IndexedPeekIterator}.
    * 
-   * @param iterator
-   *          an Iterator
+   * @param iterator an Iterator
    */
   public IndexedPeekIterator(Iterator<? extends E> iterator) {
     if (iterator == null) throw new NullPointerException();
@@ -74,8 +66,8 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
   }
 
   /**
-   * Returns the index of last returned element. If there is no element has been
-   * returned, it returns -1.
+   * Returns the index of last returned element. If there is no element has been returned, it
+   * returns -1.
    * 
    * @return the index of last returned element
    */
@@ -84,8 +76,7 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
   }
 
   /**
-   * Returns the last returned element. If {@link #next()} has never been
-   * called, it returns null.
+   * Returns the last returned element. If {@link #next()} has never been called, it returns null.
    * 
    * @return the last returned element
    */
@@ -120,8 +111,8 @@ public final class IndexedPeekIterator<E> implements Iterator<E> {
   }
 
   /**
-   * Peeks an element advanced. Warning: remove() is temporarily out of function
-   * after a peek() until a next() is called.
+   * Peeks an element advanced. Warning: remove() is temporarily out of function after a peek()
+   * until a next() is called.
    * 
    * @return element
    */
