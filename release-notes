@@ -123,3 +123,4 @@ Version 0.16.0
 
 Version 0.16.1
 * Upgrade json-base lib
++ Add removal version to deprecated APIs
