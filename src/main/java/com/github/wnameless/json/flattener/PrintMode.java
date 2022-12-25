@@ -30,7 +30,7 @@ public enum PrintMode {
   MINIMAL,
 
   /**
-   * Prints each objects in different lines with necessary indentations.
+   * Prints output in different lines with necessary indentations.
    */
   PRETTY;
 

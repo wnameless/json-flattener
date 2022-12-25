@@ -25,12 +25,12 @@ package com.github.wnameless.json.flattener;
 public enum FlattenMode {
 
   /**
-   * Flattens every objects.
+   * Flattens every object.
    */
   NORMAL,
 
   /**
-   * Flattens every objects except arrays.
+   * Flattens every object except arrays.
    */
   KEEP_ARRAYS,
 
@@ -40,7 +40,7 @@ public enum FlattenMode {
   MONGODB,
 
   /**
-   * Flattens every objects except arrays which contain only primitive types(strings, numbers,
+   * Flattens every object except arrays which contain only primitive types(strings, numbers,
    * booleans, and null).
    */
   KEEP_PRIMITIVE_ARRAYS;
