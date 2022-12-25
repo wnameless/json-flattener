@@ -37,8 +37,9 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
 
   /**
    * Escapes all JSON special characters but Unicode.
+   *
    * 
-   * @deprecated use {@link StringEscapePolicy#ALL_BUT_UNICODE} instead
+   * @deprecated for removal in 0.17.0 in favor of {@link StringEscapePolicy#ALL_BUT_UNICODE}
    */
   @Deprecated
   NORMAL(new AggregateTranslator(new LookupTranslator(new HashMap<CharSequence, CharSequence>() {
@@ -53,7 +54,7 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
   /**
    * Escapes all JSON special characters and Unicode.
    * 
-   * @deprecated use {@link StringEscapePolicy#ALL} instead
+   * @deprecated for removal in 0.17.0 in favor of {@link StringEscapePolicy#ALL}
    */
   @Deprecated
   ALL_UNICODES(StringEscapeUtils.ESCAPE_JSON),
