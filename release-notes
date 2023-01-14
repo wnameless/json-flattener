@@ -124,3 +124,6 @@ Version 0.16.0
 Version 0.16.3
 * Upgrade json-base lib
 + Add removal version to deprecated APIs
+
+Version 0.16.4
+* Improve performance of JsonUnflattener
