@@ -21,7 +21,6 @@ import static org.apache.commons.lang3.Validate.notNull;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -55,11 +54,6 @@ public final class JsonUnflattener {
    * in the Map with {@link ROOT} as its key.
    */
   public static final String ROOT = "root";
-
-  private static final Pattern naturalNumberPattern = Pattern.compile("\\d+");
-  private static final Pattern doubleQuoteAndSpacePattern = Pattern.compile("[\"\\s]");
-
-  private final Map<String, Pattern> patternCache = new HashMap<>();
 
   /**
    * Returns a JSON string of nested objects by the given flattened JSON string.
@@ -195,48 +189,26 @@ public final class JsonUnflattener {
     root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());
   }
 
-  private Pattern arrayIndexPattern() {
-    String regex = Pattern.quote(leftBracket.toString()) + "\\s*\\d+\\s*"
+  private String arrayIndex() {
+    return Pattern.quote(leftBracket.toString()) + "\\s*\\d+\\s*"
         + Pattern.quote(rightBracket.toString());
-    if (!patternCache.containsKey(regex)) {
-      patternCache.put(regex, Pattern.compile(regex));
-    }
-    return patternCache.get(regex);
   }
 
-  private Pattern objectComplexKeyPattern() {
-    String regex = Pattern.quote(leftBracket.toString()) + "\\s*\".+?\"\\s*"
+  private String objectComplexKey() {
+    return Pattern.quote(leftBracket.toString()) + "\\s*\".+?\"\\s*"
         + Pattern.quote(rightBracket.toString());
-    if (!patternCache.containsKey(regex)) {
-      patternCache.put(regex, Pattern.compile(regex));
-    }
-    return patternCache.get(regex);
   }
 
-  private Pattern objectKeyPattern() {
-    String regex = "[^" + Pattern.quote(separator.toString())
-        + Pattern.quote(leftBracket.toString()) + Pattern.quote(rightBracket.toString()) + "]+";
-    if (!patternCache.containsKey(regex)) {
-      patternCache.put(regex, Pattern.compile(regex));
-    }
-    return patternCache.get(regex);
+  private String objectKey() {
+    return "[^" + Pattern.quote(separator.toString()) + Pattern.quote(leftBracket.toString())
+        + Pattern.quote(rightBracket.toString()) + "]+";
   }
 
   private Pattern keyPartPattern() {
-    if (flattenMode.equals(MONGODB)) {
-      String regex = "[^" + Pattern.quote(separator.toString()) + "]+";
-      if (!patternCache.containsKey(regex)) {
-        patternCache.put(regex, Pattern.compile(regex));
-      }
-      return patternCache.get(regex);
-    } else {
-      String regex = arrayIndexPattern().pattern() + "|" + objectComplexKeyPattern().pattern() + "|"
-          + objectKeyPattern().pattern();
-      if (!patternCache.containsKey(regex)) {
-        patternCache.put(regex, Pattern.compile(regex));
-      }
-      return patternCache.get(regex);
-    }
+    if (flattenMode.equals(MONGODB))
+      return Pattern.compile("[^" + Pattern.quote(separator.toString()) + "]+");
+    else
+      return Pattern.compile(arrayIndex() + "|" + objectComplexKey() + "|" + objectKey());
   }
 
   /**
@@ -259,18 +231,17 @@ public final class JsonUnflattener {
    */
   public JsonUnflattener withSeparator(char separator) {
     String separatorStr = String.valueOf(separator);
-    isTrue(!doubleQuoteAndSpacePattern.matcher(separatorStr).matches(),
-        "Separator contains illegal character(%s)", separatorStr);
+    isTrue(!separatorStr.matches("[\"\\s]"), "Separator contains illegal character(%s)",
+        separatorStr);
     isTrue(!leftBracket.equals(separator) && !rightBracket.equals(separator),
         "Separator(%s) is already used in brackets", separatorStr);
 
-    patternCache.clear();
     this.separator = separator;
     return this;
   }
 
-  private Pattern illegalBracketsPattern() {
-    return Pattern.compile("[\"\\s" + Pattern.quote(separator.toString()) + "]");
+  private String illegalBracketsRegex() {
+    return "[\"\\s" + Pattern.quote(separator.toString()) + "]";
   }
 
   /**
@@ -285,13 +256,11 @@ public final class JsonUnflattener {
     isTrue(leftBracket != rightBracket, "Both brackets cannot be the same");
     String leftBracketStr = String.valueOf(leftBracket);
     String rightBracketStr = String.valueOf(rightBracket);
-    Pattern illegalBracketsPattern = illegalBracketsPattern();
-    isTrue(!illegalBracketsPattern.matcher(leftBracketStr).matches(),
+    isTrue(!leftBracketStr.matches(illegalBracketsRegex()),
         "Left bracket contains illegal character(%s)", leftBracketStr);
-    isTrue(!illegalBracketsPattern.matcher(rightBracketStr).matches(),
+    isTrue(!rightBracketStr.matches(illegalBracketsRegex()),
         "Right bracket contains illegal character(%s)", rightBracketStr);
 
-    patternCache.clear();
     this.leftBracket = leftBracket;
     this.rightBracket = rightBracket;
     return this;
@@ -429,7 +398,7 @@ public final class JsonUnflattener {
   }
 
   private String extractKey(String keyPart) {
-    if (objectComplexKeyPattern().matcher(keyPart).matches()) {
+    if (keyPart.matches(objectComplexKey())) {
       keyPart = keyPart.replaceAll("^" + Pattern.quote(leftBracket.toString()) + "\\s*\"", "");
       keyPart = keyPart.replaceAll("\"\\s*" + Pattern.quote(rightBracket.toString()) + "$", "");
     }
@@ -445,8 +414,8 @@ public final class JsonUnflattener {
   }
 
   private boolean isJsonArray(String keyPart) {
-    return arrayIndexPattern().matcher(keyPart).matches()
-        || (flattenMode.equals(MONGODB) && naturalNumberPattern.matcher(keyPart).matches());
+    return keyPart.matches(arrayIndex())
+        || (flattenMode.equals(MONGODB) && keyPart.matches("\\d+"));
   }
 
   private JsonArrayCore<?> findOrCreateJsonArray(JsonValueCore<?> currentVal, String objKey,
