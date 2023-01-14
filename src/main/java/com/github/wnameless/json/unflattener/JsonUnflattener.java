@@ -57,7 +57,7 @@ public final class JsonUnflattener {
   public static final String ROOT = "root";
 
   private static final Pattern naturalNumberPattern = Pattern.compile("\\d+");
-  private static final Pattern doubleQuoteAndSpacePattern = Pattern.compile("[\"\\s]");
+  private static final Pattern illegalSeparatorPattern = Pattern.compile("[\"\\s]");
 
   private final Map<String, Pattern> patternCache = new HashMap<>();
 
@@ -259,7 +259,7 @@ public final class JsonUnflattener {
    */
   public JsonUnflattener withSeparator(char separator) {
     String separatorStr = String.valueOf(separator);
-    isTrue(!doubleQuoteAndSpacePattern.matcher(separatorStr).matches(),
+    isTrue(!illegalSeparatorPattern.matcher(separatorStr).matches(),
         "Separator contains illegal character(%s)", separatorStr);
     isTrue(!leftBracket.equals(separator) && !rightBracket.equals(separator),
         "Separator(%s) is already used in brackets", separatorStr);
