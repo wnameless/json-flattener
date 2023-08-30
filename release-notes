@@ -127,3 +127,6 @@ Version 0.16.3
 
 Version 0.16.4
 * Improve performance of JsonUnflattener
+
+Version 0.16.5
+* Upgrade json-base lib
