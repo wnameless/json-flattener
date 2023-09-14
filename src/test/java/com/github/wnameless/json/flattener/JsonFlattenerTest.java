@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -33,12 +32,11 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JacksonJsonValue;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
@@ -70,12 +68,41 @@ public class JsonFlattenerTest {
   }
 
   @Test
+  public void testFlattenWithExactFloat() {
+    assertEquals("{\"[0].a\":1,\"[1]\":2.0,\"[2].c[0]\":3,\"[2].c[1]\":4}",
+        JsonFlattener.flatten("[{\"a\":1},2.00,{\"c\":[3,4]}]"));
+
+    JsonNodeFactory f = new JsonNodeFactory(true);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+    mapper.setNodeFactory(f);
+    JsonFlattener jsonFlattener =
+        new JsonFlattener(new JacksonJsonCore(mapper), "[{\"a\":1},2.00,{\"c\":[3,4]}]");
+    assertEquals("{\"[0].a\":1,\"[1]\":2.00,\"[2].c[0]\":3,\"[2].c[1]\":4}",
+        jsonFlattener.flatten());
+  }
+
+  @Test
   public void testFlattenAsMap() throws IOException {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);
 
     assertEquals("{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
         JsonFlattener.flattenAsMap(json).toString());
+  }
+
+  @Test
+  public void testFlattenAsMapWithExactFloat() throws IOException {
+    URL url = Resources.getResource("test2.json");
+    String json = Resources.toString(url, Charsets.UTF_8);
+
+    JsonNodeFactory f = new JsonNodeFactory(true);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+    mapper.setNodeFactory(f);
+    JsonFlattener jsonFlattener = new JsonFlattener(new JacksonJsonCore(mapper), json);
+    assertEquals("{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.30}",
+        jsonFlattener.flattenAsMap().toString());
   }
 
   @Test
@@ -437,18 +464,15 @@ public class JsonFlattenerTest {
     try {
       new JsonFlattener("{\"abc\":{\"def\":123}}").withFlattenMode(null);
       fail();
-    } catch (NullPointerException e) {
-    }
+    } catch (NullPointerException e) {}
     try {
       new JsonFlattener("{\"abc\":{\"def\":123}}").withStringEscapePolicy(null);
       fail();
-    } catch (NullPointerException e) {
-    }
+    } catch (NullPointerException e) {}
     try {
       new JsonFlattener("{\"abc\":{\"def\":123}}").withPrintMode(null);
       fail();
-    } catch (NullPointerException e) {
-    }
+    } catch (NullPointerException e) {}
   }
 
   @Test

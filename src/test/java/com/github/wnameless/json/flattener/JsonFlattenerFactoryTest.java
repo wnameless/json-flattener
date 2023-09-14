@@ -17,16 +17,13 @@ package com.github.wnameless.json.flattener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import com.github.wnameless.json.base.GsonJsonCore;
 import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JsonCore;
@@ -55,7 +52,7 @@ public class JsonFlattenerFactoryTest {
     JsonFlattener jf = jsonFlattenerFactory.build(json);
     assertEquals(
         JsonPrinter.prettyPrint(
-            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.30}"),
         jf.flatten());
 
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer);
@@ -74,14 +71,14 @@ public class JsonFlattenerFactoryTest {
     JsonFlattener jf = jsonFlattenerFactory.build(jsonCore.parse(json));
     assertEquals(
         JsonPrinter.prettyPrint(
-            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.30}"),
         jf.flatten());
 
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer);
     jf = jsonFlattenerFactory.build(jsonCore.parse(json));
     assertEquals(
         JsonPrinter.prettyPrint(
-            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.30}"),
         jf.flatten());
   }
 
@@ -93,7 +90,7 @@ public class JsonFlattenerFactoryTest {
     JsonFlattener jf = jsonFlattenerFactory.build(new StringReader(json));
     assertEquals(
         JsonPrinter.prettyPrint(
-            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}"),
+            "{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.30}"),
         jf.flatten());
 
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer);
