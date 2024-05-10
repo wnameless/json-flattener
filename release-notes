@@ -133,3 +133,6 @@ Version 0.16.5
 
 Version 0.16.6
 * Upgrade json-base to preserve precise scale of the float number
+
+Version 0.16.7
+* Upgrade json-base lib
