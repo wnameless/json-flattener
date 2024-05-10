@@ -17,13 +17,13 @@ package com.github.wnameless.json.unflattener;
 
 import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
 import static org.apache.commons.lang3.Validate.isTrue;
-import static org.apache.commons.lang3.Validate.notNull;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.github.wnameless.json.base.JacksonJsonCore;
@@ -147,7 +147,7 @@ public final class JsonUnflattener {
    * @param json a JSON string
    */
   public JsonUnflattener(JsonCore<?> jsonCore, String json) {
-    this.jsonCore = notNull(jsonCore);
+    this.jsonCore = Objects.requireNonNull(jsonCore);
     root = parseJson(json);
   }
 
@@ -170,7 +170,7 @@ public final class JsonUnflattener {
    * @throws IOException if the jsonReader cannot be read
    */
   public JsonUnflattener(JsonCore<?> jsonCore, Reader jsonReader) throws IOException {
-    this.jsonCore = notNull(jsonCore);
+    this.jsonCore = Objects.requireNonNull(jsonCore);
     root = jsonCore.parse(jsonReader);
   }
 
@@ -191,7 +191,7 @@ public final class JsonUnflattener {
    * @param flattenedMap a flattened {@link Map}
    */
   public JsonUnflattener(JsonCore<?> jsonCore, Map<String, ?> flattenedMap) {
-    this.jsonCore = notNull(jsonCore);
+    this.jsonCore = Objects.requireNonNull(jsonCore);
     root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());
   }
 
@@ -246,7 +246,7 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withFlattenMode(FlattenMode flattenMode) {
-    this.flattenMode = notNull(flattenMode);
+    this.flattenMode = Objects.requireNonNull(flattenMode);
     return this;
   }
 
@@ -305,7 +305,7 @@ public final class JsonUnflattener {
    * @return this {@link JsonUnflattener}
    */
   public JsonUnflattener withPrintMode(PrintMode printMode) {
-    this.printMode = notNull(printMode);
+    this.printMode = Objects.requireNonNull(printMode);
     return this;
   }
 
