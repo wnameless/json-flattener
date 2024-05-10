@@ -18,8 +18,7 @@ package com.github.wnameless.json.flattener;
 import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
 import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
 import static java.util.Collections.EMPTY_MAP;
-import static org.apache.commons.lang3.Validate.isTrue;
-import static org.apache.commons.lang3.Validate.notNull;
+import static org.apache.commons.lang3.Validate.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayDeque;
@@ -110,7 +109,7 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private final JsonCore<?> jsonCore;
+  private static final JsonCore<?> jsonCore = new JacksonJsonCore();
   private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
   private final JsonValueBase<?> source;
 
@@ -143,7 +142,6 @@ public final class JsonFlattener {
    * @param json a {@link JsonValueBase}
    */
   public JsonFlattener(JsonValueBase<?> json) {
-    jsonCore = new JacksonJsonCore();
     source = notNull(json);
   }
 
@@ -154,7 +152,6 @@ public final class JsonFlattener {
    * @param json a JSON string
    */
   public JsonFlattener(JsonCore<?> jsonCore, JsonValueBase<?> json) {
-    this.jsonCore = notNull(jsonCore);
     source = jsonCore.parse(json.toJson());
   }
 
@@ -164,7 +161,6 @@ public final class JsonFlattener {
    * @param json a JSON string
    */
   public JsonFlattener(String json) {
-    jsonCore = new JacksonJsonCore();
     source = jsonCore.parse(json);
   }
 
@@ -175,7 +171,6 @@ public final class JsonFlattener {
    * @param json a JSON string
    */
   public JsonFlattener(JsonCore<?> jsonCore, String json) {
-    this.jsonCore = notNull(jsonCore);
     source = jsonCore.parse(json);
   }
 
@@ -186,7 +181,6 @@ public final class JsonFlattener {
    * @throws IOException if the jsonReader cannot be read
    */
   public JsonFlattener(Reader jsonReader) throws IOException {
-    jsonCore = new JacksonJsonCore();
     source = jsonCore.parse(jsonReader);
   }
 
@@ -198,7 +192,6 @@ public final class JsonFlattener {
    * @throws IOException if the jsonReader cannot be read
    */
   public JsonFlattener(JsonCore<?> jsonCore, Reader jsonReader) throws IOException {
-    this.jsonCore = notNull(jsonCore);
     source = jsonCore.parse(jsonReader);
   }
 
