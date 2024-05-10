@@ -16,8 +16,7 @@
 package com.github.wnameless.json.unflattener;
 
 import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
-import static org.apache.commons.lang3.Validate.isTrue;
-import static org.apache.commons.lang3.Validate.notNull;
+import static org.apache.commons.lang3.Validate.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -146,6 +145,7 @@ public final class JsonUnflattener {
    * @param jsonCore a {@link JsonCore}
    * @param json a JSON string
    */
+  @SuppressWarnings("deprecation")
   public JsonUnflattener(JsonCore<?> jsonCore, String json) {
     this.jsonCore = notNull(jsonCore);
     root = parseJson(json);
@@ -169,6 +169,7 @@ public final class JsonUnflattener {
    * @param jsonReader a JSON reader
    * @throws IOException if the jsonReader cannot be read
    */
+  @SuppressWarnings("deprecation")
   public JsonUnflattener(JsonCore<?> jsonCore, Reader jsonReader) throws IOException {
     this.jsonCore = notNull(jsonCore);
     root = jsonCore.parse(jsonReader);
@@ -190,6 +191,7 @@ public final class JsonUnflattener {
    * @param jsonCore a {@link JsonCore}
    * @param flattenedMap a flattened {@link Map}
    */
+  @SuppressWarnings("deprecation")
   public JsonUnflattener(JsonCore<?> jsonCore, Map<String, ?> flattenedMap) {
     this.jsonCore = notNull(jsonCore);
     root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());
@@ -245,6 +247,7 @@ public final class JsonUnflattener {
    * @param flattenMode a {@link FlattenMode}
    * @return this {@link JsonUnflattener}
    */
+  @SuppressWarnings("deprecation")
   public JsonUnflattener withFlattenMode(FlattenMode flattenMode) {
     this.flattenMode = notNull(flattenMode);
     return this;
@@ -304,6 +307,7 @@ public final class JsonUnflattener {
    * @param printMode a {@link PrintMode}
    * @return this {@link JsonUnflattener}
    */
+  @SuppressWarnings("deprecation")
   public JsonUnflattener withPrintMode(PrintMode printMode) {
     this.printMode = notNull(printMode);
     return this;

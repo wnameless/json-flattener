@@ -141,6 +141,7 @@ public final class JsonFlattener {
    * 
    * @param json a {@link JsonValueBase}
    */
+  @SuppressWarnings("deprecation")
   public JsonFlattener(JsonValueBase<?> json) {
     source = notNull(json);
   }
@@ -201,6 +202,7 @@ public final class JsonFlattener {
    * @param flattenMode a {@link FlattenMode}
    * @return this {@link JsonFlattener}
    */
+  @SuppressWarnings("deprecation")
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
     this.flattenMode = notNull(flattenMode);
     flattenedMap = null;
@@ -213,6 +215,7 @@ public final class JsonFlattener {
    * @param policy any {@link CharSequenceTranslatorFactory} or a {@link StringEscapePolicy}
    * @return this {@link JsonFlattener}
    */
+  @SuppressWarnings("deprecation")
   public JsonFlattener withStringEscapePolicy(CharSequenceTranslatorFactory policy) {
     this.policy = notNull(policy);
     flattenedMap = null;
@@ -272,6 +275,7 @@ public final class JsonFlattener {
    * @param printMode a {@link PrintMode}
    * @return this {@link JsonFlattener}
    */
+  @SuppressWarnings("deprecation")
   public JsonFlattener withPrintMode(PrintMode printMode) {
     this.printMode = notNull(printMode);
     return this;

@@ -43,6 +43,7 @@ public final class JsonFlattenerFactory {
    * @param configurer a functional interface used to set up the configuration of a
    *        {@link JsonFlattener}.
    */
+  @SuppressWarnings("deprecation")
   public JsonFlattenerFactory(Consumer<JsonFlattener> configurer) {
     this.configurer = notNull(configurer);
     this.jsonCore = Optional.empty();
@@ -55,6 +56,7 @@ public final class JsonFlattenerFactory {
    *        {@link JsonFlattener}.
    * @param jsonCore a {@link JsonCore}
    */
+  @SuppressWarnings("deprecation")
   public JsonFlattenerFactory(Consumer<JsonFlattener> configurer, JsonCore<?> jsonCore) {
     this.configurer = notNull(configurer);
     this.jsonCore = Optional.of(jsonCore);
