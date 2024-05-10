@@ -15,9 +15,9 @@
  */
 package com.github.wnameless.json.flattener;
 
+import static org.apache.commons.lang3.Validate.notNull;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import com.github.wnameless.json.base.JsonCore;
@@ -44,7 +44,7 @@ public final class JsonFlattenerFactory {
    *        {@link JsonFlattener}.
    */
   public JsonFlattenerFactory(Consumer<JsonFlattener> configurer) {
-    this.configurer = Objects.requireNonNull(configurer);
+    this.configurer = notNull(configurer);
     this.jsonCore = Optional.empty();
   }
 
@@ -56,7 +56,7 @@ public final class JsonFlattenerFactory {
    * @param jsonCore a {@link JsonCore}
    */
   public JsonFlattenerFactory(Consumer<JsonFlattener> configurer, JsonCore<?> jsonCore) {
-    this.configurer = Objects.requireNonNull(configurer);
+    this.configurer = notNull(configurer);
     this.jsonCore = Optional.of(jsonCore);
   }
 

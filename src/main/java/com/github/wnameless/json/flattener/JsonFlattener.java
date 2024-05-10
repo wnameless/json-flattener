@@ -18,14 +18,13 @@ package com.github.wnameless.json.flattener;
 import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
 import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
 import static java.util.Collections.EMPTY_MAP;
-import static org.apache.commons.lang3.Validate.isTrue;
+import static org.apache.commons.lang3.Validate.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import com.github.wnameless.json.base.JacksonJsonCore;
@@ -143,7 +142,7 @@ public final class JsonFlattener {
    * @param json a {@link JsonValueBase}
    */
   public JsonFlattener(JsonValueBase<?> json) {
-    source = Objects.requireNonNull(json);
+    source = notNull(json);
   }
 
   /**
@@ -203,7 +202,7 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
-    this.flattenMode = Objects.requireNonNull(flattenMode);
+    this.flattenMode = notNull(flattenMode);
     flattenedMap = null;
     return this;
   }
@@ -215,7 +214,7 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withStringEscapePolicy(CharSequenceTranslatorFactory policy) {
-    this.policy = Objects.requireNonNull(policy);
+    this.policy = notNull(policy);
     flattenedMap = null;
     return this;
   }
@@ -274,7 +273,7 @@ public final class JsonFlattener {
    * @return this {@link JsonFlattener}
    */
   public JsonFlattener withPrintMode(PrintMode printMode) {
-    this.printMode = Objects.requireNonNull(printMode);
+    this.printMode = notNull(printMode);
     return this;
   }
 
