@@ -136,3 +136,7 @@ Version 0.16.6
 
 Version 0.16.7
 * Upgrade json-base lib
+
+Version 0.17.0
+* Upgrade json-base lib
++ The ObjectMapper in JacksonJsonCore is lazy-loading now
