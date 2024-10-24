@@ -437,6 +437,7 @@ public final class JsonUnflattener {
       keyPart = keyPart.replaceAll("^" + Pattern.quote(leftBracket.toString()) + "\\s*\"", "");
       keyPart = keyPart.replaceAll("\"\\s*" + Pattern.quote(rightBracket.toString()) + "$", "");
     }
+    // Empty string
     if ("\"\"".equals(keyPart)) keyPart = "";
     return keyTrans != null ? keyTrans.transform(keyPart) : keyPart;
   }
