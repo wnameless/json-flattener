@@ -17,14 +17,7 @@ package com.github.wnameless.json.flattener;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -621,6 +614,13 @@ public class JsonFlattenerTest {
         "[{\"matrix\":\"reloaded\",\"agent_smith_no\":\"1\"},{\"matrix\":\"reloaded\",\"agent_smith_no\":\"2\"}]",
         new JsonFlattener(jsonArray).withFlattenMode(FlattenMode.KEEP_ARRAYS).withSeparator('_')
             .ignoreReservedCharacters().flatten());
+  }
+
+  @Test
+  public void testWithEmptyStringKey() {
+    String json = "{\"item_list\": [{\"\": 67,\"val\": 6}]}";
+    assertEquals("{\"item_list[0][\\\"\\\"]\":67,\"item_list[0].val\":6}",
+        JsonFlattener.flatten(json));
   }
 
 }

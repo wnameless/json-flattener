@@ -567,4 +567,10 @@ public class JsonUnflattenerTest {
         ju.unflatten());
   }
 
+  @Test
+  public void testWithEmptyStringKey() {
+    String json = "{\"item_list[0][\\\"\\\"]\":67,\"item_list[0].val\":6}";
+    assertEquals("{\"item_list\":[{\"\":67,\"val\":6}]}", JsonUnflattener.unflatten(json));
+  }
+
 }
