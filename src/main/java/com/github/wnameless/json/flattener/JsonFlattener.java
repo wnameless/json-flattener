@@ -470,6 +470,7 @@ public final class JsonFlattener {
         @SuppressWarnings("unchecked")
         String key = ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent()).getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
+        // Empty string or string with reserved characters must be wrapped in double quotes
         if (key.isEmpty() || (!ignoreReservedCharacters && hasReservedCharacters(key))) {
           sb.append(leftBracket);
           sb.append('"');
