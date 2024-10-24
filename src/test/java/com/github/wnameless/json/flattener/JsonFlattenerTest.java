@@ -243,14 +243,6 @@ public class JsonFlattenerTest {
         new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten());
   }
 
-  @SuppressWarnings("deprecation")
-  @Test
-  public void testWithStringEscapePolicyALL_UNICODES() {
-    String json = "{\"abc\":{\"def\":\"太極\"}}";
-    assertEquals("{\"abc.def\":\"\\u592A\\u6975\"}",
-        new JsonFlattener(json).withStringEscapePolicy(StringEscapePolicy.ALL_UNICODES).flatten());
-  }
-
   @Test
   public void testWithStringEscapePolicyALL() {
     String json = "{\"abc\":{\"def\":\"太極/兩儀\"}}";

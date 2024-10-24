@@ -36,30 +36,6 @@ import org.apache.commons.text.translate.LookupTranslator;
 public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
 
   /**
-   * Escapes all JSON special characters but Unicode.
-   *
-   * 
-   * @deprecated for removal in 0.17.0 in favor of {@link StringEscapePolicy#ALL_BUT_UNICODE}
-   */
-  @Deprecated
-  NORMAL(new AggregateTranslator(new LookupTranslator(new HashMap<CharSequence, CharSequence>() {
-    private static final long serialVersionUID = 1L;
-    {
-      put("\"", "\\\"");
-      put("\\", "\\\\");
-      put("/", "\\/");
-    }
-  }), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE))),
-
-  /**
-   * Escapes all JSON special characters and Unicode.
-   * 
-   * @deprecated for removal in 0.17.0 in favor of {@link StringEscapePolicy#ALL}
-   */
-  @Deprecated
-  ALL_UNICODES(StringEscapeUtils.ESCAPE_JSON),
-
-  /**
    * Escapes all JSON special characters and Unicode.
    */
   ALL(StringEscapeUtils.ESCAPE_JSON),
