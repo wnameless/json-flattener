@@ -207,7 +207,7 @@ public final class JsonUnflattener {
   }
 
   private Pattern objectComplexKeyPattern() {
-    String regex = Pattern.quote(leftBracket.toString()) + "\\s*\".+?\"\\s*"
+    String regex = Pattern.quote(leftBracket.toString()) + "\\s*\".*?\"\\s*"
         + Pattern.quote(rightBracket.toString());
     if (!patternCache.containsKey(regex)) {
       patternCache.put(regex, Pattern.compile(regex));
@@ -451,8 +451,7 @@ public final class JsonUnflattener {
       keyPart = keyPart.replaceAll("^" + Pattern.quote(leftBracket.toString()) + "\\s*\"", "");
       keyPart = keyPart.replaceAll("\"\\s*" + Pattern.quote(rightBracket.toString()) + "$", "");
     }
-    // Empty string
-    if ("\"\"".equals(keyPart)) keyPart = "";
+
     return keyTrans != null ? keyTrans.transform(keyPart) : keyPart;
   }
 
