@@ -615,4 +615,25 @@ public class JsonFlattenerTest {
         JsonFlattener.flatten(json));
   }
 
+  @Test
+  public void testWithEmptyStringKeyAndMONGDB() {
+    String json = "{\"item_list\": [{\"\": 67,\"val\": 6}]}";
+    assertEquals("{\"item_list.0.\":67,\"item_list.0.val\":6}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten());
+  }
+
+  @Test
+  public void testWithEmptyStringKeyAndMONGDBAndSeparator() {
+    String json = "{\"item_list\": [{\"\": 67,\"val\": 6}]}";
+    assertEquals("{\"item_list-0-\":67,\"item_list-0-val\":6}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).withSeparator('-').flatten());
+  }
+
+  @Test
+  public void testWithEmptyStringKeyAtBeginningAndEnd() {
+    String json = "{\"\": [{\"\": 67,\"val\": 6}]}";
+    assertEquals("{\"-0-\":67,\"-0-val\":6}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).withSeparator('-').flatten());
+  }
+
 }

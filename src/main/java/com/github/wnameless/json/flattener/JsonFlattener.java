@@ -471,7 +471,8 @@ public final class JsonFlattener {
         String key = ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent()).getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
         // Empty string or string with reserved characters must be wrapped in double quotes
-        if (key.isEmpty() || (!ignoreReservedCharacters && hasReservedCharacters(key))) {
+        if ((key.isEmpty() && !flattenMode.equals(MONGODB))
+            || (!ignoreReservedCharacters && hasReservedCharacters(key))) {
           sb.append(leftBracket);
           sb.append('"');
           sb.append(key);

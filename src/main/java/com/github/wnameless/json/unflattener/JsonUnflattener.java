@@ -226,7 +226,21 @@ public final class JsonUnflattener {
 
   private Pattern keyPartPattern() {
     if (flattenMode.equals(MONGODB)) {
-      String regex = "[^" + Pattern.quote(separator.toString()) + "]+";
+      // Escape the separator character for regex patterns
+      String separatorRegex = Pattern.quote(separator.toString());
+
+      // Escape the separator character for character classes
+      String separatorCharClass =
+          "\\^-$[]".contains(separator.toString()) ? "\\" + separator : separator.toString();
+
+      // Construct the regex pattern
+      String regex = "\\b[^" + separatorCharClass + "\\s]+\\b" // Words not containing the separator
+          + "|^(?=" + separatorRegex + ")" // Empty string before separator at start
+          + "|(?<=" + separatorRegex + ")$" // Empty string after separator at end
+          + "|(?<=" + separatorRegex + ")(?=" + separatorRegex + ")"; // Empty strings between
+                                                                      // separators
+      // String regex = "\\b[^.\\s]+\\b|^(?=\\.)|(?<=\\.)$|(?<=\\.)(?=\\.)";
+
       if (!patternCache.containsKey(regex)) {
         patternCache.put(regex, Pattern.compile(regex));
       }
