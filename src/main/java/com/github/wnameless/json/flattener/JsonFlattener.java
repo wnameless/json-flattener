@@ -453,6 +453,7 @@ public final class JsonFlattener {
   }
 
   private boolean hasReservedCharacters(String key) {
+    if (ignoreReservedCharacters) return false;
     if (flattenMode.equals(MONGODB) && StringUtils.containsAny(key, separator))
       throw new IllegalArgumentException(
           "Key cannot contain separator(" + separator + ") in FlattenMode." + MONGODB);
@@ -471,8 +472,7 @@ public final class JsonFlattener {
         String key = ((Entry<String, ? extends JsonValueBase<?>>) iter.getCurrent()).getKey();
         if (keyTrans != null) key = keyTrans.transform(key);
         // Empty string or string with reserved characters must be wrapped in double quotes
-        if ((key.isEmpty() && !flattenMode.equals(MONGODB))
-            || (!ignoreReservedCharacters && hasReservedCharacters(key))) {
+        if ((key.isEmpty() && !flattenMode.equals(MONGODB)) || hasReservedCharacters(key)) {
           sb.append(leftBracket);
           sb.append('"');
           sb.append(key);
