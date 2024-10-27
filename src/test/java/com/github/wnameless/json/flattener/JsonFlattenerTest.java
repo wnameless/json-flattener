@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JacksonJsonValue;
+import com.github.wnameless.json.base.JsonValueBase;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
@@ -45,6 +46,9 @@ public class JsonFlattenerTest {
   public void testConstructorException() {
     assertThrows(RuntimeException.class, () -> {
       new JsonFlattener("abc[123]}");
+    });
+    assertThrows(NullPointerException.class, () -> {
+      new JsonFlattener((JsonValueBase<?>) null);
     });
   }
 

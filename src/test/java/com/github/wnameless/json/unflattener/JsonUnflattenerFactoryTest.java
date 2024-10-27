@@ -60,6 +60,16 @@ public class JsonUnflattenerFactoryTest {
   }
 
   @Test
+  public void testConstructorException() {
+    assertThrows(NullPointerException.class, () -> {
+      new JsonUnflattenerFactory((Consumer<JsonUnflattener>) null);
+    });
+    assertThrows(NullPointerException.class, () -> {
+      new JsonUnflattenerFactory((Consumer<JsonUnflattener>) null, (JsonCore<?>) null);
+    });
+  }
+
+  @Test
   public void testBuildWithJSONString() throws IOException {
     URL url = Resources.getResource("test_mongo_flattened.json");
     String json = Resources.toString(url, Charsets.UTF_8);

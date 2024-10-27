@@ -18,7 +18,7 @@ package com.github.wnameless.json.flattener;
 import static com.github.wnameless.json.flattener.FlattenMode.MONGODB;
 import static com.github.wnameless.json.flattener.IndexedPeekIterator.newIndexedPeekIterator;
 import static java.util.Collections.EMPTY_MAP;
-import static org.apache.commons.lang3.Validate.*;
+import static org.apache.commons.lang3.Validate.isTrue;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayDeque;
@@ -141,9 +141,9 @@ public final class JsonFlattener {
    * 
    * @param json a {@link JsonValueBase}
    */
-  @SuppressWarnings("deprecation")
   public JsonFlattener(JsonValueBase<?> json) {
-    source = notNull(json);
+    if (json == null) throw new NullPointerException();
+    source = json;
   }
 
   /**
@@ -202,9 +202,9 @@ public final class JsonFlattener {
    * @param flattenMode a {@link FlattenMode}
    * @return this {@link JsonFlattener}
    */
-  @SuppressWarnings("deprecation")
   public JsonFlattener withFlattenMode(FlattenMode flattenMode) {
-    this.flattenMode = notNull(flattenMode);
+    if (flattenMode == null) throw new NullPointerException();
+    this.flattenMode = flattenMode;
     flattenedMap = null;
     return this;
   }
@@ -215,9 +215,9 @@ public final class JsonFlattener {
    * @param policy any {@link CharSequenceTranslatorFactory} or a {@link StringEscapePolicy}
    * @return this {@link JsonFlattener}
    */
-  @SuppressWarnings("deprecation")
   public JsonFlattener withStringEscapePolicy(CharSequenceTranslatorFactory policy) {
-    this.policy = notNull(policy);
+    if (policy == null) throw new NullPointerException();
+    this.policy = policy;
     flattenedMap = null;
     return this;
   }
@@ -275,9 +275,9 @@ public final class JsonFlattener {
    * @param printMode a {@link PrintMode}
    * @return this {@link JsonFlattener}
    */
-  @SuppressWarnings("deprecation")
   public JsonFlattener withPrintMode(PrintMode printMode) {
-    this.printMode = notNull(printMode);
+    if (printMode == null) throw new NullPointerException();
+    this.printMode = printMode;
     return this;
   }
 

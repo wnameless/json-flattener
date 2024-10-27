@@ -44,6 +44,16 @@ public class JsonFlattenerFactoryTest {
   }
 
   @Test
+  public void testConstructorException() {
+    assertThrows(NullPointerException.class, () -> {
+      new JsonFlattenerFactory((Consumer<JsonFlattener>) null);
+    });
+    assertThrows(NullPointerException.class, () -> {
+      new JsonFlattenerFactory((Consumer<JsonFlattener>) null, (JsonCore<?>) null);
+    });
+  }
+
+  @Test
   public void testBuildWithJSONString() throws IOException {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, Charsets.UTF_8);

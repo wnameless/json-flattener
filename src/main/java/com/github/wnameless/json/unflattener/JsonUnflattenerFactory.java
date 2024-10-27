@@ -15,7 +15,6 @@
  */
 package com.github.wnameless.json.unflattener;
 
-import static org.apache.commons.lang3.Validate.notNull;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
@@ -43,9 +42,9 @@ public final class JsonUnflattenerFactory {
    * @param configurer a functional interface used to set up the configuration of a
    *        {@link JsonUnflattener}.
    */
-  @SuppressWarnings("deprecation")
   public JsonUnflattenerFactory(Consumer<JsonUnflattener> configurer) {
-    this.configurer = notNull(configurer);
+    if (configurer == null) throw new NullPointerException();
+    this.configurer = configurer;
     this.jsonCore = Optional.empty();
   }
 
@@ -56,9 +55,9 @@ public final class JsonUnflattenerFactory {
    *        {@link JsonUnflattener}.
    * @param jsonCore a {@link JsonCore}
    */
-  @SuppressWarnings("deprecation")
   public JsonUnflattenerFactory(Consumer<JsonUnflattener> configurer, JsonCore<?> jsonCore) {
-    this.configurer = notNull(configurer);
+    if (configurer == null) throw new NullPointerException();
+    this.configurer = configurer;
     this.jsonCore = Optional.of(jsonCore);
   }
 

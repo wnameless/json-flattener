@@ -17,6 +17,7 @@ package com.github.wnameless.json.unflattener;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.Map;
@@ -27,6 +28,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.wnameless.json.base.JacksonJsonCore;
+import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.github.wnameless.json.flattener.KeyTransformer;
@@ -52,6 +54,15 @@ public class JsonUnflattenerTest {
   public void testConstructorException() {
     assertThrows(RuntimeException.class, () -> {
       new JsonUnflattener("abc[123]}");
+    });
+    assertThrows(NullPointerException.class, () -> {
+      new JsonUnflattener((JsonCore<?>) null, (String) null);
+    });
+    assertThrows(NullPointerException.class, () -> {
+      new JsonUnflattener((JsonCore<?>) null, (Reader) null);
+    });
+    assertThrows(NullPointerException.class, () -> {
+      new JsonUnflattener((JsonCore<?>) null, (Map<String, ?>) null);
     });
   }
 
@@ -459,6 +470,9 @@ public class JsonUnflattenerTest {
 
   @Test
   public void testNullPointerException() {
+    assertThrows(NullPointerException.class, () -> {
+      new JsonUnflattener("{\"abc.def\":123}").withFlattenMode(null);
+    });
     assertThrows(NullPointerException.class, () -> {
       new JsonUnflattener("{\"abc.def\":123}").withPrintMode(null);
     });
