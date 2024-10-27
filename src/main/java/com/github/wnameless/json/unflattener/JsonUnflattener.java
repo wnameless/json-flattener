@@ -239,7 +239,6 @@ public final class JsonUnflattener {
           + "|(?<=" + separatorRegex + ")$" // Empty string after separator at end
           + "|(?<=" + separatorRegex + ")(?=" + separatorRegex + ")"; // Empty strings between
                                                                       // separators
-      // String regex = "\\b[^.\\s]+\\b|^(?=\\.)|(?<=\\.)$|(?<=\\.)(?=\\.)";
 
       if (!patternCache.containsKey(regex)) {
         patternCache.put(regex, Pattern.compile(regex));
