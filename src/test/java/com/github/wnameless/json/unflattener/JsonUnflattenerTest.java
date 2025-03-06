@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +34,6 @@ import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.github.wnameless.json.flattener.KeyTransformer;
 import com.github.wnameless.json.flattener.PrintMode;
-import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
 public class JsonUnflattenerTest {
@@ -148,7 +148,7 @@ public class JsonUnflattenerTest {
   @Test
   public void testUnflattenWithArrayOfNestedObjectsInValByKeepArraysMode() throws IOException {
     URL url = Resources.getResource("test6.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     String flattendJson =
         new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten();
@@ -178,7 +178,7 @@ public class JsonUnflattenerTest {
   @Test
   public void testUnflattenWithReversedIndexesWithinObjects() throws IOException {
     URL url = Resources.getResource("test3.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     assertEquals("{\"List\":[{\"type\":\"A\"},null,{\"type\":\"B\"}]}",
         JsonUnflattener.unflatten(json));
@@ -244,7 +244,7 @@ public class JsonUnflattenerTest {
   @Test
   public void testWithKeepArrays() throws IOException {
     URL url = Resources.getResource("test4.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     assertEquals(json, JsonUnflattener
         .unflatten(new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS).flatten()));
@@ -494,10 +494,10 @@ public class JsonUnflattenerTest {
   @Test
   public void testFlattenModeMongodb() throws IOException {
     URL url = Resources.getResource("test_mongo.json");
-    String expectedJson = Resources.toString(url, Charsets.UTF_8);
+    String expectedJson = Resources.toString(url, StandardCharsets.UTF_8);
 
     URL urlMongo = Resources.getResource("test_mongo_flattened.json");
-    String json = Resources.toString(urlMongo, Charsets.UTF_8);
+    String json = Resources.toString(urlMongo, StandardCharsets.UTF_8);
 
     JsonUnflattener ju = new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB);
     assertEquals(mapper.readTree(expectedJson).toString(), ju.unflatten());
@@ -537,10 +537,10 @@ public class JsonUnflattenerTest {
   @Test
   public void testWithFlattenModeKeepBottomArrays() throws IOException {
     URL url = Resources.getResource("test_keep_primitive_arrays.json");
-    String expectedJson = Resources.toString(url, Charsets.UTF_8);
+    String expectedJson = Resources.toString(url, StandardCharsets.UTF_8);
 
     URL urlKBA = Resources.getResource("test_keep_primitive_arrays_flattened.json");
-    String json = Resources.toString(urlKBA, Charsets.UTF_8);
+    String json = Resources.toString(urlKBA, StandardCharsets.UTF_8);
 
     JsonUnflattener ju =
         new JsonUnflattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS);
@@ -554,7 +554,7 @@ public class JsonUnflattenerTest {
   @Test
   public void testWithJsonCore() throws IOException {
     URL url = Resources.getResource("test_long_decimal.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     ObjectMapper mapper = new ObjectMapper() {
       private static final long serialVersionUID = 1L;

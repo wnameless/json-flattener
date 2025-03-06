@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -32,7 +33,6 @@ import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonPrinter;
 import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.PrintMode;
-import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
 public class JsonUnflattenerFactoryTest {
@@ -46,7 +46,7 @@ public class JsonUnflattenerFactoryTest {
   @BeforeAll
   public static void init() throws IOException {
     URL url = Resources.getResource("test_mongo.json");
-    expectedJson = JsonPrinter.prettyPrint(Resources.toString(url, Charsets.UTF_8));
+    expectedJson = JsonPrinter.prettyPrint(Resources.toString(url, StandardCharsets.UTF_8));
   }
 
   @BeforeEach
@@ -72,7 +72,7 @@ public class JsonUnflattenerFactoryTest {
   @Test
   public void testBuildWithJSONString() throws IOException {
     URL url = Resources.getResource("test_mongo_flattened.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     JsonUnflattener ju = jsonUnflattenerFactory.build(json);
     assertEquals(expectedJson, ju.unflatten());
@@ -86,7 +86,7 @@ public class JsonUnflattenerFactoryTest {
   @Test
   public void testBuildWithMap() throws IOException {
     URL url = Resources.getResource("test_mongo_flattened.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     JsonUnflattener ju = jsonUnflattenerFactory
         .build((Map<String, ?>) new ObjectMapper().readValue(json, Map.class));
@@ -101,7 +101,7 @@ public class JsonUnflattenerFactoryTest {
   @Test
   public void testBuildWithJsonReader() throws IOException {
     URL url = Resources.getResource("test_mongo_flattened.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     JsonUnflattener ju = jsonUnflattenerFactory.build(new StringReader(json));
     assertEquals(expectedJson, ju.unflatten());

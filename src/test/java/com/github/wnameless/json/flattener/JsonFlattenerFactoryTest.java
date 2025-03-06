@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,6 @@ import com.github.wnameless.json.base.GsonJsonCore;
 import com.github.wnameless.json.base.JacksonJsonCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonPrinter;
-import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
 public class JsonFlattenerFactoryTest {
@@ -56,7 +56,7 @@ public class JsonFlattenerFactoryTest {
   @Test
   public void testBuildWithJSONString() throws IOException {
     URL url = Resources.getResource("test2.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     JsonFlattener jf = jsonFlattenerFactory.build(json);
     assertEquals(
@@ -75,7 +75,7 @@ public class JsonFlattenerFactoryTest {
   @Test
   public void testBuildWithJsonValueBase() throws IOException {
     URL url = Resources.getResource("test2.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     JsonFlattener jf = jsonFlattenerFactory.build(jsonCore.parse(json));
     assertEquals(
@@ -94,7 +94,7 @@ public class JsonFlattenerFactoryTest {
   @Test
   public void testBuildWithJsonReader() throws IOException {
     URL url = Resources.getResource("test2.json");
-    String json = Resources.toString(url, Charsets.UTF_8);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
 
     JsonFlattener jf = jsonFlattenerFactory.build(new StringReader(json));
     assertEquals(
