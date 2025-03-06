@@ -143,3 +143,6 @@ Version 0.17.0
 
 Version 0.17.1
 * Fix the bug: Flatten or unfaltten empty string keys
+
+Version 0.17.2
+* Upgrade Apache commons-text lib
