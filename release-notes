@@ -146,3 +146,6 @@ Version 0.17.1
 
 Version 0.17.2
 * Upgrade Apache commons-text lib
+
+Version 0.17.3
+* Fix handling of byte arrays with Jackson
