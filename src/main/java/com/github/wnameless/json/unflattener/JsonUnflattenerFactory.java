@@ -69,13 +69,9 @@ public final class JsonUnflattenerFactory {
    * @return a {@link JsonUnflattener}
    */
   public JsonUnflattener build(String json) {
-    JsonUnflattener jf;
-    if (jsonCore.isPresent()) {
-      jf = new JsonUnflattener(jsonCore.get(), json);
-    } else {
-      jf = new JsonUnflattener(json);
-    }
-
+    JsonUnflattener jf = jsonCore
+            .map(core -> new JsonUnflattener(core, json))
+            .orElseGet(() -> new JsonUnflattener(json));
     configurer.accept(jf);
     return jf;
   }
@@ -88,12 +84,9 @@ public final class JsonUnflattenerFactory {
    * @return a {@link JsonUnflattener}
    */
   public JsonUnflattener build(Map<String, ?> flattenedMap) {
-    JsonUnflattener jf;
-    if (jsonCore.isPresent()) {
-      jf = new JsonUnflattener(jsonCore.get(), flattenedMap);
-    } else {
-      jf = new JsonUnflattener(flattenedMap);
-    }
+    JsonUnflattener jf = jsonCore
+            .map(core -> new JsonUnflattener(core, flattenedMap))
+            .orElseGet(() -> new JsonUnflattener(flattenedMap));
     configurer.accept(jf);
     return jf;
   }
