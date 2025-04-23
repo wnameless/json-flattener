@@ -5,3 +5,9 @@
 .DS_Store
 .README.md.html
 settings.json
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
