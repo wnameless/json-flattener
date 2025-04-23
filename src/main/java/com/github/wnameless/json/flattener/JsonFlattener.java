@@ -109,7 +109,7 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private static final JsonCore<?> jsonCore = new JacksonJsonCore();
+  private final JsonCore<?> jsonCore;
   private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
   private final JsonValueBase<?> source;
 
@@ -125,7 +125,7 @@ public final class JsonFlattener {
   private boolean ignoreReservedCharacters = false;
 
   private JsonFlattener newJsonFlattener(JsonValueBase<?> jsonVal) {
-    JsonFlattener jf = new JsonFlattener(jsonVal);
+    JsonFlattener jf = new JsonFlattener(jsonCore, jsonVal);
     jf.withFlattenMode(flattenMode);
     jf.withStringEscapePolicy(policy);
     jf.withSeparator(separator);
@@ -142,8 +142,7 @@ public final class JsonFlattener {
    * @param json a {@link JsonValueBase}
    */
   public JsonFlattener(JsonValueBase<?> json) {
-    if (json == null) throw new NullPointerException();
-    source = json;
+    this(new JacksonJsonCore(), json);
   }
 
   /**
@@ -153,6 +152,8 @@ public final class JsonFlattener {
    * @param json a JSON string
    */
   public JsonFlattener(JsonCore<?> jsonCore, JsonValueBase<?> json) {
+    if (json == null) throw new NullPointerException();
+    this.jsonCore = jsonCore;
     source = jsonCore.parse(json.toJson());
   }
 
@@ -162,7 +163,7 @@ public final class JsonFlattener {
    * @param json a JSON string
    */
   public JsonFlattener(String json) {
-    source = jsonCore.parse(json);
+    this(new JacksonJsonCore(), json);
   }
 
   /**
@@ -172,6 +173,7 @@ public final class JsonFlattener {
    * @param json a JSON string
    */
   public JsonFlattener(JsonCore<?> jsonCore, String json) {
+    this.jsonCore = jsonCore;
     source = jsonCore.parse(json);
   }
 
@@ -182,7 +184,7 @@ public final class JsonFlattener {
    * @throws IOException if the jsonReader cannot be read
    */
   public JsonFlattener(Reader jsonReader) throws IOException {
-    source = jsonCore.parse(jsonReader);
+    this(new JacksonJsonCore(), jsonReader);
   }
 
   /**
@@ -193,6 +195,7 @@ public final class JsonFlattener {
    * @throws IOException if the jsonReader cannot be read
    */
   public JsonFlattener(JsonCore<?> jsonCore, Reader jsonReader) throws IOException {
+    this.jsonCore = jsonCore;
     source = jsonCore.parse(jsonReader);
   }
 

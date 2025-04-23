@@ -111,7 +111,7 @@ public final class JsonUnflattener {
   private KeyTransformer keyTrans = null;
 
   private JsonUnflattener newJsonUnflattener(JsonValueCore<?> jsonValue) {
-    JsonUnflattener ju = new JsonUnflattener(jsonValue);
+    JsonUnflattener ju = new JsonUnflattener(jsonCore, jsonValue);
     ju.withFlattenMode(flattenMode);
     ju.withSeparator(separator);
     ju.withLeftAndRightBrackets(leftBracket, rightBracket);
@@ -120,8 +120,8 @@ public final class JsonUnflattener {
     return ju;
   }
 
-  private JsonUnflattener(JsonValueCore<?> root) {
-    jsonCore = new JacksonJsonCore();
+  private JsonUnflattener(JsonCore<?> jsonCore, JsonValueCore<?> root) {
+    this.jsonCore = jsonCore;
     this.root = root;
   }
 
