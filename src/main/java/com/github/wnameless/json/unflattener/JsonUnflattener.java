@@ -135,8 +135,7 @@ public final class JsonUnflattener {
    * @param json a JSON string
    */
   public JsonUnflattener(String json) {
-    jsonCore = new JacksonJsonCore();
-    root = parseJson(json);
+    this(new JacksonJsonCore(), json);
   }
 
   /**
@@ -158,8 +157,7 @@ public final class JsonUnflattener {
    * @throws IOException if the jsonReader cannot be read
    */
   public JsonUnflattener(Reader jsonReader) throws IOException {
-    jsonCore = new JacksonJsonCore();
-    root = jsonCore.parse(jsonReader);
+    this(new JacksonJsonCore(), jsonReader);
   }
 
   /**
@@ -181,8 +179,7 @@ public final class JsonUnflattener {
    * @param flattenedMap a flattened {@link Map}
    */
   public JsonUnflattener(Map<String, ?> flattenedMap) {
-    jsonCore = new JacksonJsonCore();
-    root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());
+    this(new JacksonJsonCore(), flattenedMap);
   }
 
   /**

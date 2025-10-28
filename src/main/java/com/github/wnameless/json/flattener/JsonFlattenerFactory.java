@@ -69,12 +69,9 @@ public final class JsonFlattenerFactory {
    * @return a {@link JsonFlattener}
    */
   public JsonFlattener build(String json) {
-    JsonFlattener jf;
-    if (jsonCore.isPresent()) {
-      jf = new JsonFlattener(jsonCore.get(), json);
-    } else {
-      jf = new JsonFlattener(json);
-    }
+    JsonFlattener jf = jsonCore
+            .map(core -> new JsonFlattener(core, json))
+            .orElseGet(() -> new JsonFlattener(json));
     configurer.accept(jf);
     return jf;
   }
@@ -87,12 +84,9 @@ public final class JsonFlattenerFactory {
    * @return a {@link JsonFlattener}
    */
   public JsonFlattener build(JsonValueBase<?> json) {
-    JsonFlattener jf;
-    if (jsonCore.isPresent()) {
-      jf = new JsonFlattener(jsonCore.get(), json);
-    } else {
-      jf = new JsonFlattener(json);
-    }
+    JsonFlattener jf = jsonCore
+            .map(core -> new JsonFlattener(core, json))
+            .orElseGet(() -> new JsonFlattener(json));
     configurer.accept(jf);
     return jf;
   }
