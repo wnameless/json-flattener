@@ -149,3 +149,6 @@ Version 0.17.2
 
 Version 0.17.3
 * Fix handling of byte arrays with Jackson
+  
+Version 0.17.4
+* Use central-publishing-maven-plugin for releasing artifact
