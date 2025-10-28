@@ -5,3 +5,7 @@
 .DS_Store
 .README.md.html
 settings.json
+
+### AI ###
+CLAUDE.md
+.claude/
