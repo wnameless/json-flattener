@@ -152,3 +152,7 @@ Version 0.17.3
   
 Version 0.17.4
 * Use central-publishing-maven-plugin for releasing artifact
+
+Version 0.18.0
+* Java 17 required
+* Jackson 2 is replaced by Jackson 3

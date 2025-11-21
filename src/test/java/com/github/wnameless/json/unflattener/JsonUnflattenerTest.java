@@ -23,29 +23,27 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.wnameless.json.base.JacksonJsonCore;
+import com.github.wnameless.json.base.Jackson3JsonCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.github.wnameless.json.flattener.KeyTransformer;
 import com.github.wnameless.json.flattener.PrintMode;
 import com.google.common.io.Resources;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class JsonUnflattenerTest {
 
   ObjectMapper mapper = new ObjectMapper();
 
-  private Map<String, ?> toMap(String json) throws JsonMappingException, JsonProcessingException {
+  private Map<String, ?> toMap(String json) {
     return mapper.readValue(json, new TypeReference<Map<String, Object>>() {});
   }
 
-  private Map<String, ?> toRootMap(String json)
-      throws JsonMappingException, JsonProcessingException {
+  private Map<String, ?> toRootMap(String json) {
     return mapper.readValue("{\"" + JsonUnflattener.ROOT + "\":" + json + "}",
         new TypeReference<Map<String, Object>>() {});
   }
@@ -67,7 +65,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testUnflatten() throws JsonMappingException, JsonProcessingException {
+  public void testUnflatten() {
     assertEquals(
         "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}",
         JsonUnflattener.unflatten(
@@ -105,7 +103,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testUnflattenAsMap() throws JsonMappingException, JsonProcessingException {
+  public void testUnflattenAsMap() {
     assertEquals(toMap(
         "{\"a\":{\"b\":1,\"c\":null,\"d\":[false,true,{\"sss\":777,\"vvv\":888}]},\"e\":\"f\",\"g\":2.3}"),
         JsonUnflattener.unflattenAsMap(
@@ -165,8 +163,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testUnflattenWithKeyContainsDotAndSquareBracket()
-      throws JsonMappingException, JsonProcessingException {
+  public void testUnflattenWithKeyContainsDotAndSquareBracket() {
     assertEquals("[1,[2,3],4,{\"ab.c.[\":5}]", JsonUnflattener.unflatten(
         "{\"[1][0]\":2,\"[ 0 ]\":1,\"[1][1]\":3,\"[2]\":4,\"[3][ \\\"ab.c.[\\\" ]\":5}"));
 
@@ -189,8 +186,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testUnflattenWithReversedIndexes()
-      throws JsonMappingException, JsonProcessingException {
+  public void testUnflattenWithReversedIndexes() {
     String json = "{\"[1][1]\":\"B\",\"[0][0]\":\"A\"}";
 
     assertEquals("[[\"A\"],[null,\"B\"]]", JsonUnflattener.unflatten(json));
@@ -200,8 +196,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testUnflattenWithInitComplexKey()
-      throws JsonMappingException, JsonProcessingException {
+  public void testUnflattenWithInitComplexKey() {
     String json = "{\"[\\\"b.b\\\"].aaa\":123}";
 
     assertEquals("{\"b.b\":{\"aaa\":123}}", JsonUnflattener.unflatten(json));
@@ -255,7 +250,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithSeparater() throws JsonMappingException, JsonProcessingException {
+  public void testWithSeparater() {
     String json = "{\"abc\":{\"def\":123}}";
     assertEquals(json, new JsonUnflattener(new JsonFlattener(json).withSeparator('*').flatten())
         .withSeparator('*').unflatten());
@@ -267,7 +262,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithSeparaterException() throws JsonMappingException, JsonProcessingException {
+  public void testWithSeparaterException() {
     String json = "{\"abc\":{\"def\":123}}";
     try {
       new JsonUnflattener(json).withSeparator('"');
@@ -322,7 +317,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithLeftAndRightBrackets() throws JsonMappingException, JsonProcessingException {
+  public void testWithLeftAndRightBrackets() {
     String json = "{\"abc[\\\"A.\\\"][0]\":123}";
     assertEquals("{\"abc\":{\"A.\":[123]}}",
         new JsonUnflattener(json).withLeftAndRightBrackets('[', ']').unflatten());
@@ -342,8 +337,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithLeftAndRightBracketsException()
-      throws JsonMappingException, JsonProcessingException {
+  public void testWithLeftAndRightBracketsException() {
     String json = "{\"abc\":{\"def\":123}}";
     try {
       new JsonUnflattener(json).withLeftAndRightBrackets('#', '#');
@@ -434,7 +428,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithNonObject() throws JsonMappingException, JsonProcessingException {
+  public void testWithNonObject() {
     assertEquals("123", JsonUnflattener.unflatten("123"));
     assertEquals("\"abc\"", JsonUnflattener.unflatten("\"abc\""));
     assertEquals("true", JsonUnflattener.unflatten("true"));
@@ -457,7 +451,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testNoCache() throws JsonMappingException, JsonProcessingException {
+  public void testNoCache() {
     JsonUnflattener ju = new JsonUnflattener("{\"abc.def\":123}");
     assertNotSame(ju.unflatten(), ju.unflatten());
     assertEquals("{\"abc\":{\"def\":123}}", ju.withPrintMode(PrintMode.MINIMAL).unflatten());
@@ -486,7 +480,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testInitByMap() throws JsonMappingException, JsonProcessingException {
+  public void testInitByMap() {
     assertEquals(new JsonUnflattener("{\"abc.def\":123}"),
         new JsonUnflattener(toMap("{\"abc.def\":123}")));
   }
@@ -508,7 +502,7 @@ public class JsonUnflattenerTest {
   }
 
   @Test
-  public void testWithKeyTransformer() throws JsonMappingException, JsonProcessingException {
+  public void testWithKeyTransformer() {
     String json = "{\"abc.de_f\":123}";
     JsonUnflattener ju = new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB)
         .withKeyTransformer(new KeyTransformer() {
@@ -556,25 +550,21 @@ public class JsonUnflattenerTest {
     URL url = Resources.getResource("test_long_decimal.json");
     String json = Resources.toString(url, StandardCharsets.UTF_8);
 
-    ObjectMapper mapper = new ObjectMapper() {
-      private static final long serialVersionUID = 1L;
-      {
-        configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
-        configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true);
-      }
-    };
+    ObjectMapper mapper =
+        JsonMapper.builder().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+            .enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS).build();
 
-    JsonUnflattener ju = new JsonUnflattener(new JacksonJsonCore(mapper), json);
+    JsonUnflattener ju = new JsonUnflattener(new Jackson3JsonCore(mapper), json);
     ju.withPrintMode(PrintMode.PRETTY);
     assertEquals(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(json)),
         ju.unflatten());
 
-    ju = new JsonUnflattener(new JacksonJsonCore(mapper), new StringReader(json));
+    ju = new JsonUnflattener(new Jackson3JsonCore(mapper), new StringReader(json));
     ju.withPrintMode(PrintMode.PRETTY);
     assertEquals(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(json)),
         ju.unflatten());
 
-    ju = new JsonUnflattener(new JacksonJsonCore(mapper),
+    ju = new JsonUnflattener(new Jackson3JsonCore(mapper),
         mapper.readValue(json, new TypeReference<Map<String, Object>>() {}));
     ju.withPrintMode(PrintMode.PRETTY);
     assertEquals(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(json)),

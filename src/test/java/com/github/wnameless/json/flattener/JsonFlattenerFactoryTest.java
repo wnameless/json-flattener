@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.github.wnameless.json.base.GsonJsonCore;
-import com.github.wnameless.json.base.JacksonJsonCore;
+import com.github.wnameless.json.base.Jackson3JsonCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonPrinter;
 import com.google.common.io.Resources;
@@ -118,7 +118,7 @@ public class JsonFlattenerFactoryTest {
     assertEquals(result, jsonFlattenerFactory.hashCode());
 
     configurer = jf -> jf.withPrintMode(PrintMode.PRETTY);
-    jsonCore = new JacksonJsonCore();
+    jsonCore = new Jackson3JsonCore();
     jsonFlattenerFactory = new JsonFlattenerFactory(configurer, jsonCore);
     assertNotEquals(result, jsonFlattenerFactory.hashCode());
   }
@@ -133,7 +133,7 @@ public class JsonFlattenerFactoryTest {
     otherJsonFlattenerFactory = new JsonFlattenerFactory(configurer);
     assertNotEquals(jsonFlattenerFactory, otherJsonFlattenerFactory);
 
-    jsonCore = new JacksonJsonCore();
+    jsonCore = new Jackson3JsonCore();
     otherJsonFlattenerFactory = new JsonFlattenerFactory(configurer, jsonCore);
     assertNotEquals(jsonFlattenerFactory, otherJsonFlattenerFactory);
 

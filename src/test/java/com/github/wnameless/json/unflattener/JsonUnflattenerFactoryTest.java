@@ -26,14 +26,14 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.wnameless.json.base.GsonJsonCore;
-import com.github.wnameless.json.base.JacksonJsonCore;
+import com.github.wnameless.json.base.Jackson3JsonCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonPrinter;
 import com.github.wnameless.json.flattener.FlattenMode;
 import com.github.wnameless.json.flattener.PrintMode;
 import com.google.common.io.Resources;
+import tools.jackson.databind.ObjectMapper;
 
 public class JsonUnflattenerFactoryTest {
 
@@ -119,7 +119,7 @@ public class JsonUnflattenerFactoryTest {
     assertEquals(result, jsonUnflattenerFactory.hashCode());
 
     configurer = ju -> ju.withPrintMode(PrintMode.PRETTY);
-    jsonCore = new JacksonJsonCore();
+    jsonCore = new Jackson3JsonCore();
     jsonUnflattenerFactory = new JsonUnflattenerFactory(configurer, jsonCore);
     assertNotEquals(result, jsonUnflattenerFactory.hashCode());
   }
@@ -135,7 +135,7 @@ public class JsonUnflattenerFactoryTest {
     otherJsonUnflattenerFactory = new JsonUnflattenerFactory(configurer);
     assertNotEquals(jsonUnflattenerFactory, otherJsonUnflattenerFactory);
 
-    jsonCore = new JacksonJsonCore();
+    jsonCore = new Jackson3JsonCore();
     otherJsonUnflattenerFactory = new JsonUnflattenerFactory(configurer, jsonCore);
     assertNotEquals(jsonUnflattenerFactory, otherJsonUnflattenerFactory);
 

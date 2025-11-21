@@ -27,16 +27,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.github.wnameless.json.base.JacksonJsonCore;
-import com.github.wnameless.json.base.JacksonJsonValue;
+import com.github.wnameless.json.base.Jackson3JsonCore;
+import com.github.wnameless.json.base.Jackson3JsonValue;
 import com.github.wnameless.json.base.JsonValueBase;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 public class JsonFlattenerTest {
 
@@ -69,12 +70,10 @@ public class JsonFlattenerTest {
     assertEquals("{\"[0].a\":1,\"[1]\":2.0,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         JsonFlattener.flatten("[{\"a\":1},2.00,{\"c\":[3,4]}]"));
 
-    JsonNodeFactory f = new JsonNodeFactory(true);
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
-    mapper.setNodeFactory(f);
+    ObjectMapper mapper = JsonMapper.builder().nodeFactory(new JsonNodeFactory())
+        .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).build();
     JsonFlattener jsonFlattener =
-        new JsonFlattener(new JacksonJsonCore(mapper), "[{\"a\":1},2.00,{\"c\":[3,4]}]");
+        new JsonFlattener(new Jackson3JsonCore(mapper), "[{\"a\":1},2.00,{\"c\":[3,4]}]");
     assertEquals("{\"[0].a\":1,\"[1]\":2.00,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         jsonFlattener.flatten());
   }
@@ -93,11 +92,9 @@ public class JsonFlattenerTest {
     URL url = Resources.getResource("test2.json");
     String json = Resources.toString(url, StandardCharsets.UTF_8);
 
-    JsonNodeFactory f = new JsonNodeFactory(true);
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
-    mapper.setNodeFactory(f);
-    JsonFlattener jsonFlattener = new JsonFlattener(new JacksonJsonCore(mapper), json);
+    ObjectMapper mapper = JsonMapper.builder().nodeFactory(new JsonNodeFactory())
+        .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).build();
+    JsonFlattener jsonFlattener = new JsonFlattener(new Jackson3JsonCore(mapper), json);
     assertEquals("{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.30}",
         jsonFlattener.flattenAsMap().toString());
   }
@@ -109,7 +106,7 @@ public class JsonFlattenerTest {
 
     JsonNode jsonVal = new ObjectMapper().readTree(json);
     assertEquals("{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
-        JsonFlattener.flatten(new JacksonJsonValue(jsonVal)));
+        JsonFlattener.flatten(new Jackson3JsonValue(jsonVal)));
 
     assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         JsonFlattener.flatten("[{\"a\":1},2,{\"c\":[3,4]}]"));
@@ -122,7 +119,7 @@ public class JsonFlattenerTest {
 
     JsonNode jsonVal = new ObjectMapper().readTree(json);
     assertEquals("{\"a.b\":1,\"a.c\":null,\"a.d[0]\":false,\"a.d[1]\":true,\"e\":\"f\",\"g\":2.3}",
-        JsonFlattener.flattenAsMap(new JacksonJsonValue(jsonVal)).toString());
+        JsonFlattener.flattenAsMap(new Jackson3JsonValue(jsonVal)).toString());
 
     assertEquals("{\"[0].a\":1,\"[1]\":2,\"[2].c[0]\":3,\"[2].c[1]\":4}",
         JsonFlattener.flattenAsMap("[{\"a\":1},2,{\"c\":[3,4]}]").toString());
@@ -561,25 +558,22 @@ public class JsonFlattenerTest {
     URL url = Resources.getResource("test_long_decimal.json");
     String json = Resources.toString(url, StandardCharsets.UTF_8);
 
-    ObjectMapper mapper = new ObjectMapper() {
-      private static final long serialVersionUID = 1L;
-      {
-        configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
-        configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true);
-      }
-    };
+    ObjectMapper mapper =
+        JsonMapper.builder().enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)
+            .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).build();
 
-    JsonFlattener jf = new JsonFlattener(new JacksonJsonCore(mapper), json);
+    JsonFlattener jf = new JsonFlattener(new Jackson3JsonCore(mapper), json);
+    jf.withPrintMode(PrintMode.PRETTY);
+
+    assertEquals(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(json)),
+        jf.flatten());
+
+    jf = new JsonFlattener(new Jackson3JsonCore(mapper), new StringReader(json));
     jf.withPrintMode(PrintMode.PRETTY);
     assertEquals(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(json)),
         jf.flatten());
 
-    jf = new JsonFlattener(new JacksonJsonCore(mapper), new StringReader(json));
-    jf.withPrintMode(PrintMode.PRETTY);
-    assertEquals(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(json)),
-        jf.flatten());
-
-    jf = new JsonFlattener(new JacksonJsonCore(mapper), new JacksonJsonCore(mapper).parse(json));
+    jf = new JsonFlattener(new Jackson3JsonCore(mapper), new Jackson3JsonCore(mapper).parse(json));
     jf.withPrintMode(PrintMode.PRETTY);
     assertEquals(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readTree(json)),
         jf.flatten());

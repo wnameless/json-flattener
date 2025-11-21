@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import com.github.wnameless.json.base.JacksonJsonCore;
+import com.github.wnameless.json.base.Jackson3JsonCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonValueBase;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
@@ -109,7 +109,7 @@ public final class JsonFlattener {
     return new JsonFlattener(json).flattenAsMap();
   }
 
-  private static final JsonCore<?> jsonCore = new JacksonJsonCore();
+  private static final JsonCore<?> jsonCore = new Jackson3JsonCore();
   private final Deque<IndexedPeekIterator<?>> elementIters = new ArrayDeque<>();
   private final JsonValueBase<?> source;
 

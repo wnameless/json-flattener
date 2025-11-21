@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.github.wnameless.json.base.JacksonJsonCore;
+import com.github.wnameless.json.base.Jackson3JsonCore;
 import com.github.wnameless.json.base.JsonArrayCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.base.JsonObjectCore;
@@ -121,7 +121,7 @@ public final class JsonUnflattener {
   }
 
   private JsonUnflattener(JsonValueCore<?> root) {
-    jsonCore = new JacksonJsonCore();
+    jsonCore = new Jackson3JsonCore();
     this.root = root;
   }
 
@@ -135,7 +135,7 @@ public final class JsonUnflattener {
    * @param json a JSON string
    */
   public JsonUnflattener(String json) {
-    jsonCore = new JacksonJsonCore();
+    jsonCore = new Jackson3JsonCore();
     root = parseJson(json);
   }
 
@@ -158,7 +158,7 @@ public final class JsonUnflattener {
    * @throws IOException if the jsonReader cannot be read
    */
   public JsonUnflattener(Reader jsonReader) throws IOException {
-    jsonCore = new JacksonJsonCore();
+    jsonCore = new Jackson3JsonCore();
     root = jsonCore.parse(jsonReader);
   }
 
@@ -181,7 +181,7 @@ public final class JsonUnflattener {
    * @param flattenedMap a flattened {@link Map}
    */
   public JsonUnflattener(Map<String, ?> flattenedMap) {
-    jsonCore = new JacksonJsonCore();
+    jsonCore = new Jackson3JsonCore();
     root = jsonCore.parse(new JsonifyLinkedHashMap<>(flattenedMap).toString());
   }
 
