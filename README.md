@@ -462,3 +462,4 @@ System.out.println(new JsonUnflattener(json).withPrintMode(PrintMode.PRETTY).unf
 | Group ID is changed from [com.github.wnameless] to [com.github.wnameless.json]. | v0.7.0 |
 | Java Module supported. | v0.9.0 |
 | The Map produced by JsonFlattener#flattenAsMap after serialization is now identical to the JSON produced by JsonFlattener#flatten. Before v0.10.0, the serialized flattened Map may be different at some edge cases(ex: input keys contain separator('.')). | v0.10.0 |
+| Java 17 required. | v0.18.0 |
