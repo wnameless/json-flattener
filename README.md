@@ -98,6 +98,7 @@ System.out.println(nestedJsonWithDotKey);
 # Feature List<a id='top'></a>
 | Name | Description | Since |
 | --- | --- | --- |
+| Jackson 3 | Jackson 2 is replaced by Jackson 3, but Jackson 2 is still supported through [json-base](https://github.com/wnameless/json-base). | v0.18.0 |
 | Jackson, Gson, org.json, Jakarta | Upgrading [json-base](https://github.com/wnameless/json-base) to support 4 major JSON implementations | v0.16.0 |
 | [JsonFlattenerFactory](#14.0.1) | produces any JsonFlattener with preconfigured settings | v0.14.0 |
 | [JsonUnflattenerFactory](#14.0.2) | produces any JsonUnflattener with preconfigured settings | v0.14.0 |
@@ -200,6 +201,11 @@ ObjectMapper mapper = new ObjectMapper() {
 jf = new JsonFlattener(new JacksonJsonCore(mapper), json);
 ju = new JsonUnflattener(new JacksonJsonCore(mapper), json);
 
+// If you are using Jackson 3:
+// ObjectMapper mapper = JsonMapper.builder().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS).build();
+// jf = new JsonFlattener(new Jackson3JsonCore(mapper), json);
+// ju = new JsonUnflattener(new Jackson3JsonCore(mapper), json);
+
 Gson gson = new GsonBuilder().serializeNulls().create();
 jf = new JsonFlattener(new GsonJsonCore(gson), json);
 ju = new JsonUnflattener(new GsonJsonCore(gson), json);
@@ -230,6 +236,8 @@ JsonValueBase<?> jsonVal;
 
 // JacksonJsonValue, which is provided by json-base lib, can wrap Jackson jsonNode to JsonValueBase
 jsonVal = new JacksonJsonValue(jsonNode);
+// If you are using Jackson 3:
+// jsonVal = new Jackson3JsonValue(jsonNode);
 
 Map<String, Object> flattenMap = JsonFlattener.flattenAsMap(jsonVal);
 ```
@@ -251,6 +259,8 @@ jsonVal = new GsonJsonValue(jsonElement);
 
 // JacksonJsonValue, which is provided by json-base lib, can wrap Jackson jsonNode to JsonValueBase
 jsonVal = new JacksonJsonValue(jsonNode);
+// If you are using Jackson 3:
+// jsonVal = new Jackson3JsonValue(jsonNode);
 
 // You can also implement the JsonValueBase interface for any JSON lib you are using
 jsonVal = new CostumeJsonValue(yourJsonVal);
