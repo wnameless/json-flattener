@@ -12,12 +12,12 @@ jobs:
       uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
       with:
         oss-fuzz-project-name: 'json-flattener'
-        language: java
+        language: jvm
     - name: Run Fuzzers
       uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
       with:
         oss-fuzz-project-name: 'json-flattener'
-        language: java
+        language: jvm
         fuzz-seconds: 600
         output-sarif: true
     - name: Upload Crash
