@@ -83,6 +83,13 @@
       <version>6.0.1</version>
       <scope>test</scope>
     </dependency>
+    <!-- Jazzer API: provided at compile time by OSS-Fuzz runtime; needed to compile fuzz targets -->
+    <dependency>
+      <groupId>com.code-intelligence</groupId>
+      <artifactId>jazzer-api</artifactId>
+      <version>0.22.1</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -191,6 +198,12 @@
             <goals>
               <goal>report</goal>
             </goals>
+            <configuration>
+              <formats>
+                <format>HTML</format>
+                <format>XML</format>
+              </formats>
+            </configuration>
           </execution>
         </executions>
       </plugin>
