@@ -49,7 +49,7 @@ Version 0.4.0
 + Add #withKeyTransformer
 
 Version 0.4.1
-* Fix the bug of unable to use JsonUnflattener to unflatten json made form KEEP_ARRAYS mode correctly if flattened objects exist in an array
+* Fix the bug of unable to use JsonUnflattener to unflatten json made from KEEP_ARRAYS mode correctly if flattened objects exist in an array
 
 Version 0.5.0
 * Using Apache common-text instead of common-lang3
@@ -59,14 +59,14 @@ Version 0.5.0
 Version 0.6.0
 + Add StringEscapePolicy.ALL
 + Add StringEscapePolicy.ALL_BUT_SLASH
-+ Add StringEscapePolicy.ALL_BUT_UNICODD
++ Add StringEscapePolicy.ALL_BUT_UNICODE
 + Add StringEscapePolicy.ALL_BUT_SLASH_AND_UNICODE
 + Add StringEscapePolicy.DEFAULT
 * Make StringEscapePolicy.DEFAULT as the default StringEscapePolicy of JsonFlattener
 
 Version 0.7.0
 * Change new Group ID from com.github.wnameless to com.github.wnameless.json
-+ Accept Gson, Jackson, minimal-json objects by applying json-base libarary
++ Accept Gson, Jackson, minimal-json objects by applying json-base library
 
 Version 0.7.1
 + Add maven relocation
@@ -142,7 +142,7 @@ Version 0.17.0
 + The ObjectMapper in JacksonJsonCore is lazy-loading now
 
 Version 0.17.1
-* Fix the bug: Flatten or unfaltten empty string keys
+* Fix the bug: Flatten or unflatten empty string keys
 
 Version 0.17.2
 * Upgrade Apache commons-text lib
@@ -156,3 +156,9 @@ Version 0.17.4
 Version 0.18.0
 * Java 17 required
 * Jackson 2 is replaced by Jackson 3
+
+Version 0.18.1
+* Fix Maven dependency security issues
+
+Version 0.18.2
+* Upgrade jackson-databind to fix its security issue
