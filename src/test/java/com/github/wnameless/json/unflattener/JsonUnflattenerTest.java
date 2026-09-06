@@ -598,4 +598,37 @@ public class JsonUnflattenerTest {
         .withFlattenMode(FlattenMode.MONGODB).withSeparator('-').unflatten());
   }
 
+  @Test
+  public void testComplexKeyWithLineTerminator() {
+    // Issue: a complex key containing a line terminator and array-index-like text was split as
+    // if "[7]" were an array index, because "." in the regex does not match line terminators
+    String[] lineTerminators = {"\n", "\r", "\u0085", "\u2028", "\u2029"};
+    for (String lt : lineTerminators) {
+      String json = String.format("{\"\\u%04x[7]\":false}", (int) lt.charAt(0));
+      Map<String, Object> expected = Map.of(lt + "[7]", false);
+      for (FlattenMode mode : new FlattenMode[] {FlattenMode.NORMAL, FlattenMode.KEEP_ARRAYS,
+          FlattenMode.KEEP_PRIMITIVE_ARRAYS}) {
+        String flattened = new JsonFlattener(json).withFlattenMode(mode).flatten();
+        assertEquals(expected,
+            new JsonUnflattener(flattened).withFlattenMode(mode).unflattenAsMap(),
+            "mode=" + mode + " key=U+" + Integer.toHexString(lt.charAt(0)));
+      }
+    }
+  }
+
+  @Test
+  public void testComplexKeyWithLineTerminatorInReadmeExample() {
+    String json = "[{\"a.a.[\\r\":1},2,{\"c\":[3,4]}]";
+    assertEquals(json, JsonUnflattener.unflatten(JsonFlattener.flatten(json)));
+  }
+
+  @Test
+  public void testComplexKeyWithLineTerminatorAndCustomBrackets() {
+    String json = "{\"a<0>\\n\":1,\"b\":{\"c\\r<0>\":2}}";
+    String flattened = new JsonFlattener(json).withLeftAndRightBrackets('<', '>').flatten();
+    assertEquals("{\"<\\\"a<0>\\n\\\">\":1,\"b<\\\"c\\r<0>\\\">\":2}", flattened);
+    assertEquals(json,
+        new JsonUnflattener(flattened).withLeftAndRightBrackets('<', '>').unflatten());
+  }
+
 }

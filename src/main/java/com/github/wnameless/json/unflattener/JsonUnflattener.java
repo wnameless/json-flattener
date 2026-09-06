@@ -207,7 +207,10 @@ public final class JsonUnflattener {
   }
 
   private Pattern objectComplexKeyPattern() {
-    String regex = Pattern.quote(leftBracket.toString()) + "\\s*\".*?\"\\s*"
+    // [\s\S] is used instead of "." because "." does not match line terminators (LF, CR,
+    // NEL, LS, PS). Pattern.DOTALL cannot be used here since keyPartPattern() concatenates the
+    // pattern strings and recompiles them, which would drop any compile flag.
+    String regex = Pattern.quote(leftBracket.toString()) + "\\s*\"[\\s\\S]*?\"\\s*"
         + Pattern.quote(rightBracket.toString());
     if (!patternCache.containsKey(regex)) {
       patternCache.put(regex, Pattern.compile(regex));

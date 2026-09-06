@@ -162,3 +162,6 @@ Version 0.18.1
 
 Version 0.18.2
 * Upgrade jackson-databind to fix its security issue
+
+Version 0.18.3
+* Fix the bug of complex keys containing line terminators (\n, \r, \u0085, \u2028, \u2029) being split incorrectly during unflattening(ex: {"[\"\r[7]\"]":false})
