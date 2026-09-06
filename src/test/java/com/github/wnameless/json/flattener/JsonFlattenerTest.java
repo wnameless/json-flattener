@@ -273,6 +273,37 @@ public class JsonFlattenerTest {
   }
 
   @Test
+  public void testControlCharactersAreEscapedByEveryPolicy() {
+    // U+0000 to U+001F are never allowed unescaped in a JSON string, but only \b \t \n \f \r
+    // used to be escaped by the policies that do not escape Unicode
+    StringBuilder json = new StringBuilder("{");
+    Map<String, Object> expected = new java.util.LinkedHashMap<>();
+    for (int c = 0; c < 0x20; c++) {
+      if (c > 0) json.append(',');
+      json.append(String.format("\"k\\u%04x\":\"v\\u%04x\"", c, c));
+      expected.put("k" + (char) c, "v" + (char) c);
+    }
+    json.append('}');
+
+    for (StringEscapePolicy policy : StringEscapePolicy.values()) {
+      String flattened =
+          new JsonFlattener(json.toString()).withStringEscapePolicy(policy).flatten();
+      for (int i = 0; i < flattened.length(); i++) {
+        assertTrue(flattened.charAt(i) >= 0x20,
+            policy + " left U+" + Integer.toHexString(flattened.charAt(i)) + " unescaped");
+      }
+      assertEquals(expected, JsonUnflattener.unflattenAsMap(flattened), policy.toString());
+    }
+  }
+
+  @Test
+  public void testControlCharactersEscapeForm() {
+    // Short forms are kept for the common control characters, \\uXXXX is used for the rest
+    String json = "{\"a\\u0000b\":\"\\u000b\\u001f\\n\"}";
+    assertEquals("{\"a\\u0000b\":\"\\u000B\\u001F\\n\"}", JsonFlattener.flatten(json));
+  }
+
+  @Test
   public void testWithSeparator() {
     String json = "{\"abc\":{\"def\":123}}";
     assertEquals("{\"abc*def\":123}", new JsonFlattener(json).withSeparator('*').flatten());
@@ -632,6 +663,30 @@ public class JsonFlattenerTest {
     String json = "{\"\": [{\"\": 67,\"val\": 6}]}";
     assertEquals("{\"-0-\":67,\"-0-val\":6}",
         new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).withSeparator('-').flatten());
+  }
+
+  @Test
+  public void testWithEmptyStringKeyAtBeginningFollowedByObjectAndMONGODB() {
+    // A leading empty key used to vanish because the separator was only added when the key
+    // buffer was non-empty, and MONGODB mode does not wrap empty keys
+    String json = "{\"\":{\"a\":1}}";
+    String flattened = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten();
+    assertEquals("{\".a\":1}", flattened);
+    assertEquals(json,
+        new JsonUnflattener(flattened).withFlattenMode(FlattenMode.MONGODB).unflatten());
+
+    json = "{\"\":{\"\":{\"a\":1}}}";
+    flattened = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten();
+    assertEquals("{\"..a\":1}", flattened);
+    assertEquals(json,
+        new JsonUnflattener(flattened).withFlattenMode(FlattenMode.MONGODB).unflatten());
+
+    json = "{\"\":{\"a\":[1]}}";
+    flattened = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).withSeparator('-')
+        .flatten();
+    assertEquals("{\"-a-0\":1}", flattened);
+    assertEquals(json, new JsonUnflattener(flattened).withFlattenMode(FlattenMode.MONGODB)
+        .withSeparator('-').unflatten());
   }
 
 }

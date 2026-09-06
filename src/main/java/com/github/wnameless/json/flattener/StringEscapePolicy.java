@@ -28,7 +28,11 @@ import org.apache.commons.text.translate.LookupTranslator;
 /**
  * 
  * {@link StringEscapePolicy} lists all acceptable JSON string escape policy of the
- * {@link JsonFlattener}.
+ * {@link JsonFlattener}.<br>
+ * <br>
+ * Every policy escapes the C0 control characters (U+0000 to U+001F), which JSON never allows
+ * unescaped inside a string. The common ones use their short forms (\b, \t, \n, \f, \r) and the
+ * rest use \\uXXXX.
  * 
  * @author Wei-Ming Wu
  *
@@ -64,7 +68,8 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
           put("\\", "\\\\");
           put("/", "\\/");
         }
-      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE))),
+      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE),
+      JavaUnicodeEscaper.below(0x20))),
 
   /**
    * Escapes all JSON special characters but slash('/') and Unicode.
@@ -76,7 +81,8 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
           put("\"", "\\\"");
           put("\\", "\\\\");
         }
-      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE))),
+      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE),
+      JavaUnicodeEscaper.below(0x20))),
 
   /**
    * Escapes all JSON special characters but slash('/') and Unicode.
@@ -88,7 +94,8 @@ public enum StringEscapePolicy implements CharSequenceTranslatorFactory {
           put("\"", "\\\"");
           put("\\", "\\\\");
         }
-      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE)));
+      })), new LookupTranslator(EntityArrays.JAVA_CTRL_CHARS_ESCAPE),
+      JavaUnicodeEscaper.below(0x20)));
 
   private final CharSequenceTranslator translator;
 

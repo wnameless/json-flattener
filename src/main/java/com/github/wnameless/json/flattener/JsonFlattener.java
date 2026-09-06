@@ -465,6 +465,7 @@ public final class JsonFlattener {
     if (elementIters.isEmpty()) return ROOT;
 
     StringBuilder sb = new StringBuilder();
+    boolean first = true;
 
     for (IndexedPeekIterator<?> iter : elementIters) {
       if (iter.getCurrent() instanceof Entry) {
@@ -479,7 +480,9 @@ public final class JsonFlattener {
           sb.append('"');
           sb.append(rightBracket);
         } else {
-          if (sb.length() != 0) sb.append(separator);
+          // sb.length() cannot be used to detect the first element: in MONGODB mode an empty key
+          // is not wrapped, so a leading empty key would leave sb empty and lose the separator
+          if (!first) sb.append(separator);
           sb.append(key);
         }
       } else { // JsonValue
@@ -487,6 +490,7 @@ public final class JsonFlattener {
         sb.append(iter.getIndex());
         sb.append(flattenMode.equals(MONGODB) ? "" : rightBracket);
       }
+      first = false;
     }
 
     return sb.toString();

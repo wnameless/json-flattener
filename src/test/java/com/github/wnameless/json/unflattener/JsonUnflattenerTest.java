@@ -631,4 +631,53 @@ public class JsonUnflattenerTest {
         new JsonUnflattener(flattened).withLeftAndRightBrackets('<', '>').unflatten());
   }
 
+  @Test
+  public void testMongodbModeKeysWithWhitespaceOrBrackets() {
+    // Keys containing whitespace, brackets or line terminators were mangled in MONGODB mode
+    // because the key part pattern relied on \b and excluded \s
+    String[] jsons = {"{\"a[7]\":false}", // bracket-quoted by the flattener
+        "{\"\\rx\":false}", // whitespace inside a plain key
+        "{\"\\r[7]\":false}", // the fuzzer input
+        "{\"a b\":{\"c d\":[1,2]}}", // whitespace in nested plain keys
+        "{\"x\":{\"a[1]\":2}}", // complex key appended to a plain key without separator
+        "{\"x\":{\"a[1]\":{\"y\":2}}}", // plain key after a complex key
+        "{\"x\":{\"\":{\"y\":2}}}"}; // empty key still works
+    for (String json : jsons) {
+      String flattened = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB).flatten();
+      assertEquals(json,
+          new JsonUnflattener(flattened).withFlattenMode(FlattenMode.MONGODB).unflatten(),
+          "flattened=" + flattened);
+    }
+  }
+
+  @Test
+  public void testMongodbModeKeysWithWhitespaceOrBracketsAndSeparator() {
+    String json = "{\"x\":{\"a[1]\":2,\"b c\":{\"d.e\":[3]}}}";
+    String flattened = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB)
+        .withSeparator('-').flatten();
+    assertEquals("{\"x[\\\"a[1]\\\"]\":2,\"x-b c-d.e-0\":3}", flattened);
+    assertEquals(json, new JsonUnflattener(flattened).withFlattenMode(FlattenMode.MONGODB)
+        .withSeparator('-').unflatten());
+  }
+
+  @Test
+  public void testMongodbModeKeysWithBracketsAndIgnoreReservedCharacters() {
+    // Brackets are not structural in MONGODB mode, so raw brackets must survive as-is
+    String json = "{\"a[7]\":{\"b]c\":false}}";
+    String flattened = new JsonFlattener(json).withFlattenMode(FlattenMode.MONGODB)
+        .ignoreReservedCharacters().flatten();
+    assertEquals("{\"a[7].b]c\":false}", flattened);
+    assertEquals(json,
+        new JsonUnflattener(flattened).withFlattenMode(FlattenMode.MONGODB).unflatten());
+  }
+
+  @Test
+  public void testUnflattenMapWithControlCharacters() {
+    // The Map constructor serializes through StringEscapePolicy.DEFAULT, which used to leave
+    // control characters other than \b \t \n \f \r unescaped and produce invalid JSON
+    Map<String, Object> flattened = Map.of("a\u000b.b", "\u001f");
+    assertEquals(Map.of("a\u000b", Map.of("b", "\u001f")),
+        new JsonUnflattener(flattened).unflattenAsMap());
+  }
+
 }

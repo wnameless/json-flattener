@@ -229,15 +229,16 @@ public final class JsonUnflattener {
 
   private Pattern keyPartPattern() {
     if (flattenMode.equals(MONGODB)) {
-      // Escape the separator character for regex patterns
       String separatorRegex = Pattern.quote(separator.toString());
+      // The opening of a bracket-quoted complex key, e.g. ["
+      String complexKeyStart = Pattern.quote(leftBracket.toString()) + "\\s*\"";
 
-      // Escape the separator character for character classes
-      String separatorCharClass =
-          "\\^-$[]".contains(separator.toString()) ? "\\" + separator : separator.toString();
-
-      // Construct the regex pattern
-      String regex = "\\b[^" + separatorCharClass + "\\s]+\\b" // Words not containing the separator
+      // A key part is either a bracket-quoted complex key (which JsonFlattener appends without a
+      // separator, e.g. abc["d[e]"]), or a run of non-separator characters that does not contain
+      // the opening of a complex key. Whitespace and brackets are legal inside plain keys, so
+      // neither \\b nor \\s may be used to delimit them.
+      String regex = objectComplexKeyPattern().pattern() // Bracket-quoted complex key
+          + "|(?:(?!" + complexKeyStart + ")[^" + separatorRegex + "])+" // Plain key
           + "|^(?=" + separatorRegex + ")" // Empty string before separator at start
           + "|(?<=" + separatorRegex + ")$" // Empty string after separator at end
           + "|(?<=" + separatorRegex + ")(?=" + separatorRegex + ")"; // Empty strings between
