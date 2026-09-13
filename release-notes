@@ -168,3 +168,6 @@ Version 0.18.3
 * Fix the bug of keys containing whitespace or brackets being mangled during unflattening in MONGODB mode(ex: {"a[7]":false}, {"a b":false})
 * Escape all control characters (U+0000 to U+001F) in flattened JSON, not just \b \t \n \f \r, so the output is always valid JSON
 * Fix the bug of a leading empty string key being dropped during flattening in MONGODB mode(ex: {"":{"a":1}})
+
+Version 0.18.4
+* Upgrade jackson-databind lib
