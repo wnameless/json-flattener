@@ -96,6 +96,17 @@ System.out.println(nestedJsonWithDotKey);
 // [1,[2,3],4,{"ab.c.[":5}]
 ```
 
+# Round Trip and Security Considerations
+`JsonUnflattener` is designed to undo what `JsonFlattener` does, however the round trip is a best effort rather than a guarantee. A flattened key is a textual encoding in which separators, brackets and quotes carry structural meaning, therefore some inputs cannot be encoded unambiguously and come back in a different shape. Known cases:
+
+| Case | Example |
+| --- | --- |
+| In `FlattenMode.MONGODB`, an object key which looks like an array index is restored as an array, because dot notation cannot tell the field `"1"` from the index `1` | `{"a":{"1":2}}` -> `{"a.1":2}` -> `{"a":[null,2]}` |
+| Flattening and unflattening must share the same settings; a different FlattenMode, separator, bracket pair or KeyTransformer produces a different structure | `{"a":{"b":1}}` -> `{"a.b":1}` -> `{"a":{"b":1}}` with separator `.`, but `{"a.b":1}` with separator `,` |
+| `ignoreReservedCharacters()` skips the key validation, which permits keys that cannot be parsed back, and it is a `JsonFlattener` option only | `{"a.b":1}` in MONGODB mode -> `{"a.b":1}` -> `{"a":{"b":1}}` |
+
+Because of the above, the flattened representation must not be used as a security boundary. Validating, filtering or deduplicating flattened keys and then unflattening the result is unsafe: a value may end up at a path other than the one which was inspected. Such checks belong on the JSON structure itself or on the data after unflattening.
+
 # Feature List<a id='top'></a>
 | Name | Description | Since |
 | --- | --- | --- |
