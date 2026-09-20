@@ -171,3 +171,6 @@ Version 0.18.3
 
 Version 0.18.4
 * Upgrade jackson-databind lib
+
+Version 0.18.5
+* Fix the stack overflow when unflattening a long key that alternates between normal characters and supplementary characters such as emoji in MONGODB mode(ex: {"a\uD83D\uDE00a\uD83D\uDE00...":1})

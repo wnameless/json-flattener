@@ -22,6 +22,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import com.github.wnameless.json.base.Jackson3JsonCore;
 import com.github.wnameless.json.base.JsonCore;
@@ -678,6 +679,27 @@ public class JsonUnflattenerTest {
     Map<String, Object> flattened = Map.of("a\u000b.b", "\u001f");
     assertEquals(Map.of("a\u000b", Map.of("b", "\u001f")),
         new JsonUnflattener(flattened).unflattenAsMap());
+  }
+
+  @Test
+  public void testMongodbModeKeyAlternatingSurrogatePairs() throws InterruptedException {
+    // The MONGODB plain key pattern is a quantified group, and Pattern$GroupCurly recursed once
+    // per change of match width, so a key alternating between BMP characters and surrogate pairs
+    // used to overflow the stack(OSS-Fuzz issue 563678627)
+    String json = "{\"" + "a\uD83D\uDE00".repeat(10000) + "\":1}";
+    AtomicReference<Throwable> failure = new AtomicReference<>();
+    Runnable unflatten = () -> assertEquals(json,
+        new JsonUnflattener(json).withFlattenMode(FlattenMode.MONGODB).unflatten());
+
+    // A dedicated 256KB stack keeps the test independent of the default thread stack size
+    Thread thread = new Thread(null, unflatten, "small-stack-unflatten", 256 * 1024);
+    thread.setUncaughtExceptionHandler((t, e) -> failure.set(e));
+    thread.start();
+    thread.join();
+
+    if (failure.get() != null) {
+      throw new AssertionError("Unflattening failed on a 256KB stack", failure.get());
+    }
   }
 
 }

@@ -236,9 +236,13 @@ public final class JsonUnflattener {
       // A key part is either a bracket-quoted complex key (which JsonFlattener appends without a
       // separator, e.g. abc["d[e]"]), or a run of non-separator characters that does not contain
       // the opening of a complex key. Whitespace and brackets are legal inside plain keys, so
-      // neither \\b nor \\s may be used to delimit them.
+      // neither \\b nor \\s may be used to delimit them. The plain key quantifier is possessive
+      // because a quantified group is compiled into a Pattern$GroupCurly, whose greedy matching
+      // recurses once per change of match width and therefore overflows the stack on keys that
+      // alternate between BMP characters and surrogate pairs. A plain key run is never backtracked
+      // into, so the possessive quantifier matches the very same key parts.
       String regex = objectComplexKeyPattern().pattern() // Bracket-quoted complex key
-          + "|(?:(?!" + complexKeyStart + ")[^" + separatorRegex + "])+" // Plain key
+          + "|(?:(?!" + complexKeyStart + ")[^" + separatorRegex + "])++" // Plain key
           + "|^(?=" + separatorRegex + ")" // Empty string before separator at start
           + "|(?<=" + separatorRegex + ")$" // Empty string after separator at end
           + "|(?<=" + separatorRegex + ")(?=" + separatorRegex + ")"; // Empty strings between
