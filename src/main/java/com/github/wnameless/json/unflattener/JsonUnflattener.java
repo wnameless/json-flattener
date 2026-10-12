@@ -55,6 +55,10 @@ public final class JsonUnflattener {
    */
   public static final String ROOT = "root";
 
+  // Every key part is one nesting level, and a recursive JSON writer such as Gson's overflows the
+  // stack on a deep enough structure, so keys are capped at Jackson 3's default write limit
+  private static final int MAX_NESTING_DEPTH = 500;
+
   private static final Pattern naturalNumberPattern = Pattern.compile("\\d+");
   private static final Pattern illegalSeparatorPattern = Pattern.compile("[\"\\s]");
 
@@ -379,9 +383,12 @@ public final class JsonUnflattener {
       JsonValueCore<?> currentVal = unflattened;
       String objKey = null;
       Integer aryIdx = null;
+      int depth = 0;
 
       Matcher matcher = keyPartPattern().matcher(key);
       while (matcher.find()) {
+        isTrue(++depth <= MAX_NESTING_DEPTH, "Key nesting depth exceeds the maximum allowed(%d)",
+            MAX_NESTING_DEPTH);
         String keyPart = matcher.group();
 
         if (objKey != null ^ aryIdx != null) {

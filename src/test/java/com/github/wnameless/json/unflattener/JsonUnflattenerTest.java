@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
+import com.github.wnameless.json.base.GsonJsonCore;
 import com.github.wnameless.json.base.Jackson3JsonCore;
 import com.github.wnameless.json.base.JsonCore;
 import com.github.wnameless.json.flattener.FlattenMode;
@@ -700,6 +701,36 @@ public class JsonUnflattenerTest {
     if (failure.get() != null) {
       throw new AssertionError("Unflattening failed on a 256KB stack", failure.get());
     }
+  }
+
+  @Test
+  public void testKeyNestingDepthLimit() {
+    // Every key part becomes one nesting level, so a long flat key used to build a structure too
+    // deep for a recursive JSON writer such as Gson's to serialize(OSS-Fuzz issue 529936493)
+    JsonCore<?> gson = new GsonJsonCore();
+    String deepest = "{\"a" + ".a".repeat(499) + "\":1}";
+    String nested = "{\"a\":".repeat(500) + "1" + "}".repeat(500);
+    assertEquals(nested, new JsonUnflattener(gson, deepest).unflatten());
+    assertEquals(nested, new JsonUnflattener(deepest).unflatten());
+
+    String tooDeep = "{\"a" + ".a".repeat(500) + "\":1}";
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+        () -> new JsonUnflattener(gson, tooDeep).unflatten());
+    assertEquals("Key nesting depth exceeds the maximum allowed(500)", e.getMessage());
+    assertThrows(IllegalArgumentException.class, () -> new JsonUnflattener(tooDeep).unflatten());
+    assertThrows(IllegalArgumentException.class,
+        () -> new JsonUnflattener(gson, "{\"" + "[0]".repeat(501) + "\":1}").unflatten());
+    assertThrows(IllegalArgumentException.class,
+        () -> new JsonUnflattener(gson, "{\"a" + ".0".repeat(500) + "\":1}")
+            .withFlattenMode(FlattenMode.MONGODB).unflatten());
+    assertThrows(IllegalArgumentException.class,
+        () -> new JsonUnflattener(gson, "{\"a" + ".a".repeat(100000) + "\":1}").unflatten());
+  }
+
+  @Test
+  public void testKeyNestingDepthLimitIsPerKey() {
+    String json = "{\"a" + ".a".repeat(499) + "\":1,\"b" + ".b".repeat(499) + "\":2}";
+    assertDoesNotThrow(() -> new JsonUnflattener(new GsonJsonCore(), json).unflatten());
   }
 
 }
