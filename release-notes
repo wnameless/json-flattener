@@ -177,3 +177,4 @@ Version 0.18.5
 
 Version 0.18.6
 * Fix the stack overflow when unflattening a key nested deeper than 500 levels with GsonJsonCore, such a key now throws IllegalArgumentException with every JsonCore(ex: {"a.a.a...":1} of 501 parts)
+* Upgrade jackson-databind to 3.2.3 to fix its security issues(CVE-2026-91776, CVE-2026-91777 and CVE-2026-89425 of jackson-core)
