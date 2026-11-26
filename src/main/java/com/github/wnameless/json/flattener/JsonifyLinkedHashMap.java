@@ -70,9 +70,16 @@ public class JsonifyLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
         sb.append(translator.translate((String) mem.getValue()));
         sb.append('"');
       } else if (mem.getValue() instanceof Collection) {
-        sb.append(new JsonifyArrayList<>((Collection<?>) mem.getValue()));
+        // The nested writer starts with the default translator, so the configured escape policy
+        // has to be handed down explicitly; otherwise every value below the top level is escaped
+        // by the default policy instead of the requested one
+        JsonifyArrayList<?> nested = new JsonifyArrayList<>((Collection<?>) mem.getValue());
+        nested.setTranslator(translator);
+        sb.append(nested);
       } else if (mem.getValue() instanceof Map) {
-        sb.append(new JsonifyLinkedHashMap<>((Map<?, ?>) mem.getValue()));
+        JsonifyLinkedHashMap<?, ?> nested = new JsonifyLinkedHashMap<>((Map<?, ?>) mem.getValue());
+        nested.setTranslator(translator);
+        sb.append(nested);
       } else {
         sb.append(mem.getValue());
       }

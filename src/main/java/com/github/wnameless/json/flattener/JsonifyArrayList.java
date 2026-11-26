@@ -64,9 +64,16 @@ public class JsonifyArrayList<E> extends ArrayList<E> {
         sb.append(translator.translate((String) e));
         sb.append('"');
       } else if (e instanceof Collection) {
-        sb.append(new JsonifyArrayList<>((Collection<?>) e));
+        // The nested writer starts with the default translator, so the configured escape policy
+        // has to be handed down explicitly; otherwise every value below the top level is escaped
+        // by the default policy instead of the requested one
+        JsonifyArrayList<?> nested = new JsonifyArrayList<>((Collection<?>) e);
+        nested.setTranslator(translator);
+        sb.append(nested);
       } else if (e instanceof Map) {
-        sb.append(new JsonifyLinkedHashMap<>((Map<?, ?>) e));
+        JsonifyLinkedHashMap<?, ?> nested = new JsonifyLinkedHashMap<>((Map<?, ?>) e);
+        nested.setTranslator(translator);
+        sb.append(nested);
       } else {
         sb.append(e);
       }
