@@ -273,6 +273,47 @@ public class JsonFlattenerTest {
   }
 
   @Test
+  public void testWithStringEscapePolicyAppliesToValuesInsideKeptArrays() {
+    String json = "{\"abc\":{\"def\":[\"太極/兩儀\"]}}";
+    assertEquals("{\"abc.def\":[\"\\u592A\\u6975\\/\\u5169\\u5100\"]}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withStringEscapePolicy(StringEscapePolicy.ALL).flatten());
+    assertEquals("{\"abc.def\":[\"\\u592A\\u6975\\/\\u5169\\u5100\"]}",
+        new JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS)
+            .withStringEscapePolicy(StringEscapePolicy.ALL).flatten());
+  }
+
+  @Test
+  public void testWithStringEscapePolicyAppliesToValuesInsideNestedObjectsAndArrays() {
+    assertEquals("{\"a\":[{\"b\":\"\\u592A\\u6975\"}]}",
+        new JsonFlattener("{\"a\":[{\"b\":\"太極\"}]}")
+            .withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withStringEscapePolicy(StringEscapePolicy.ALL).flatten());
+    assertEquals("{\"a\":[[\"\\u592A\\u6975\"]]}",
+        new JsonFlattener("{\"a\":[[\"太極\"]]}").withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withStringEscapePolicy(StringEscapePolicy.ALL).flatten());
+    assertEquals("[[\"\\u592A\\u6975\"]]",
+        new JsonFlattener("[[\"太極\"]]").withFlattenMode(FlattenMode.KEEP_ARRAYS)
+            .withStringEscapePolicy(StringEscapePolicy.ALL).flatten());
+  }
+
+  @Test
+  public void testUnicodeEscapingPolicyLeavesNoNonAsciiAnywhereInKeptArrays() {
+    // A policy which escapes Unicode must leave none behind at any nesting level: a JSON
+    // document embedded in a script element must not carry a raw U+2028 or U+2029
+    String json = "{\"a\":[\"x\u2028y\",{\"b\":[\"z\u2029w\"]}]}";
+    for (FlattenMode mode : new FlattenMode[] {FlattenMode.KEEP_ARRAYS,
+        FlattenMode.KEEP_PRIMITIVE_ARRAYS}) {
+      String flattened = new JsonFlattener(json).withFlattenMode(mode)
+          .withStringEscapePolicy(StringEscapePolicy.ALL).flatten();
+      for (int i = 0; i < flattened.length(); i++) {
+        assertTrue(flattened.charAt(i) < 0x80,
+            mode + " left U+" + Integer.toHexString(flattened.charAt(i)) + " unescaped");
+      }
+    }
+  }
+
+  @Test
   public void testControlCharactersAreEscapedByEveryPolicy() {
     // U+0000 to U+001F are never allowed unescaped in a JSON string, but only \b \t \n \f \r
     // used to be escaped by the policies that do not escape Unicode
